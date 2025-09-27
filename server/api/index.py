@@ -1,11 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 import os
 
 app = FastAPI()
 
-FRONTEND_URL: str = os.getenv('FRONTEND_URL', '*')
+FRONTEND_URL: str = os.getenv('FRONTEND_URL', 'test123')
 
 app.add_middleware(
     CORSMiddleware,
