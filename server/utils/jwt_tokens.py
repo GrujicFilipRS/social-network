@@ -27,22 +27,22 @@ def decode_token(token: str) -> int | None:
         return None
 
 
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
+# def token_required(f):
+#     @wraps(f)
+#     def decorated(*args, **kwargs):
+#         token = None
 
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header.split(" ")[1]
+#         auth_header = request.headers.get("Authorization")
+#         if auth_header and auth_header.startswith("Bearer "):
+#             token = auth_header.split(" ")[1]
 
-        if not token:
-            return {"message": "Token is missing"}, 401
+#         if not token:
+#             return {"message": "Token is missing"}, 401
 
-        user_id = decode_token(token)
-        if not user_id:
-            return {"message": "Invalid or expired token"}, 401
+#         user_id = decode_token(token)
+#         if not user_id:
+#             return {"message": "Invalid or expired token"}, 401
 
-        return f(user_id=user_id, *args, **kwargs)
+#         return f(user_id=user_id, *args, **kwargs)
 
-    return decorated
+#     return decorated
