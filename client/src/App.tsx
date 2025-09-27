@@ -5,7 +5,7 @@ import './App.css'
 function App() {
     const [message, setMessage] = useState();
 
-    const apiUrl = import.meta.env.VITE_API_URL;
+    const apiUrl = `${import.meta.env.VITE_API_URL}/api/`;
 
     useEffect(() => {
         fetch(`${apiUrl}/`)
