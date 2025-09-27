@@ -17,4 +17,4 @@ app.add_middleware(
 
 @app.get('/', status_code=200)
 async def root():
-    return JSONResponse({"message": "Hello from FastAPI!"})
+    return {"message": "Hello from FastAPI!"}
