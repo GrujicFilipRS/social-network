@@ -15,6 +15,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get('/', status_code=200)
+@app.get('/api/', status_code=200)
 async def root():
     return {"message": "Hello from FastAPI!"}
