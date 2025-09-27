@@ -4,7 +4,7 @@ import os
 
 app = FastAPI()
 
-FRONTEND_URL: str = os.getenv('FRONTEND_URL', 'test123')
+FRONTEND_URL: str = os.getenv('FRONTEND_URL')
 
 app.add_middleware(
     CORSMiddleware,
