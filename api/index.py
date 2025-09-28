@@ -34,3 +34,7 @@ from .services import (
 @app.get('/')
 def index():
     return {'message': 'success'}
+
+@app.get('/test')
+def test():
+    return {'message': 'testpage'}
