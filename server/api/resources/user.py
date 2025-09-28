@@ -15,8 +15,11 @@ class UserRegister(BaseModel):
 
 
 @app.get('/api/get_user/')
-async def get_user(user_id: int):
+async def get_user(user_id: int | None, req_name: bool=False, req_creation_date=False):
     db_session = create_session()
+
+    if user_id is None:
+        return JSONResponse(content={'message': '`user_id` parameter is necessary'}, status_code=400)
 
     try:
         user = db_session.get(User, user_id)
@@ -24,7 +27,12 @@ async def get_user(user_id: int):
         if not user:
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
         
-        return JSONResponse(content=user.to_dict, status_code=201)
+        content: dict = {
+            'message': 'User found',
+            'user': user.to_dict(req_name=req_name, req_creation_date=req_creation_date)
+        }
+
+        return JSONResponse(content=content, status_code=200)
     
     except Exception as e:
         return JSONResponse(content={'message': f'An error occured: {str(e)}'}, status_code=500)
@@ -45,7 +53,7 @@ async def register(user: UserRegister):
 
     try:
         if db_sess.query(User).filter_by(username=username).first():
-            return JSONResponse(content={'message': 'Username with such username already exists'}, status_code=400)
+            return JSONResponse(content={'message': 'User with such username already exists'}, status_code=400)
         
         user = User(username=username)
         user.set_password(password)
@@ -82,12 +90,12 @@ async def login(user: UserRegister):
 
     try:
         if not db_sess.query(User).filter_by(username=username).first():
-            return JSONResponse(content={'message': 'Noone with that username exists'}, status_code=400)
+            return JSONResponse(content={'message': 'Incorrect credentials'}, status_code=400)
         
         user = db_sess.query(User).filter_by(username=username).first()
 
         if not user.check_password(password):
-            return JSONResponse(content={'message': 'Incorrect password'}, status_code=400)
+            return JSONResponse(content={'message': 'Incorrect credentials'}, status_code=400)
         
         token = jwt_tokens.encode_token(user.id)
 
