@@ -8,6 +8,7 @@ from ..server.db.models.users import User
 from ..server.db.db_session import create_session
 
 from ..server.utils import jwt_tokens
+from .authorization import AuthorizationHeader
 
 from ..index import app
 
@@ -30,7 +31,11 @@ class AuthorizationHeader(BaseModel):
 
 
 @app.get('user/get_user/')
-async def get_user(user_id: int | None, req_name: bool=False, req_creation_date=False) -> JSONResponse:
+async def get_user(
+    user_id: int | None,
+    req_name: bool = False,
+    req_creation_date: bool = False
+) -> JSONResponse:
     db_session = create_session()
 
     if user_id is None:
@@ -131,7 +136,10 @@ async def login(user: UserRegister) -> JSONResponse:
 
 
 @app.put('/user/set_name/')
-async def set_user_name(body: NameSetter, headers: Annotated[AuthorizationHeader, Header()]) -> JSONResponse:
+async def set_user_name(
+    body: NameSetter,
+    headers: Annotated[AuthorizationHeader, Header()]
+) -> JSONResponse:
     new_name: str = body.new_name
     token: str = headers.Authorization
 
@@ -164,7 +172,10 @@ async def set_user_name(body: NameSetter, headers: Annotated[AuthorizationHeader
 
 
 @app.put('/user/change_username/')
-async def change_username(body: UsernameSetter, headers: Annotated[AuthorizationHeader, Header()]) -> JSONResponse:
+async def change_username(
+    body: UsernameSetter,
+    headers: Annotated[AuthorizationHeader, Header()]
+) -> JSONResponse:
     new_username: str = body.username
     token: str = headers.Authorization
 

@@ -14,6 +14,8 @@ from ..index import app
 
 from ..services.literals import PostLiterals
 
+from .authorization import AuthorizationHeader
+
 
 class PostCreator(BaseModel):
     title: str
@@ -21,8 +23,11 @@ class PostCreator(BaseModel):
     status: str
 
 
-class AuthorizationHeader(BaseModel):
-    Authorization: str
+class PostEditor(BaseModel):
+    id: int
+    title: str
+    body: str
+    status: str
 
 
 @app.get('/post/get_post/')
@@ -113,7 +118,50 @@ def create_post(
         return JSONResponse(content=content, status_code=201)
 
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while getting post: {e}'}, status_code=500)
+        return JSONResponse(content={'message': f'Error while creating post: {e}'}, status_code=500)
     
     finally:
-        db_sess.close() 
+        db_sess.close()
+
+
+@app.put('/post/edit_post/')
+def edit_post(
+    data: PostEditor,
+    headers: Annotated[AuthorizationHeader, Header()]
+) -> JSONResponse:
+    
+    token: str = headers.Authorization
+
+    try:
+        if not token:
+            return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
+        
+        user_id: int = jwt_tokens.get_user_from_token(token)
+        if user_id == -1:
+            return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
+
+        db_sess = create_session()
+        post = db_sess.get(Post, data.id)
+
+        if post.user_id != user_id:
+            return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
+        
+        post.set_title(data.title)
+        post.set_body(data.body)
+        post.set_status(data.status)
+
+        db_sess.add(post)
+        db_sess.commit()
+
+        content: dict = {
+            'message': 'Successfully edited post',
+            'post': post.to_dict()
+        }
+
+        return JSONResponse(content=content, status_code=200)
+
+    except Exception as e:
+        return JSONResponse(content={'message': f'Error while editing post: {e}'}, status_code=500)
+
+    finally:
+        db_sess.close()
