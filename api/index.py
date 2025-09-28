@@ -4,10 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 import os
 
-from server.db import db_session
-from server.db.models.__all_models import *
+from .server.db import db_session
+from .server.db.models.__all_models import *
 
-from server.conf import Config
+from .server.conf import Config
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
