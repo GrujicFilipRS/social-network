@@ -1,7 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from mangum import Mangum
 import os
 
 from .server.db import db_session
@@ -35,11 +34,3 @@ from .services import (
 @app.get('/')
 def index():
     return {'message': 'success'}
-
-# For vercel
-handler = Mangum(app)
-
-# For local development
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("api.index:app", host=Config.HOST, port=Config.PORT, reload=True)
