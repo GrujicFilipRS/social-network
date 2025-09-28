@@ -5,20 +5,10 @@
             "src": "client/package.json",
             "use": "@vercel/static-build",
             "config": { "distDir": "dist" }
-        },
-        {
-            "src": "api/index.py",
-            "use": "@vercel/python"
         }
     ],
     "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "api/index.py"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "client/index.html"
-        }
+        { "src": "/api/(.*)", "dest": "api/index.py" },
+        { "src": "/(.*)", "dest": "client/dist/index.html" }
     ]
 }
