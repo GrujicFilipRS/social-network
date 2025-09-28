@@ -1,6 +1,6 @@
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 from server.db.models.users import User
 from server.db.db_session import create_session
@@ -57,6 +57,7 @@ async def register(user: UserRegister):
         
         user = User(username=username)
         user.set_password(password)
+        user.set_creation_date(datetime.now())
 
         db_sess.add(user)
         db_sess.commit()

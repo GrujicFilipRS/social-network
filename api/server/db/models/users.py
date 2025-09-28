@@ -24,12 +24,15 @@ class User(SqlAlchemyBase):
             output['name'] = self.name
         
         if req_creation_date:
-            output['created_at'] = self.created_at
+            output['created_at'] = str(self.created_at)
 
         return output
 
-    def set_password(self, password):
+    def set_password(self, password) -> None:
         self.hashed_password = generate_password_hash(password)
 
-    def check_password(self, password):
+    def check_password(self, password) -> str:
         return check_password_hash(self.hashed_password, password)
+    
+    def set_creation_date(self, creation_date: DateTime) -> None:
+        self.created_at = creation_date
