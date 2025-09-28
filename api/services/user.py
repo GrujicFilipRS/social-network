@@ -56,7 +56,7 @@ async def get_user(
         return JSONResponse(content=content, status_code=200)
     
     except Exception as e:
-        return JSONResponse(content={'message': f'An error occured: {str(e)}'}, status_code=500)
+        return JSONResponse(content={'message': f'An error occured: {str(e)}'}, status_code=40)
     
     finally:
         db_session.close()
@@ -94,7 +94,7 @@ async def register(user: UserRegister) -> JSONResponse:
         return JSONResponse(content=content, status_code=201)
     
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while creating user: {e}'}, status_code=500)
+        return JSONResponse(content={'message': f'Error while creating user: {e}'}, status_code=400)
     
     finally:
         db_sess.close()
@@ -130,7 +130,7 @@ async def login(user: UserRegister) -> JSONResponse:
         return JSONResponse(content=content, status_code=200)
     
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while logging in: {e}'}, status_code=500)
+        return JSONResponse(content={'message': f'Error while logging in: {e}'}, status_code=400)
 
     finally:
         db_sess.close()
@@ -166,7 +166,7 @@ async def set_user_name(
         return JSONResponse(content={'message': f'Name successfully changed to {new_name}'}, status_code=200)
 
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while setting name: {e}'}, status_code=500)
+        return JSONResponse(content={'message': f'Error while setting name: {e}'}, status_code=400)
 
     finally:
         db_sess.close()
@@ -210,7 +210,7 @@ async def change_username(
         return JSONResponse(content={'message': f'Username successfully changed to {new_username}'}, status_code=200)
         
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while changing username: {e}'}, status_code=500)
+        return JSONResponse(content={'message': f'Error while changing username: {e}'}, status_code=400)
     
     finally:
         db_sess.close()
