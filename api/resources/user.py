@@ -7,14 +7,14 @@ from server.db.db_session import create_session
 
 from server.utils import jwt_tokens
 
-from server.api.index import app
+from index import app
 
 class UserRegister(BaseModel):
     username: str
     password: str
 
 
-@app.get('/api/get_user/')
+@app.get('/get_user/')
 async def get_user(user_id: int | None, req_name: bool=False, req_creation_date=False):
     db_session = create_session()
 
@@ -41,7 +41,7 @@ async def get_user(user_id: int | None, req_name: bool=False, req_creation_date=
         db_session.close()
 
 
-@app.post('/api/register_user/')
+@app.post('/register_user/')
 async def register(user: UserRegister):
     username = user.username
     password = user.password
@@ -78,7 +78,7 @@ async def register(user: UserRegister):
         db_sess.close()
 
 
-@app.post('/api/login/')
+@app.post('/login/')
 async def login(user: UserRegister):
     username = user.username
     password = user.password
