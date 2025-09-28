@@ -25,6 +25,10 @@ from server.api.resources import (
     user
 )
 
+@app.get('/api/')
+def index():
+    return {'message': 'success'}
+
 db_session.global_init(Config.DBNAME)
 
 handler = Mangum(app)
