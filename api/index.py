@@ -27,8 +27,9 @@ app.add_middleware(
 )
 
 # Loading in the endpoints (hopefully)
-from resources import (
-    user
+from services import (
+    user,
+    post
 )
 
 @app.get('/')

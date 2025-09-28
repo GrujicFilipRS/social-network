@@ -11,6 +11,7 @@ from server.utils import jwt_tokens
 
 from index import app
 
+
 class UserRegister(BaseModel):
     username: str
     password: str

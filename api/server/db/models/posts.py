@@ -20,11 +20,19 @@ class Post(SqlAlchemyBase):
             'title': self.title,
             'body': self.body,
             'status': self.status,
+            'user_id': self.user_id
         }
 
         if req_creation_date:
-            output['created_at'] = self.created_at.isoformat()
-        
-        output['user'] = self.user.to_dict()
+            output['created_at'] = str(self.created_at)
         
         return output
+
+    def set_title(self, title: str) -> None:
+        self.title = title
+    
+    def set_body(self, body: str) -> None:
+        self.body = body
+    
+    def set_status(self, status: str) -> None:
+        self.status = status
