@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
@@ -8,7 +9,12 @@ from server.db.models.__all_models import *
 
 from server.conf import Config
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    db_session.global_init(Config.DBNAME)
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 FRONTEND_URL: str = os.getenv('FRONTEND_URL')
 
@@ -16,8 +22,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins = [FRONTEND_URL],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=['*'],
+    allow_headers=['*'],
 )
 
 # Loading in the endpoints (hopefully)
@@ -25,12 +31,11 @@ from server.api.resources import (
     user
 )
 
-@app.get('/api/')
+@app.get('/')
 def index():
     return {'message': 'success'}
 
-db_session.global_init(Config.DBNAME)
-
+# For vercel
 handler = Mangum(app)
 
 # For local development
