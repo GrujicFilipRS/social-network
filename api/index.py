@@ -25,11 +25,11 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-# Loading in the endpoints (hopefully)
-from .services import (
-    user,
-    post
-)
+from .services.user import router as user_router
+from .services.post import router as post_router
+
+app.include_router(user_router, prefix="/user", tags=["user"])
+app.include_router(post_router, prefix="/post", tags=["post"])
 
 @app.get('/')
 def index():

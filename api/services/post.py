@@ -10,12 +10,13 @@ from ..server.db.db_session import create_session
 
 from ..server.utils import jwt_tokens
 
-from ..index import app
-
 from ..services.literals import PostLiterals
 
 from .authorization import AuthorizationHeader
 
+from fastapi import APIRouter
+
+router = APIRouter()
 
 class PostCreator(BaseModel):
     title: str
@@ -30,7 +31,7 @@ class PostEditor(BaseModel):
     status: str
 
 
-@app.get('/post/get_post/')
+@router.get('/get_post/')
 async def get_post(
     post_id: int | None,
     headers: Annotated[AuthorizationHeader, Header()],
@@ -82,7 +83,7 @@ async def get_post(
         db_sess.close()
 
 
-@app.post('/post/create_post/')
+@router.post('/create_post/')
 def create_post(
     data: PostCreator,
     headers: Annotated[AuthorizationHeader, Header()]
@@ -124,7 +125,7 @@ def create_post(
         db_sess.close()
 
 
-@app.put('/post/edit_post/')
+@router.put('/edit_post/')
 def edit_post(
     data: PostEditor,
     headers: Annotated[AuthorizationHeader, Header()]

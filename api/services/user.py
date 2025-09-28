@@ -10,8 +10,9 @@ from ..server.db.db_session import create_session
 from ..server.utils import jwt_tokens
 from .authorization import AuthorizationHeader
 
-from ..index import app
+from fastapi import APIRouter
 
+router = APIRouter()
 
 class UserRegister(BaseModel):
     username: str
@@ -30,7 +31,7 @@ class AuthorizationHeader(BaseModel):
     Authorization: str
 
 
-@app.get('user/get_user/')
+@router.get('/get_user/')
 async def get_user(
     user_id: int | None,
     req_name: bool = False,
@@ -61,7 +62,7 @@ async def get_user(
         db_session.close()
 
 
-@app.post('/user/register/')
+@router.post('/register/')
 async def register(user: UserRegister) -> JSONResponse:
     username = user.username
     password = user.password
@@ -99,7 +100,7 @@ async def register(user: UserRegister) -> JSONResponse:
         db_sess.close()
 
 
-@app.post('/user/login/')
+@router.post('/login/')
 async def login(user: UserRegister) -> JSONResponse:
     username = user.username
     password = user.password
@@ -135,7 +136,7 @@ async def login(user: UserRegister) -> JSONResponse:
         db_sess.close()
 
 
-@app.put('/user/set_name/')
+@router.put('/set_name/')
 async def set_user_name(
     body: NameSetter,
     headers: Annotated[AuthorizationHeader, Header()]
@@ -171,7 +172,7 @@ async def set_user_name(
         db_sess.close()
 
 
-@app.put('/user/change_username/')
+@router.put('/change_username/')
 async def change_username(
     body: UsernameSetter,
     headers: Annotated[AuthorizationHeader, Header()]
