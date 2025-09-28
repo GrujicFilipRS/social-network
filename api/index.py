@@ -11,12 +11,9 @@ from .server.db.models.__all_models import *
 
 from .server.conf import Config
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    db_session.global_init(Config.DBNAME)
-    yield
+db_session.global_init(Config.DBNAME)
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 FRONTEND_URL: str = os.getenv('FRONTEND_URL')
 
