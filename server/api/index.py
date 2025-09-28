@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from mangum import Mangum
 import os
 
 from server.db import db_session
@@ -25,3 +26,10 @@ from server.api.resources import (
 )
 
 db_session.global_init(Config.DBNAME)
+
+handler = Mangum(app)
+
+# For local development
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("server.api.index:app", host="127.0.0.1", port=8000, reload=True)
