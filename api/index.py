@@ -27,7 +27,7 @@ app.add_middleware(
 )
 
 # Loading in the endpoints (hopefully)
-from services import (
+from .services import (
     user,
     post
 )
@@ -42,4 +42,4 @@ handler = Mangum(app)
 # For local development
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("index:app", host=Config.HOST, port=Config.PORT, reload=True)
+    uvicorn.run("api.index:app", host=Config.HOST, port=Config.PORT, reload=True)

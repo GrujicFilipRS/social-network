@@ -4,15 +4,15 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Annotated
 
-from server.db.models.posts import Post
-from server.db.models.users import User
-from server.db.db_session import create_session
+from ..server.db.models.posts import Post
+from ..server.db.models.users import User
+from ..server.db.db_session import create_session
 
-from server.utils import jwt_tokens
+from ..server.utils import jwt_tokens
 
-from index import app
+from ..index import app
 
-from services.literals import PostLiterals
+from ..services.literals import PostLiterals
 
 class AuthorizationHeader(BaseModel):
     Authorization: str

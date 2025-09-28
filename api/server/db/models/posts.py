@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Text
 from sqlalchemy.orm import relationship
-from server.db.db_session import SqlAlchemyBase
+from ..db_session import SqlAlchemyBase
 
 class Post(SqlAlchemyBase):
     __tablename__ = 'posts'

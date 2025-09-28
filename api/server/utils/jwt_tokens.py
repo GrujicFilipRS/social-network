@@ -2,7 +2,7 @@ from functools import wraps
 import jwt
 from datetime import datetime, timezone, timedelta
 
-from server.conf import Config
+from ..conf import Config
 
 def encode_token(user_id: int) -> str:
     expiration = datetime.now(timezone.utc) + timedelta(hours=Config.JWT_EXPIRATION_HOURS)

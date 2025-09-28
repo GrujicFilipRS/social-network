@@ -1,6 +1,5 @@
-from server.db.models import (
-    users,
-    posts
+from . import (
+    users, posts
 )
 
 User = users.User

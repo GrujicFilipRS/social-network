@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
-from server.db.db_session import SqlAlchemyBase
+from ..db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(SqlAlchemyBase):
