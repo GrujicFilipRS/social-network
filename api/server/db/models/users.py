@@ -39,3 +39,6 @@ class User(SqlAlchemyBase):
 
     def set_name(self, name: str) -> None:
         self.name = name
+    
+    def set_username(self, username: str) -> None:
+        self.username = username

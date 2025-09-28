@@ -2,7 +2,7 @@
 
 ---
 
-### GET `/get_user/{user_id: int}`
+### GET `/user/get_user/{user_id: int}`
 
 Gets the user object corresponding to the unique user id provided
 
@@ -59,7 +59,7 @@ This request can be caused by a number of issues
 
 ---
 
-### POST `/register_user/`
+### POST `/user/register/`
 Endpoint responsible for registering a user
 
 Request body:
@@ -114,7 +114,7 @@ This request can be caused by a number of issues
 
 ---
 
-### POST `/login/`
+### POST `/user/login/`
 Endpoint responsible for logging in a user
 
 Request body:
@@ -171,7 +171,7 @@ This request can be caused by a number of issues
 
 ---
 
-### PUT `/set_user_name/`
+### PUT `/user/set_name/`
 Sets the name of the current authenticated user
 
 Required body:
@@ -221,5 +221,74 @@ Can occurr for various reasons
 ```json
 {
     "message": "Error while setting name: {e}"
+}
+```
+
+---
+
+### PUT `/user/change_username/`
+Changes the username of the authenticated user
+
+Required body:
+```json
+{
+    "username": "newusername123"
+}
+```
+
+Required headers:
+```py
+"Authorization: YOUR_JWT_HERE"
+```
+<br/>
+
+`RESPONSE 200 - OK`
+Successfully set the new name
+
+```json
+{
+    "message": "Username successfully changed to {username}"
+}
+```
+<br/>
+
+`RESPONSE 400 - Bad Request`
+Can occurr for four reasons:
+1. The new name and the authorization token weren't provided
+2. There already exists a user with that username
+3. The new username is the same as the old one
+3. The token is invalid
+
+```json
+{
+    "message": "New username and token required"
+}
+```
+OR
+```json
+{
+    "message": "User with such username already exists"
+}
+```
+OR
+```json
+{
+    "message": "That doesn't change the username"
+}
+```
+OR
+```json
+{
+    "message": "Invalid authorization"
+}
+```
+<br/>
+
+`RESPONSE 500 - Internal server error`
+Can occurr for various reasons
+
+```json
+{
+    "message": "Error while setting username: {e}"
 }
 ```

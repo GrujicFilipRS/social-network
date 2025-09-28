@@ -20,11 +20,15 @@ class NameSetter(BaseModel):
     new_name: str
 
 
+class UsernameSetter(BaseModel):
+    username: str
+
+
 class AuthorizationHeader(BaseModel):
     Authorization: str
 
 
-@app.get('/get_user/')
+@app.get('user/get_user/')
 async def get_user(user_id: int | None, req_name: bool=False, req_creation_date=False) -> JSONResponse:
     db_session = create_session()
 
@@ -51,7 +55,7 @@ async def get_user(user_id: int | None, req_name: bool=False, req_creation_date=
         db_session.close()
 
 
-@app.post('/register_user/')
+@app.post('/user/register/')
 async def register(user: UserRegister) -> JSONResponse:
     username = user.username
     password = user.password
@@ -89,7 +93,7 @@ async def register(user: UserRegister) -> JSONResponse:
         db_sess.close()
 
 
-@app.post('/login/')
+@app.post('/user/login/')
 async def login(user: UserRegister) -> JSONResponse:
     username = user.username
     password = user.password
@@ -125,7 +129,7 @@ async def login(user: UserRegister) -> JSONResponse:
         db_sess.close()
 
 
-@app.put('/set_user_name/')
+@app.put('/user/set_name/')
 async def set_user_name(body: NameSetter, headers: Annotated[AuthorizationHeader, Header()]) -> JSONResponse:
     new_name: str = body.new_name
     token: str = headers.Authorization
@@ -154,5 +158,46 @@ async def set_user_name(body: NameSetter, headers: Annotated[AuthorizationHeader
     except Exception as e:
         return JSONResponse(content={'message': f'Error while setting name: {e}'}, status_code=500)
 
+    finally:
+        db_sess.close()
+
+
+@app.put('/user/change_username/')
+async def change_username(body: UsernameSetter, headers: Annotated[AuthorizationHeader, Header()]) -> JSONResponse:
+    new_username: str = body.username
+    token: str = headers.Authorization
+
+    if not new_username or not token:
+        return JSONResponse(content={'message': 'New username and token required'}, status_code=400)
+    
+    user_id: int = jwt_tokens.get_user_from_token(token)
+
+    if user_id == -1:
+        return JSONResponse(content={'message': 'Invalid authorization'}, status_code=400)
+
+    db_sess = create_session()
+
+    try:
+        user: User | None = db_sess.query(User).filter_by(id=user_id).first()
+
+        if user.username == new_username: # Didn't actually change the username
+            return JSONResponse(content={'message': 'That doesn\'t change the username'}, status_code=400)
+
+        if db_sess.query(User).filter_by(username=new_username).first():
+            return JSONResponse(content={'message': 'User with such username already exists'}, status_code=400)
+        
+        if user is None:
+            return JSONResponse(content={'message': 'User doesn\'t exist'}, status_code=400)
+        
+        user.set_username(new_username)
+
+        db_sess.add(user)
+        db_sess.commit()
+
+        return JSONResponse(content={'message': f'Username successfully changed to {new_username}'}, status_code=200)
+        
+    except Exception as e:
+        return JSONResponse(content={'message': f'Error while changing username: {e}'}, status_code=500)
+    
     finally:
         db_sess.close()
