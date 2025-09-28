@@ -36,3 +36,6 @@ class User(SqlAlchemyBase):
     
     def set_creation_date(self, creation_date: DateTime) -> None:
         self.created_at = creation_date
+
+    def set_name(self, name: str) -> None:
+        self.name = name

@@ -2,7 +2,7 @@
 
 ---
 
-### GET `/api/get_user/{user_id: int}`
+### GET `/get_user/{user_id: int}`
 
 Gets the user object corresponding to the unique user id provided
 
@@ -59,7 +59,7 @@ This request can be caused by a number of issues
 
 ---
 
-### POST `/api/register_user/`
+### POST `/register_user/`
 Endpoint responsible for registering a user
 
 Request body:
@@ -114,7 +114,7 @@ This request can be caused by a number of issues
 
 ---
 
-### POST `/api/login/`
+### POST `/login/`
 Endpoint responsible for logging in a user
 
 Request body:
@@ -166,5 +166,60 @@ This request can be caused by a number of issues
 ```json
 {
     "message": "An error occured: {error}"
+}
+```
+
+---
+
+### PUT `/set_user_name/`
+Sets the name of the current authenticated user
+
+Required body:
+```json
+{
+    "new_name": "John Smith"
+}
+```
+
+Required headers:
+```py
+"Authorization: YOUR_JWT_HERE"
+```
+<br/>
+
+`RESPONSE 200 - OK`
+Successfully set the new name
+
+```json
+{
+    "message": "Name successfully changed to {new_name}"
+}
+```
+<br/>
+
+`RESPONSE 400 - Bad Request`
+Can occurr for two reasons:
+1. The new name and the authorization token weren't provided
+2. The token is invalid
+
+```json
+{
+    "message": "New name and token required"
+}
+```
+OR
+```json
+{
+    "message": "Invalid authorization"
+}
+```
+<br/>
+
+`RESPONSE 500 - Internal server error`
+Can occurr for various reasons
+
+```json
+{
+    "message": "Error while setting name: {e}"
 }
 ```

@@ -1,6 +1,8 @@
 from fastapi.responses import JSONResponse
+from fastapi import Header
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Annotated
 
 from server.db.models.users import User
 from server.db.db_session import create_session
@@ -14,8 +16,16 @@ class UserRegister(BaseModel):
     password: str
 
 
+class NameSetter(BaseModel):
+    new_name: str
+
+
+class AuthorizationHeader(BaseModel):
+    Authorization: str
+
+
 @app.get('/get_user/')
-async def get_user(user_id: int | None, req_name: bool=False, req_creation_date=False):
+async def get_user(user_id: int | None, req_name: bool=False, req_creation_date=False) -> JSONResponse:
     db_session = create_session()
 
     if user_id is None:
@@ -42,7 +52,7 @@ async def get_user(user_id: int | None, req_name: bool=False, req_creation_date=
 
 
 @app.post('/register_user/')
-async def register(user: UserRegister):
+async def register(user: UserRegister) -> JSONResponse:
     username = user.username
     password = user.password
 
@@ -80,7 +90,7 @@ async def register(user: UserRegister):
 
 
 @app.post('/login/')
-async def login(user: UserRegister):
+async def login(user: UserRegister) -> JSONResponse:
     username = user.username
     password = user.password
 
@@ -110,6 +120,39 @@ async def login(user: UserRegister):
     
     except Exception as e:
         return JSONResponse(content={'message': f'Error while logging in: {e}'}, status_code=500)
+
+    finally:
+        db_sess.close()
+
+
+@app.put('/set_user_name/')
+async def set_user_name(body: NameSetter, headers: Annotated[AuthorizationHeader, Header()]) -> JSONResponse:
+    new_name: str = body.new_name
+    token: str = headers.Authorization
+
+    if not new_name or not token:
+        return JSONResponse(content={'message': 'New name and token required'}, status_code=400)
+
+    user_id: int = jwt_tokens.get_user_from_token(token)
+
+    if user_id == -1:
+        return JSONResponse(content={'message': 'Invalid authorization'}, status_code=400)
+    
+    db_sess = create_session()
+
+    try:
+        user: User | None = db_sess.query(User).filter_by(id=user_id).first()
+        if User is None:
+            return JSONResponse(content={'message': 'User doesn\'t exist'}, status_code=400)
+        
+        user.set_name(new_name)
+        db_sess.add(user)
+        db_sess.commit()
+
+        return JSONResponse(content={'message': f'Name successfully changed to {new_name}'}, status_code=200)
+
+    except Exception as e:
+        return JSONResponse(content={'message': f'Error while setting name: {e}'}, status_code=500)
 
     finally:
         db_sess.close()
