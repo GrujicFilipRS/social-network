@@ -166,3 +166,38 @@ def edit_post(
 
     finally:
         db_sess.close()
+
+
+@router.delete('/delete_post/')
+def delete_post(
+    post_id: int | None,
+    headers: Annotated[AuthorizationHeader, Header()]
+) -> JSONResponse:
+    
+    token: str = headers.Authorization
+
+    try:
+        if not token:
+            return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
+                
+        user_id: int = jwt_tokens.get_user_from_token(token)
+        if user_id == -1:
+            return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
+        
+        db_sess = create_session()
+
+        post = db_sess.get(Post, post_id)
+
+        if post.user_id != user_id:
+            return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
+        
+        db_sess.delete(post)
+        db_sess.commit()
+
+        return JSONResponse(content={'message': 'Successully deleted post'}, status_code=200)
+    
+    except Exception as e:
+        return JSONResponse(content={'message': f'Error while deleting post: {e}'}, status_code=400)
+    
+    finally:
+        db_sess.close()

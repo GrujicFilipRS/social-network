@@ -2,7 +2,7 @@
 
 ---
 
-### GET `/user/get_user/{user_id: int}`
+### GET `/user/get_user/?{user_id: int}`
 
 Gets the user object corresponding to the unique user id provided
 
@@ -48,7 +48,7 @@ This request happens when a user with the provided user_id doesn't exist
 ```
 <br/>
 
-`RESPONSE 500 - Internal server error`
+`RESPONSE 500 - Internal Server Error`
 This request can be caused by a number of issues
 
 ```json
@@ -103,7 +103,7 @@ OR
 ```
 <br/>
 
-`RESPONSE 500 - Internal server error`
+`RESPONSE 500 - Internal Server Error`
 This request can be caused by a number of issues
 
 ```json
@@ -160,7 +160,7 @@ OR
 ```
 <br/>
 
-`RESPONSE 500 - Internal server error`
+`RESPONSE 500 - Internal Server Error`
 This request can be caused by a number of issues
 
 ```json
@@ -215,7 +215,7 @@ OR
 ```
 <br/>
 
-`RESPONSE 500 - Internal server error`
+`RESPONSE 500 - Internal Server Error`
 Can occurr for various reasons
 
 ```json
@@ -284,7 +284,7 @@ OR
 ```
 <br/>
 
-`RESPONSE 500 - Internal server error`
+`RESPONSE 500 - Internal Server Error`
 Can occurr for various reasons
 
 ```json
