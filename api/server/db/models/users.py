@@ -42,3 +42,22 @@ class User(SqlAlchemyBase):
     
     def set_username(self, username: str) -> None:
         self.username = username
+    
+    @staticmethod
+    def validate_username(username: str) -> bool:
+        if username.lower() != username:
+            return False
+        
+        ALLOWED_CHARS: str = set([c for c in 'abcdefghijklmnopqrstuvwxyz0123456789_']) # conv to set for performance
+
+        if not all([char in ALLOWED_CHARS for char in username]):
+            return False
+
+        if len(username) < 7 or len(username) > 15:
+            return False
+
+        return True
+
+    @staticmethod
+    def validate_password(password: str) -> bool:
+        return len(password) > 7 and len(password) < 15
