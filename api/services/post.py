@@ -77,7 +77,7 @@ async def get_post(
         return JSONResponse(content=content, status_code=200)
     
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while getting post: {e}'}, status_code=500)
+        return JSONResponse(content={'message': f'Error while getting post: {e}'}, status_code=400)
 
     finally:
         db_sess.close()
@@ -119,7 +119,7 @@ def create_post(
         return JSONResponse(content=content, status_code=201)
 
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while creating post: {e}'}, status_code=500)
+        return JSONResponse(content={'message': f'Error while creating post: {e}'}, status_code=400)
     
     finally:
         db_sess.close()
@@ -162,7 +162,7 @@ def edit_post(
         return JSONResponse(content=content, status_code=200)
 
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while editing post: {e}'}, status_code=500)
+        return JSONResponse(content={'message': f'Error while editing post: {e}'}, status_code=400)
 
     finally:
         db_sess.close()
