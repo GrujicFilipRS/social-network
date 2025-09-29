@@ -272,4 +272,4 @@ async def change_password(
         return JSONResponse(content={'message': f'Error while changing password: {e}'}, status_code=400)
     
     finally:
-        pass
+        db_sess.close()
