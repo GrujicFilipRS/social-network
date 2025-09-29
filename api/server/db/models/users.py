@@ -13,6 +13,9 @@ class User(SqlAlchemyBase):
     created_at = Column(DateTime)
 
     posts = relationship('Post', back_populates='user')
+    
+    follows = relationship('Follow', foreign_keys='Follow.follower_id', back_populates='follower')
+    followers = relationship('Follow', foreign_keys='Follow.followed_id', back_populates='followed')
 
     def to_dict(self, req_name=False, req_creation_date=False) -> dict:
         output: dict = {

@@ -1,6 +1,7 @@
 from . import (
-    users, posts
+    users, posts, follows
 )
 
 User = users.User
 Post = posts.Post
+Follow = follows.Follow
