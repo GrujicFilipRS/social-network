@@ -1,7 +1,7 @@
 from fastapi.responses import JSONResponse
 from fastapi import Header
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Annotated
 
 from ..server.db.models.users import User
@@ -86,7 +86,7 @@ async def register(user: UserRegister) -> JSONResponse:
         
         user = User(username=username)
         user.set_password(password)
-        user.set_creation_date(datetime.now())
+        user.set_creation_date(datetime.now(timezone.utc))
 
         db_sess.add(user)
         db_sess.commit()

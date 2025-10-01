@@ -1,7 +1,7 @@
 from fastapi.responses import JSONResponse
 from fastapi import Header
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Annotated
 
 from ..server.db.models.posts import Post
@@ -106,7 +106,7 @@ def create_post(
         post.set_body(data.body)
         post.set_status(data.status)
         post.user_id = user_id
-        post.created_at = datetime.now()
+        post.created_at = datetime.now(timezone.utc)
 
         db_sess.add(post)
         db_sess.commit()

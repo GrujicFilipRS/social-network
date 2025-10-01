@@ -1,7 +1,7 @@
 from fastapi.responses import JSONResponse
 from fastapi import Header
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Annotated
 
 from ..server.db.models.follows import Follow
@@ -13,6 +13,10 @@ from .authorization import AuthorizationHeader
 from fastapi import APIRouter
 
 router = APIRouter()
+
+
+class ToFollowData(BaseModel):
+    to_follow_id: int
 
 
 @router.get('/get_follow/')
@@ -35,5 +39,43 @@ def get_follow(follow_id: int, req_names: bool = False) -> JSONResponse:
     except Exception as e:
         return JSONResponse(content={'message': f'Error while getting follow: {e}'}, status_code=400)
 
+    finally:
+        db_sess.close()
+
+
+@router.post('/follow_user/')
+def follow_user(
+    data: ToFollowData,
+    headers: Annotated[AuthorizationHeader, Header()]
+) -> JSONResponse:
+    try:
+        token: str = headers.Authorization
+
+        if not token:
+            return JSONResponse(content={'message': f'Invalid authorization'}, status_code=401)
+
+        user_id: int = jwt_tokens.get_user_from_token(token)
+
+        if user_id == -1:
+            return JSONResponse(content={'message': f'Invalid authorization'}, status_code=401)
+
+        db_sess = create_session()
+
+        if db_sess.query(Follow).filter_by(follower_id=user_id, followed_id=data.to_follow_id).first():
+            return JSONResponse(content={'message', 'You already follow this user'}, status_code=400)
+
+        follow = Follow()
+        follow.followed_id = data.to_follow_id
+        follow.follower_id = user_id
+        follow.followed_datetime = datetime.now(timezone.utc)
+
+        db_sess.add(follow)
+        db_sess.commit()
+
+        return JSONResponse(content={'message': f'Successfully followed user'}, status_code=201)
+        
+    except Exception as e:
+        return JSONResponse(content={'message': f'Error while following: {e}'}, status_code=400)
+    
     finally:
         db_sess.close()
