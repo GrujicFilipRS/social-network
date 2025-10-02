@@ -62,7 +62,7 @@ def follow_user(
 
         db_sess = create_session()
 
-        if not db_sess.get(User, data.user_id):
+        if not db_sess.get(User, data.to_follow_id):
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
 
         if db_sess.query(Follow).filter_by(follower_id=user_id, followed_id=data.to_follow_id).first():
@@ -111,8 +111,71 @@ def unfollow_user(
         db_sess.delete(follow)
         db_sess.commit()
 
-
         return JSONResponse(content={'message': 'Successfully unfollowed user'}, status_code=200)
     
     except Exception as e:
         return JSONResponse(content={'message', f'Unexpected error while unfollowing user: {e}'})
+
+
+@router.get('/get_user_follows/')
+def get_user_follows( # Gets all of the people a user is following
+    user_id: int
+) -> JSONResponse:
+    try:
+        db_sess = create_session()
+
+        if not db_sess.get(User, user_id):
+            return JSONResponse(content={'message': 'User with provided id not found'}, status_code=404)
+
+        follows = db_sess.query(Follow).filter_by(follower_id=user_id)
+
+        follows_hashed: list[User] = []
+        for follow in follows:
+            user_followed = db_sess.get(User, follow.followed_id)
+            if user_followed:
+                follows_hashed.append({ 'id': user_followed.id, 'username': user_followed.username })
+        
+        content: dict = {
+            'message': 'Successfully found followed users',
+            'users': follows_hashed
+        }
+
+        return JSONResponse(content=content, status_code=200)
+    
+    except Exception as e:
+        return JSONResponse(content={'message': f'Unexpected error while getting user\'s follows: {e}'}, status_code=400)
+
+    finally:
+        db_sess.close()
+
+
+@router.get('/get_user_followers/')
+def get_user_followers(
+    user_id: int
+) -> JSONResponse:
+    try:
+        db_sess = create_session()
+
+        if not db_sess.get(User, user_id):
+            return JSONResponse(content={'message': 'User with provided id not found'}, status_code=404)
+
+        follows = db_sess.query(Follow).filter_by(followed_id=user_id)
+
+        follows_hashed: list[User] = []
+        for follow in follows:
+            user_followed = db_sess.get(User, follow.follower_id)
+            if user_followed:
+                follows_hashed.append({ 'id': user_followed.id, 'username': user_followed.username })
+        
+        content: dict = {
+            'message': 'Successfully found followers',
+            'users': follows_hashed
+        }
+
+        return JSONResponse(content=content, status_code=200)
+    
+    except Exception as e:
+        return JSONResponse(content={'message': f'Unexpected error while getting user\'s followers: {e}'}, status_code=400)
+
+    finally:
+        db_sess.close()
