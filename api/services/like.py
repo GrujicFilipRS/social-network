@@ -89,3 +89,40 @@ def like_post(
     
     finally:
         db_sess.close()
+    
+
+@router.delete('/unlike_post/')
+def unlike_post(
+    post_id: int,
+    headers: Annotated[AuthorizationHeader, Header()]
+) -> JSONResponse:
+    try:
+        token: str = headers.Authorization
+        user_id: int = jwt_tokens.get_user_from_token(token)
+        if user_id == -1:
+            return JSONResponse(content={'message': 'You must be logged in to like a message'}, status_code=401)
+
+        db_sess = create_session()
+
+        user = db_sess.get(User, user_id)
+        if not user:
+            return JSONResponse(content={'message': 'You must be logged in to like a message'}, status_code=401)
+
+        if not any([like.post_id == post_id for like in user.likes]):
+            return JSONResponse(content={'message': 'The post isn\'t liked'}, status_code=400)
+
+        like: Like | None = db_sess.query(Like).filter_by(user_id=user_id, post_id=post_id).first()
+
+        if not like:
+            return JSONResponse(content={'message': 'Like not found'}, status_code=404)
+        
+        db_sess.delete(like)
+        db_sess.commit()
+
+        return JSONResponse(content={'message': 'Successfully unliked post'}, status_code=200)
+        
+    except Exception as e:
+        return JSONResponse({'message': f'Error while unliking post: {e}'}, status_code=400)
+    
+    finally:
+        db_sess.close()
