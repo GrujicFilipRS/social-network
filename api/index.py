@@ -11,6 +11,8 @@ from .server.db.models.__all_models import *
 
 from .server.conf import Config
 
+from .router import configure_routing
+
 db_session.global_init(Config.DBNAME)
 
 app = FastAPI()
@@ -33,13 +35,4 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={'message': str(exc)}
     )
 
-
-from .services.user import router as user_router
-from .services.post import router as post_router
-from .services.follow import router as follow_router
-from .services.like import router as like_router
-
-app.include_router(user_router, prefix='/user', tags=['user'])
-app.include_router(post_router, prefix='/post', tags=['post'])
-app.include_router(follow_router, prefix='/follow', tags=['follow'])
-app.include_router(like_router, prefix='/like', tags=['like'])
+configure_routing(app)
