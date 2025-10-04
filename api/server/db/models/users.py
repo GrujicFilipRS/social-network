@@ -17,6 +17,8 @@ class User(SqlAlchemyBase):
     follows = relationship('Follow', foreign_keys='Follow.follower_id', back_populates='follower')
     followers = relationship('Follow', foreign_keys='Follow.followed_id', back_populates='followed')
 
+    likes = relationship('Like', foreign_keys='Like.user_id', back_populates='user')
+
     def to_dict(self, req_name=False, req_creation_date=False) -> dict:
         output: dict = {
             'id': self.id,

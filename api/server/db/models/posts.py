@@ -14,6 +14,8 @@ class Post(SqlAlchemyBase):
 
     user = relationship('User', back_populates='posts', overlaps='posts,users')
 
+    likes = relationship('Like', back_populates='post')
+
     def to_dict(self, req_creation_date=False) -> dict:
         output: dict = {
             'id': self.id,
