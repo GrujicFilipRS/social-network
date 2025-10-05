@@ -12,9 +12,9 @@ class Post(SqlAlchemyBase):
     created_at = Column(DateTime, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
-    user = relationship('User', back_populates='posts', overlaps='posts,users')
-
+    user = relationship('User', back_populates='posts')
     likes = relationship('Like', back_populates='post')
+    comments = relationship('Comment', back_populates='post')
 
     def to_dict(self, req_creation_date=False) -> dict:
         output: dict = {

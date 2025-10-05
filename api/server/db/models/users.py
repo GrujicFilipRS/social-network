@@ -19,6 +19,8 @@ class User(SqlAlchemyBase):
 
     likes = relationship('Like', foreign_keys='Like.user_id', back_populates='user')
 
+    comments = relationship('Comment', foreign_keys='Comment.creator_id', back_populates='creator')
+
     def to_dict(self, req_name=False, req_creation_date=False) -> dict:
         output: dict = {
             'id': self.id,
