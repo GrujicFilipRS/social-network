@@ -128,11 +128,10 @@ def unlike_post(
         db_sess.close()
 
 
-@router.get('/get_user_likes')
+@router.get('/get_user_likes/')
 def get_user_likes(user_id: int) -> JSONResponse:
-    db_sess = create_session()
-
     try:
+        db_sess = create_session()
         user: User | None = db_sess.get(User, user_id)
 
         if not user:
