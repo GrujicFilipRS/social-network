@@ -126,3 +126,27 @@ def unlike_post(
     
     finally:
         db_sess.close()
+
+
+@router.get('/get_user_likes')
+def get_user_likes(user_id: int) -> JSONResponse:
+    db_sess = create_session()
+
+    try:
+        user: User | None = db_sess.get(User, user_id)
+
+        if not user:
+            return JSONResponse(content={'message': 'User not found'}, status_code=404)
+        
+        content: dict = {
+            'message': 'Likes successfully found',
+            'likes': [ like.to_dict() for like in user.likes ]
+        }
+
+        return JSONResponse(content=content, status_code=200)
+
+    except Exception as e:
+        return JSONResponse(content={'message': f'Error while getting user likes: {e}'}, status_code=400)
+
+    finally:
+        db_sess.close()
