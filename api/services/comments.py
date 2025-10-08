@@ -30,7 +30,7 @@ def get_comment(comment_id: int) -> JSONResponse:
         if not comment:
             return JSONResponse(content={'message': 'Comment not found'}, status_code=404)
         
-        content: dict = {
+        content: dict[str, str | dict] = {
             'message': 'Comment found',
             'comment': comment.to_dict()
         }
@@ -68,6 +68,13 @@ def post_comment(
 
         db_sess.add(new_comment)
         db_sess.commit()
+
+        content: dict = {
+            'message': 'Comment posted',
+            'comment': new_comment.to_dict()
+        }
+
+        return JSONResponse(content=content, status_code=201)
 
     except Exception as e:
         return JSONResponse(content={'message': f'Error while getting comment: {e}'}, status_code=400)
