@@ -81,3 +81,36 @@ def post_comment(
 
     finally:
         db_sess.close()
+
+
+@router.delete('/remove_comment/')
+def delete_comment(
+    comment_id: int,
+    headers: Annotated[AuthorizationHeader, Header()]
+) -> JSONResponse:
+    try:
+        token: str = headers.Authorization
+        user_id: int = jwt_tokens.get_user_from_token(token)
+
+        if user_id == -1:
+            return JSONResponse(content={'message': 'You are not authorized to delete this comment'}, status_code=401)
+
+        db_sess = create_session()
+        comment: Comment | None = db_sess.get(Comment, comment_id)
+
+        if comment is None:
+            return JSONResponse(content={'message': 'Comment not found'}, status_code=404)
+
+        if comment.creator_id != user_id:
+            return JSONResponse(content={'message': 'You are not authorized to delete this comment'}, status_code=401)
+        
+        db_sess.delete(comment)
+        db_sess.commit()
+
+        return JSONResponse(content={'message': 'Comment successfully deleted'}, status_code=200)
+    
+    except Exception as e:
+        return JSONResponse(content={'message': f'Error while deleting comment: {e}'}, status_code=400)
+    
+    finally:
+        db_sess.close()
