@@ -114,3 +114,27 @@ def delete_comment(
     
     finally:
         db_sess.close()
+
+
+@router.get('/get_post_comments/')
+def get_post_comments(post_id: int) -> JSONResponse:
+    try:
+        db_sess = create_session()
+        
+        post: Post | None = db_sess.get(Post, post_id)
+        
+        if post is None:
+            return JSONResponse(content={'message': 'Post not found'}, status_code=404)
+
+        content: dict = {
+            'message': 'Successfully gotten comments of post',
+            'comments': [comm.to_dict() for comm in post.comments]
+        }
+
+        return JSONResponse(content=content, status_code=200)
+    
+    except Exception as e:
+        return JSONResponse(content={'message': f'Error while getting post comments: {e}'}, status_code=400)
+    
+    finally:
+        db_sess.close()
