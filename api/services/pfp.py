@@ -109,6 +109,8 @@ async def delete_pfp(
         db_sess = create_session()
         token: str = headers.Authorization
         user_id: int = jwt_tokens.get_user_from_token(token)
+        if user_id == -1:
+            return JSONResponse(content={'message': 'You are not authorized to do this'}, status_code=401)
 
         pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
 
