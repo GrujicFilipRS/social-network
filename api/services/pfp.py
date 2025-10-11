@@ -100,3 +100,30 @@ async def create_user_pfp(
     finally:
         db_sess.close()
 
+
+@router.delete('/delete_pfp/')
+async def delete_pfp(
+    headers: Annotated[AuthorizationHeader, Header()]
+) -> JSONResponse:
+    try:
+        db_sess = create_session()
+        token: str = headers.Authorization
+        user_id: int = jwt_tokens.get_user_from_token(token)
+
+        pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
+
+        if pfp is None:
+            return JSONResponse(content={'message': 'pfp not found'}, status_code=404)
+
+        cloudinary.uploader.destroy(pfp.public_id)
+
+        db_sess.delte(pfp)
+        db_sess.commit()
+
+        return JSONResponse(content={'message': 'pfp successfully deleted'}, status_code=200)
+
+    except Exception as e:
+        return JSONResponse(content={'message': f'Error while creating user pfp: {e}'}, status_code=400)
+    
+    finally:
+        db_sess.close()
