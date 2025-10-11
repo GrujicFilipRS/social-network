@@ -75,6 +75,7 @@ async def create_user_pfp(
         )
 
         image_src: str = result['secure_url']
+        image_id: str = result['public_id']
 
         previous_pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
 
@@ -82,10 +83,7 @@ async def create_user_pfp(
             db_sess.delete(previous_pfp)
             db_sess.commit()
         
-        new_pfp = PFP()
-        new_pfp.user_id = user_id
-        new_pfp.image_src = image_src
-
+        new_pfp = PFP(user_id=user_id, image_src=image_src, image_id=image_id)
         db_sess.add(new_pfp)
         db_sess.commit()
 
@@ -101,3 +99,4 @@ async def create_user_pfp(
     
     finally:
         db_sess.close()
+
