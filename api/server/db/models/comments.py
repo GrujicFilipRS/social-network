@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, Text
+from sqlalchemy import Column, Integer, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from ..db_session import SqlAlchemyBase
 
@@ -7,9 +7,9 @@ class Comment(SqlAlchemyBase):
 
     id = Column(Integer, primary_key=True)
     body = Column(Text, nullable=False)
-    post_id = Column(Integer, nullable=False)
-    comment_id = Column(Integer, nullable=True)
-    creator_id = Column(Integer, nullable=False)
+    post_id = Column(Integer, ForeignKey('posts.id'), nullable=False)
+    comment_id = Column(Integer, ForeignKey('comments.id'), nullable=True)
+    creator_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     commented_at = Column(DateTime, nullable=True)
 
     post = relationship('Post', foreign_keys=[post_id], back_populates='comments')
