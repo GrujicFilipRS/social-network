@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import os
+from dotenv import load_dotenv
 
 from fastapi.responses import JSONResponse
 import traceback
@@ -13,6 +14,7 @@ from .server.conf import Config
 from .router import configure_routing
 
 db_session.global_init(Config.DBNAME)
+load_dotenv()
 
 app = FastAPI()
 
