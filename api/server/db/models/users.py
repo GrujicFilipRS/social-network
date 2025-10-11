@@ -21,6 +21,8 @@ class User(SqlAlchemyBase):
 
     comments = relationship('Comment', foreign_keys='Comment.creator_id', back_populates='creator')
 
+    pfp = relationship('PFP', foreign_keys='PFP.user_id', back_populates='user')
+
     def to_dict(self, req_name=False, req_creation_date=False) -> dict:
         output: dict = {
             'id': self.id,
