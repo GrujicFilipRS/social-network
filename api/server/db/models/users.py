@@ -23,7 +23,7 @@ class User(SqlAlchemyBase):
 
     pfp = relationship('PFP', foreign_keys='PFP.user_id', back_populates='user')
 
-    def to_dict(self, req_name=False, req_creation_date=False) -> dict:
+    def to_dict(self, req_name=False, req_creation_date=False, req_pfp=False) -> dict:
         output: dict = {
             'id': self.id,
             'username': self.username,
@@ -34,6 +34,9 @@ class User(SqlAlchemyBase):
         
         if req_creation_date:
             output['created_at'] = str(self.created_at)
+        
+        if req_pfp:
+            output['pfp'] = self.pfp.image_src
 
         return output
 

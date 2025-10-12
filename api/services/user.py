@@ -40,7 +40,8 @@ class AuthorizationHeader(BaseModel):
 async def get_user(
     user_id: int | None,
     req_name: bool = False,
-    req_creation_date: bool = False
+    req_creation_date: bool = False,
+    req_pfp: bool = False
 ) -> JSONResponse:
     db_session = create_session()
 
@@ -55,7 +56,7 @@ async def get_user(
         
         content: dict = {
             'message': 'User found',
-            'user': user.to_dict(req_name=req_name, req_creation_date=req_creation_date)
+            'user': user.to_dict(req_name=req_name, req_creation_date=req_creation_date, req_pfp=req_pfp)
         }
 
         return JSONResponse(content=content, status_code=200)
