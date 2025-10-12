@@ -1,5 +1,8 @@
 {
     "version": 2,
+    "scripts": {
+        "build": "vite build"
+    },
     "builds": [
         {
             "src": "package.json",
