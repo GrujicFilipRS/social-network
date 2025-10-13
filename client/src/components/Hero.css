@@ -17,7 +17,7 @@
 }
 
 .lside-hero button {
-    width: 35%;
+    width: 150px;
     margin-top: 20px;
 }
 
@@ -109,10 +109,6 @@
 
     .rside-hero img {
         width: 50%;
-    }
-
-    .lside-hero button {
-        width: 150px;
     }
 }
 
