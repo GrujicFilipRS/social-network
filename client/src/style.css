@@ -12,7 +12,7 @@
     --light-primary: #92DCE5;
     --primary: #52DEE5;
     --shadow: #0b0b0d;
-    --red: #9e1818;
+    --red: #bc1e1e;
 }
 
 * {
@@ -70,9 +70,9 @@ body {
 }
 
 .primary-color {
-    color: var(--primary);
+    color: var(--primary) !important;
 }
 
 .red-color {
-    color: var(--red);
+    color: var(--red) !important;
 }
