@@ -68,6 +68,28 @@ async def get_user(
         db_session.close()
 
 
+@router.get('/get_current_user/')
+def get_current_user(headers: Annotated[AuthorizationHeader, Header()]) -> JSONResponse:
+    try:
+        token: str = headers.Authorization
+        if not token:
+            return JSONResponse(content={'message': 'Token required'}, status_code=401)
+        
+        user_id: int = jwt_tokens.get_user_from_token(token)
+        if user_id == -1:
+            return JSONResponse(content={'message': 'Invalid token'}, status_code=401)
+
+        content: dict[str, str | int] = {
+            'message': 'Successful verification',
+            'user_id': user_id
+        }
+
+        return JSONResponse(content=content, status_code=200)
+    
+    except Exception as e:
+        return JSONResponse(content={'message': f'Error while creating user: {e}'}, status_code=400)
+
+
 @router.post('/register/')
 async def register(user: UserRegister) -> JSONResponse:
     username = user.username
