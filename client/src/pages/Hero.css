@@ -10,6 +10,7 @@
 .lside-hero h1 {
     font-weight: 800;
     font-size: 56pt;
+    text-shadow: var(--shadow) 1px 3px 2px;
 }
 
 .lside-hero p {
@@ -30,6 +31,7 @@
 .rside-hero img {
     width: 100%;
     border-radius: 15px;
+    box-shadow: var(--shadow) 1px 3px 2px;
 }
 
 @media (max-width: 1675px) {
