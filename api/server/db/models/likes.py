@@ -5,7 +5,7 @@ from ..db_session import SqlAlchemyBase
 class Like(SqlAlchemyBase):
     __tablename__ = 'likes'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     post_id = Column(Integer, ForeignKey('posts.id'), nullable=False)
     liked_at = Column(DateTime, nullable=True)

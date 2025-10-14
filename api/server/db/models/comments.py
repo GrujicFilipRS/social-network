@@ -5,7 +5,7 @@ from ..db_session import SqlAlchemyBase
 class Comment(SqlAlchemyBase):
     __tablename__ = 'comments'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     body = Column(Text, nullable=False)
     post_id = Column(Integer, ForeignKey('posts.id'), nullable=False)
     comment_id = Column(Integer, ForeignKey('comments.id'), nullable=True)

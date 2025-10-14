@@ -5,7 +5,7 @@ from ..db_session import SqlAlchemyBase
 class Follow(SqlAlchemyBase):
     __tablename__ = 'follows'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     followed_datetime = Column(DateTime, nullable=False)
     follower_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     followed_id = Column(Integer, ForeignKey('users.id'), nullable=False)

@@ -5,7 +5,7 @@ from ..db_session import SqlAlchemyBase
 class PFP(SqlAlchemyBase):
     __tablename__ = 'pfps'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False, unique=True)
     image_src = Column(String, nullable=False)
     image_id = Column(String, nullable=False)

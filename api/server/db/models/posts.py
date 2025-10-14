@@ -5,7 +5,7 @@ from ..db_session import SqlAlchemyBase
 class Post(SqlAlchemyBase):
     __tablename__ = 'posts'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     body = Column(Text)
     status = Column(String, nullable=False)
