@@ -3,12 +3,12 @@ import type { Ref } from "vue";
 
 import { API_ROUTE } from "../api";
 
-export async function handleLogin (
+export const handleLogin = async (
     username: string,
     password: string,
     router: Router,
     errorText: Ref<string, string>
-) {
+) => {
     fetch(`${API_ROUTE}/user/login/`, {
         method: "POST",
         body: JSON.stringify({

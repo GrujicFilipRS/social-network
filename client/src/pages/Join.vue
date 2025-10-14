@@ -40,6 +40,7 @@ async function submitSignup() {
         await handleSignup(
             formData.username.toLowerCase(),
             formData.password,
+            formData.name,
             router,
             errorText
         );

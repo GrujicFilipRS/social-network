@@ -17,6 +17,7 @@ router = APIRouter()
 class UserRegister(BaseModel):
     username: str
     password: str
+    name: str | None
 
 
 class NameSetter(BaseModel):
@@ -91,9 +92,10 @@ def get_current_user(headers: Annotated[AuthorizationHeader, Header()]) -> JSONR
 
 
 @router.post('/register/')
-async def register(user: UserRegister) -> JSONResponse:
-    username = user.username
-    password = user.password
+async def register(user_data: UserRegister) -> JSONResponse:
+    username: str = user_data.username
+    password: str = user_data.password
+    name: str | None = user_data.name
 
     if not username or not password:
         return JSONResponse(content={'message': 'Username and password required'}, status_code=400)
@@ -110,6 +112,8 @@ async def register(user: UserRegister) -> JSONResponse:
         user = User(username=username)
         user.set_password(password)
         user.set_creation_date(datetime.now(timezone.utc))
+        if name:
+            user.set_name(name)
 
         db_sess.add(user)
         db_sess.commit()
