@@ -8,8 +8,9 @@ export async function verifyUser(): Promise<number> {
         headers: { Authorization: `${token}` },
     });
 
+
     if (!res.ok) return -1;
 
     const data = await res.json();
-    return data.userId || -1;
+    return data.user_id || -1;
 }
