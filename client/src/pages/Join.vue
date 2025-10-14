@@ -8,14 +8,10 @@ import { handleLogin } from "../functions/Login";
 
 const router = useRouter();
 
-async function checkUser() {
-    const userId = await verifyUser();
-    if (userId !== -1) {
-        router.push("/feed");
-    }
+const userId = await verifyUser();
+if (userId !== -1) {
+    router.push("/feed");
 }
-
-checkUser();
 
 const signupMode = ref(true);
 const errorText = ref("");

@@ -3,8 +3,6 @@ import Hero from '../pages/Hero.vue';
 import Join from '../pages/Join.vue';
 import Feed from '../pages/Feed.vue';
 
-// import { verifyUser } from '../api';
-
 const routes = [
     { path: '/', component: Hero },
 
@@ -21,13 +19,5 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 });
-
-// router.beforeEach(async (to, from, next) => {
-//     if (to.meta.requiresAuth) {
-//         const userId = await verifyUser();
-//         if (userId === -1) return next('/');
-//     }
-//     next();
-// })
 
 export default router;
