@@ -85,6 +85,10 @@ def get_current_user(headers: Annotated[AuthorizationHeader, Header()]) -> JSONR
         if user_id == -1:
             return JSONResponse(content={'message': 'Invalid token'}, status_code=401)
 
+        db_sess = create_session()
+        if not db_sess.get(User, user_id):
+            return JSONResponse(content={'message': 'Invalid token'}, status_code=401)
+
         content: dict[str, str | int] = {
             'message': 'Successful verification',
             'user_id': user_id

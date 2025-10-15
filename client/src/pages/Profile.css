@@ -1,0 +1,44 @@
+.names p {
+    color: var(--grey);
+    font-size: 16pt;
+}
+
+.names h2 {
+    font-weight: 800;
+    font-size: 28pt;
+}
+
+.lside-info {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.pfp img {
+    width: 150px;
+    height: 150px;
+    border-radius: 100px;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 60%;
+    margin-top: 100px;
+}
+
+.rside-info {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.follows p {
+    text-align: right;
+    color: var(--grey);
+}
+
+.follows .bold {
+    font-weight: 800;
+}

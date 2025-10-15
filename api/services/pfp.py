@@ -118,15 +118,15 @@ async def delete_pfp(
         if pfp is None:
             return JSONResponse(content={'message': 'pfp not found'}, status_code=404)
 
-        cloudinary.uploader.destroy(pfp.public_id)
+        cloudinary.uploader.destroy(pfp.image_id)
 
-        db_sess.delte(pfp)
+        db_sess.delete(pfp)
         db_sess.commit()
 
         return JSONResponse(content={'message': 'pfp successfully deleted'}, status_code=200)
 
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while creating user pfp: {e}'}, status_code=400)
+        return JSONResponse(content={'message': f'Error while deleting user pfp: {e}'}, status_code=400)
     
     finally:
         db_sess.close()
