@@ -305,3 +305,76 @@ async def change_password(
     
     finally:
         db_sess.close()
+
+
+@router.get('/get_user_profile/')
+def get_user_profile(
+    username: str
+) -> JSONResponse:
+    try:
+        db_sess = create_session()
+        
+        user: User | None = db_sess.query(User).filter_by(username=username).first()
+        if not user:
+            return JSONResponse(content={'message': 'User not found'}, status_code=404)
+
+        content: dict = {
+            'message': 'User profile found',
+            'user_id': user.id,
+            'username': user.username,
+            'user_name': user.name,
+            'num_followers': len(user.followers),
+            'num_followed': len(user.follows),
+            'posts': [ post.to_dict() for post in user.posts ],
+            'pfp_src': user.pfp.image_src if user.pfp else None
+        }
+
+        return JSONResponse(content=content, status_code=200)
+
+    except Exception as e:
+        return JSONResponse(
+            content={'message': f'Error while getting user profile: {e}'},
+            status_code=500
+        )
+    
+    finally:
+        db_sess.close()
+
+@router.get('/get_current_user_profile/')
+def get_current_user_profile(
+    headers: Annotated[AuthorizationHeader, Header()]
+) -> JSONResponse:
+    try:
+        token: str = headers.Authorization
+        user_id: int = jwt_tokens.get_user_from_token(token)
+        
+        if user_id == -1:
+            return JSONResponse(content={'message': 'Unauthorized'}, status_code=401)
+        
+        db_sess = create_session()
+
+        user: User | None = db_sess.get(User, user_id)
+        if not user:
+            return JSONResponse(content={'message': 'User not found'}, status_code=404)
+        
+        content: dict = {
+            'message': 'User profile found',
+            'user_id': user.id,
+            'username': user.username,
+            'user_name': user.name,
+            'num_followers': len(user.followers),
+            'num_followed': len(user.follows),
+            'posts': [ post.to_dict() for post in user.posts ],
+            'pfp_src': user.pfp.image_src if user.pfp else None
+        }
+        
+        return JSONResponse(content=content, status_code=200)
+
+    except Exception as e:
+        return JSONResponse(
+            content={'message': f'Error while getting user profile: {e}'},
+            status_code=500
+        )
+    
+    finally:
+        db_sess.close()
