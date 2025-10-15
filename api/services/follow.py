@@ -114,7 +114,10 @@ def unfollow_user(
         return JSONResponse(content={'message': 'Successfully unfollowed user'}, status_code=200)
     
     except Exception as e:
-        return JSONResponse(content={'message', f'Unexpected error while unfollowing user: {e}'})
+        return JSONResponse(content={'message': f'Unexpected error while unfollowing user: {e}'})
+
+    finally:
+        db_sess.close()
 
 
 @router.get('/get_user_follows/')
@@ -176,6 +179,25 @@ def get_user_followers(
     
     except Exception as e:
         return JSONResponse(content={'message': f'Unexpected error while getting user\'s followers: {e}'}, status_code=400)
+
+    finally:
+        db_sess.close()
+
+
+@router.get('/check_if_following/')
+def check_if_following(
+    user_id: int,
+    headers: Annotated[AuthorizationHeader, Header()]
+) -> JSONResponse:
+    try:
+        db_sess = create_session()
+        user_from_id: int = jwt_tokens.get_user_from_token(headers.Authorization)
+        return JSONResponse(content={
+            'following': bool(db_sess.query(Follow).filter_by(follower_id=user_from_id, followed_id=user_id).first())
+        }, status_code=200)
+    
+    except Exception as e:
+        return JSONResponse(content={'message': f'Unexpected error while checking follow: {e}'}, status_code=400)
 
     finally:
         db_sess.close()

@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router';
 import { verifyUser } from '../api';
 
 import { GetProfile } from '../functions/GetProfile';
+import { CheckIfFollowing } from '../functions/CheckIfFollowing';
+import { Follow, Unfollow } from '../functions/Follow';
 
 import type { ProfileData } from '../interfaces/ProfileData';
 
@@ -22,6 +24,11 @@ const data = ref<ProfileData>(await GetProfile(username) as ProfileData);
 
 const firstRow: string = data.value.user_name ? data.value.user_name : data.value.username;
 const secondRow: string | null= data.value.user_name ? data.value.username : null;
+
+const followingUser = ref<boolean>(await CheckIfFollowing(data.value.user_id));
+
+const handleFollow = async () => { Follow(data.value.user_id, followingUser) };
+const handleUnfollow = async () => { Unfollow(data.value.user_id, followingUser) };
 
 </script>
 
@@ -57,9 +64,18 @@ const secondRow: string | null= data.value.user_name ? data.value.username : nul
 
             <button
                 class="primary-btn"
-                v-show="userId !== data.user_id"
+                v-show="userId !== data.user_id && !followingUser"
+                @click="handleFollow"
             >
                 FOLLOW
+            </button>
+
+            <button
+                class="secondary-btn"
+                v-show="userId !== data.user_id && followingUser"
+                @click="handleUnfollow"
+            >
+                Unfollow
             </button>
         </div>
     </div>
