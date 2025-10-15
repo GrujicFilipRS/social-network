@@ -20,6 +20,11 @@ class UserRegister(BaseModel):
     name: str | None
 
 
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
 class NameSetter(BaseModel):
     new_name: str
 
@@ -136,7 +141,7 @@ async def register(user_data: UserRegister) -> JSONResponse:
 
 
 @router.post('/login/')
-async def login(user: UserRegister) -> JSONResponse:
+async def login(user: UserLogin) -> JSONResponse:
     username = user.username
     password = user.password
 
