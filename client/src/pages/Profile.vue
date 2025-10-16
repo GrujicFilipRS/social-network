@@ -29,6 +29,7 @@ const followingUser = ref<boolean>(await CheckIfFollowing(data.value.user_id));
 
 const handleFollow = async () => { Follow(data.value.user_id, followingUser) };
 const handleUnfollow = async () => { Unfollow(data.value.user_id, followingUser) };
+const handleEdit = async () => { router.push('/edit_profile'); }
 
 </script>
 
@@ -76,6 +77,14 @@ const handleUnfollow = async () => { Unfollow(data.value.user_id, followingUser)
                 @click="handleUnfollow"
             >
                 Unfollow
+            </button>
+
+            <button
+                class="secondary-btn"
+                v-show="userId == data.user_id"
+                @click="handleEdit"
+            >
+                Edit profile
             </button>
         </div>
     </div>
