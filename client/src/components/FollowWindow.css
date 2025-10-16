@@ -1,0 +1,7 @@
+.follows-window {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background-color: var(--dark);
+    
+}

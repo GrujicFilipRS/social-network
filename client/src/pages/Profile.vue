@@ -9,6 +9,8 @@ import { Follow, Unfollow } from '../functions/Follow';
 
 import type { ProfileData } from '../interfaces/ProfileData';
 
+import FollowsWindow from '../components/FollowWindow.vue';
+
 const router = useRouter();
 
 const userId = await verifyUser();
@@ -26,6 +28,8 @@ const firstRow: string = data.value.user_name ? data.value.user_name : data.valu
 const secondRow: string | null= data.value.user_name ? data.value.username : null;
 
 const followingUser = ref<boolean>(await CheckIfFollowing(data.value.user_id));
+
+const showFollowWindow = ref<boolean>(true);
 
 const handleFollow = async () => { Follow(data.value.user_id, followingUser) };
 const handleUnfollow = async () => { Unfollow(data.value.user_id, followingUser) };
@@ -89,9 +93,10 @@ const handleEdit = async () => { router.push('/edit_profile'); }
         </div>
     </div>
 
-    <div class="posts">
-        
-    </div>
+    <FollowsWindow
+        v-show="showFollowWindow"
+        :userId="data.user_id"
+    />
 </template>
 
 <style>
