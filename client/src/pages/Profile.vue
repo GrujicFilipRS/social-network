@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, shallowRef } from 'vue';
 import { useRouter } from 'vue-router';
 import { verifyUser } from '../api';
 
@@ -8,6 +8,7 @@ import { CheckIfFollowing } from '../functions/CheckIfFollowing';
 import { Follow, Unfollow } from '../functions/Follow';
 
 import type { ProfileData } from '../interfaces/ProfileData';
+import type { FollowWindowModeType } from '../interfaces/FollowWindowModeType';
 
 import FollowsWindow from '../components/FollowWindow.vue';
 
@@ -28,12 +29,12 @@ const firstRow: string = data.value.user_name ? data.value.user_name : data.valu
 const secondRow: string | null= data.value.user_name ? data.value.username : null;
 
 const followingUser = ref<boolean>(await CheckIfFollowing(data.value.user_id));
-
-const showFollowWindow = ref<boolean>(true);
+const followWindowRef = ref<InstanceType<typeof FollowsWindow>>();
 
 const handleFollow = async () => { Follow(data.value.user_id, followingUser) };
 const handleUnfollow = async () => { Unfollow(data.value.user_id, followingUser) };
 const handleEdit = async () => { router.push('/edit_profile'); }
+const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.showWindow(mode); }
 
 </script>
 
@@ -54,14 +55,20 @@ const handleEdit = async () => { router.push('/edit_profile'); }
             <div class="follows">
                 <p>
                     Followers:
-                    <span class="bold">
+                    <span
+                        class="bold"
+                        @click="() => {showFollows('FOLLOWERS')}"
+                    >
                         {{ data.num_followers }}
                     </span>
                 </p>
 
                 <p>
                     Following:
-                    <span class="bold">
+                    <span
+                        class="bold"
+                        @click="() => {showFollows('FOLLOWING')}"
+                    >
                         {{ data.num_followed }}
                     </span>
                 </p>
@@ -94,7 +101,7 @@ const handleEdit = async () => { router.push('/edit_profile'); }
     </div>
 
     <FollowsWindow
-        v-show="showFollowWindow"
+        ref="followWindowRef"
         :userId="data.user_id"
     />
 </template>
