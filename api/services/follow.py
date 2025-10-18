@@ -121,7 +121,7 @@ def unfollow_user(
 
 
 @router.get('/get_user_follows/')
-def get_user_follows( # Gets all of the people a user is following
+def get_user_follows(
     user_id: int
 ) -> JSONResponse:
     try:
@@ -136,7 +136,7 @@ def get_user_follows( # Gets all of the people a user is following
         for follow in follows:
             user_followed = db_sess.get(User, follow.followed_id)
             if user_followed:
-                follows_hashed.append({ 'id': user_followed.id, 'username': user_followed.username })
+                follows_hashed.append(user_followed.to_dict())
         
         content: dict = {
             'message': 'Successfully found followed users',
@@ -168,7 +168,7 @@ def get_user_followers(
         for follow in follows:
             user_followed = db_sess.get(User, follow.follower_id)
             if user_followed:
-                follows_hashed.append({ 'id': user_followed.id, 'username': user_followed.username })
+                follows_hashed.append(user_followed.to_dict())
         
         content: dict = {
             'message': 'Successfully found followers',

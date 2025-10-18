@@ -23,11 +23,11 @@ class User(SqlAlchemyBase):
 
     pfp = relationship('PFP', foreign_keys='PFP.user_id', back_populates='user', uselist=False)
 
-    def to_dict(self, req_name=False, req_creation_date=False, req_pfp=False) -> dict:
+    def to_dict(self, req_name=False, req_creation_date=False) -> dict:
         output: dict = {
             'id': self.id,
             'username': self.username,
-            'pfp': self.pfp.image_src
+            'pfp': self.pfp.image_src if self.pfp else ''
         }
 
         if req_name:

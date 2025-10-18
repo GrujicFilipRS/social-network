@@ -18,7 +18,11 @@ const mode = ref<modeType>('FOLLOWING');
 const showWindow = (modeToShow: modeType) => {
     showRef.value = true;
     mode.value = modeToShow;
-}
+};
+
+const closeWindow = () => {
+    showRef.value = false;
+};
 
 const userFollowers = ref<FollowsData | null>(null);
 const userFollows = ref<FollowsData | null>(null);
@@ -37,9 +41,22 @@ defineExpose({ showWindow });
         class="follows-window-overlay"
     >
         <div class="follows-window">
-            {{ JSON.stringify(userFollowers) }}
-            {{ JSON.stringify(userFollows) }}
-            <button @click="showRef = false">Exit</button>
+            <div class="follows-header">
+                <div class="lside-follows-header">
+                    <button
+                        class="follows-btn"
+                    >Follows</button>
+
+                    <button
+                        class="followers-btn"
+                    >Followers</button>
+                </div>
+
+                <button
+                    class="close-follows-btn"
+                    @click="closeWindow"
+                >✖</button>
+            </div>
         </div>
     </div>
 </template>
