@@ -27,6 +27,7 @@ class User(SqlAlchemyBase):
         output: dict = {
             'id': self.id,
             'username': self.username,
+            'pfp': self.pfp.image_src
         }
 
         if req_name:
@@ -34,9 +35,6 @@ class User(SqlAlchemyBase):
         
         if req_creation_date:
             output['created_at'] = str(self.created_at)
-        
-        if req_pfp:
-            output['pfp'] = self.pfp.image_src
 
         return output
 

@@ -1,7 +1,12 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+
+import { GetUserFollowers } from '../functions/GetUserFollowers';
+import { GetUserFollows } from '../functions/GetUserFollows';
 
 import type { FollowWindowModeType as modeType } from '../interfaces/FollowWindowModeType' ;
+import type { FollowsData } from '../interfaces/FollowData';
+// import type { FollowsData } from '../interfaces/FollowData';
 
 const props = defineProps<{
     userId?: number,
@@ -15,6 +20,13 @@ const showWindow = (modeToShow: modeType) => {
     mode.value = modeToShow;
 }
 
+const userFollowers = ref<FollowsData | null>(null);
+const userFollows = ref<FollowsData | null>(null);
+onMounted(async () => {
+    userFollowers.value = await GetUserFollowers(props.userId!) as FollowsData;
+    userFollows.value = await GetUserFollows(props.userId!) as FollowsData;
+});
+
 defineExpose({ showWindow });
 
 </script>
@@ -25,16 +37,10 @@ defineExpose({ showWindow });
         class="follows-window-overlay"
     >
         <div class="follows-window">
-            {{ props.userId }}
-            {{ mode }}
-            <button
-                @click="showRef = false"
-            >
-                Exit
-            </button>
+            {{ JSON.stringify(userFollowers) }}
+            {{ JSON.stringify(userFollows) }}
+            <button @click="showRef = false">Exit</button>
         </div>
-
-
     </div>
 </template>
 

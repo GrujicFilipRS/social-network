@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { verifyUser } from '../api';
 
@@ -31,10 +31,10 @@ const secondRow: string | null= data.value.user_name ? data.value.username : nul
 const followingUser = ref<boolean>(await CheckIfFollowing(data.value.user_id));
 const followWindowRef = ref<InstanceType<typeof FollowsWindow>>();
 
-const handleFollow = async () => { Follow(data.value.user_id, followingUser) };
-const handleUnfollow = async () => { Unfollow(data.value.user_id, followingUser) };
-const handleEdit = async () => { router.push('/edit_profile'); }
-const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.showWindow(mode); }
+const handleFollow = async () => { Follow(data.value.user_id, followingUser); };
+const handleUnfollow = async () => { Unfollow(data.value.user_id, followingUser); };
+const handleEdit = async () => { router.push('/edit_profile'); };
+const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.showWindow(mode); };
 
 </script>
 
