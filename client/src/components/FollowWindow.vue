@@ -7,6 +7,8 @@ import { GetUserFollows } from '../functions/GetUserFollows';
 import type { FollowWindowModeType as modeType } from '../interfaces/FollowWindowModeType' ;
 import type { FollowsData } from '../interfaces/FollowData';
 
+import FollowBox from './FollowBox.vue';
+
 const props = defineProps<{
     userId?: number,
 }>();
@@ -74,6 +76,28 @@ defineExpose({ showWindow });
                     class="close-follows-btn"
                     @click="closeWindow"
                 >✖</button>
+            </div>
+
+            <div
+                class="follows-list"
+                v-show="mode == 'FOLLOWING'"
+            >
+                <FollowBox
+                    v-for="(user, index) in userFollows?.users"
+                    :key="user.id || index"
+                    :user="user"
+                />
+            </div>
+
+            <div
+                class="follows-list"
+                v-show="mode == 'FOLLOWERS'"
+            >
+                <FollowBox
+                    v-for="(user, index) in userFollowers?.users"
+                    :key="user.id || index"
+                    :user="user"
+                />
             </div>
         </div>
     </div>

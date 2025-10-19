@@ -28,7 +28,7 @@ const data = ref<ProfileData>(await GetProfile(username) as ProfileData);
 const firstRow: string = data.value.user_name ? data.value.user_name : data.value.username;
 const secondRow: string | null= data.value.user_name ? data.value.username : null;
 
-const followingUser = ref<boolean>(await CheckIfFollowing(data.value.user_id));
+const followingUser = ref<boolean>(data.value.user_followed);
 const followWindowRef = ref<InstanceType<typeof FollowsWindow>>();
 
 const handleFollow = async () => { Follow(data.value.user_id, followingUser); };

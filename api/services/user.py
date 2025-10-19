@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from typing import Annotated
 
 from ..server.db.models.users import User
+from ..server.db.models.follows import Follow
 from ..server.db.db_session import create_session
 
 from ..server.utils import jwt_tokens
@@ -313,14 +314,22 @@ async def change_password(
 
 @router.get('/get_user_profile/')
 def get_user_profile(
-    username: str
+    username: str,
+    headers: Annotated[AuthorizationHeader, Header()]
 ) -> JSONResponse:
     try:
         db_sess = create_session()
+
+        token: str = headers.Authorization
+        user_id: int = jwt_tokens.get_user_from_token(token)
+        if user_id == -1:
+            return JSONResponse(content={'message': 'Unauthorized'}, status_code=401)
         
         user: User | None = db_sess.query(User).filter_by(username=username).first()
         if not user:
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
+
+        user_followed: bool = not db_sess.query(Follow).filter_by(follower_id=user_id, followed_id=user.id).first() is None
 
         content: dict = {
             'message': 'User profile found',
@@ -330,7 +339,8 @@ def get_user_profile(
             'num_followers': len(user.followers),
             'num_followed': len(user.follows),
             'posts': [ post.to_dict() for post in user.posts ],
-            'pfp_src': user.pfp.image_src if user.pfp else None
+            'pfp_src': user.pfp.image_src if user.pfp else None,
+            'user_followed': user_followed
         }
 
         return JSONResponse(content=content, status_code=200)
