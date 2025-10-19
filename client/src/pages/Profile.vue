@@ -54,22 +54,24 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
         <div class="rside-info">
             <div class="follows">
                 <p>
-                    Followers:
+                    Following:
                     <span
                         class="bold"
-                        @click="() => {showFollows('FOLLOWERS')}"
+                        title="See follows"
+                        @click="() => {showFollows('FOLLOWING')}"
                     >
-                        {{ data.num_followers }}
+                        {{ data.num_followed }}
                     </span>
                 </p>
 
                 <p>
-                    Following:
+                    Followers:
                     <span
                         class="bold"
-                        @click="() => {showFollows('FOLLOWING')}"
+                        title="See followers"
+                        @click="() => {showFollows('FOLLOWERS')}"
                     >
-                        {{ data.num_followed }}
+                        {{ data.num_followers }}
                     </span>
                 </p>
             </div>

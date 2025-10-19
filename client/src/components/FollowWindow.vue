@@ -6,7 +6,6 @@ import { GetUserFollows } from '../functions/GetUserFollows';
 
 import type { FollowWindowModeType as modeType } from '../interfaces/FollowWindowModeType' ;
 import type { FollowsData } from '../interfaces/FollowData';
-// import type { FollowsData } from '../interfaces/FollowData';
 
 const props = defineProps<{
     userId?: number,
@@ -14,10 +13,23 @@ const props = defineProps<{
 
 const showRef = ref<boolean>(false);
 const mode = ref<modeType>('FOLLOWING');
+const followsTextClass = ref<'mode-active' | ''>('mode-active');
+const followersTextClass = ref<'mode-active' | ''>('');
 
 const showWindow = (modeToShow: modeType) => {
     showRef.value = true;
+    setWindowMode(modeToShow);
+};
+
+const setWindowMode = (modeToShow: modeType) => {
     mode.value = modeToShow;
+    if (modeToShow == 'FOLLOWING') {
+        followsTextClass.value = 'mode-active';
+        followersTextClass.value = '';
+    } else {
+        followsTextClass.value = '';
+        followersTextClass.value = 'mode-active';
+    }
 };
 
 const closeWindow = () => {
@@ -43,13 +55,19 @@ defineExpose({ showWindow });
         <div class="follows-window">
             <div class="follows-header">
                 <div class="lside-follows-header">
-                    <button
-                        class="follows-btn"
-                    >Follows</button>
+                    <p
+                        :class="followsTextClass"
+                        @click="setWindowMode('FOLLOWING')"
+                    >
+                        Follows
+                    </p>
 
-                    <button
-                        class="followers-btn"
-                    >Followers</button>
+                    <p
+                        :class="followersTextClass"
+                        @click="setWindowMode('FOLLOWERS')"
+                    >
+                        Followers
+                    </p>
                 </div>
 
                 <button

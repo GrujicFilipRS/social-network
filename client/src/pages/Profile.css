@@ -42,3 +42,7 @@
 .follows .bold {
     font-weight: 800;
 }
+
+.follows .bold:hover {
+    cursor: pointer;
+}

@@ -15,7 +15,6 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: var(--dark);
     border: 3px solid #0b0b0b;
     box-shadow: var(--shadow) 2px 2px 2px;
     border-radius: 15px;
@@ -34,4 +33,25 @@
 
 .close-follows-btn:hover {
     cursor: pointer;
+}
+
+.lside-follows-header {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 5px 0px;
+    flex: 1;
+}
+
+.lside-follows-header p {
+    color: var(--grey);
+    transition: 0.2s;
+}
+
+.lside-follows-header p:hover {
+    color: var(--white);
+    cursor: pointer;
+}
+
+.lside-follows-header .mode-active {
+    color: var(--white);
 }
