@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router';
 import { verifyUser } from '../api';
 
 import { GetProfile } from '../functions/GetProfile';
-import { CheckIfFollowing } from '../functions/CheckIfFollowing';
 import { Follow, Unfollow } from '../functions/Follow';
 
 import type { ProfileData } from '../interfaces/ProfileData';
