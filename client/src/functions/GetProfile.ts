@@ -13,7 +13,7 @@ export const GetProfile = async (
             'Authorization': token
         }
     }).then(async (res) => {
-        return (res.status, await res.json());
+        return {status: res.status, data: await res.json()};
     })
 }
 
@@ -27,6 +27,6 @@ const GetSelfProfile = async () => {
             'Content-Type': 'application/json'
         }
     }).then(async (res) => {
-        return (res.status, await res.json());
+        return {status: res.status, data: await res.json()};
     })
 }

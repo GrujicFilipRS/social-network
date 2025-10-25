@@ -22,7 +22,13 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const username: string | null = urlParams.get("user");
 
-const data = ref<ProfileData>(await GetProfile(username) as ProfileData);
+const fetchData = ref<{status: number, data: ProfileData}>(await GetProfile(username) as {status: number, data: ProfileData});
+
+if (fetchData.value.status === 404) {
+    router.push('/');
+}
+
+const data = ref<ProfileData>(fetchData.value.data);
 
 const firstRow: string = data.value.user_name ? data.value.user_name : data.value.username;
 const secondRow: string | null= data.value.user_name ? data.value.username : null;
