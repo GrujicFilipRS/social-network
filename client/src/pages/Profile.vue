@@ -25,7 +25,7 @@ const username: string | null = urlParams.get("user");
 const fetchData = ref<{status: number, data: ProfileData}>(await GetProfile(username) as {status: number, data: ProfileData});
 
 if (fetchData.value.status === 404) {
-    router.push('/');
+    router.push('/feed');
 }
 
 const data = ref<ProfileData>(fetchData.value.data);
