@@ -15,6 +15,7 @@ class Post(SqlAlchemyBase):
     user = relationship('User', back_populates='posts')
     likes = relationship('Like', back_populates='post')
     comments = relationship('Comment', back_populates='post')
+    photos = relationship('Photo', back_populates='post')
 
     def to_dict(self, req_creation_date=False) -> dict:
         output: dict = {
@@ -22,7 +23,8 @@ class Post(SqlAlchemyBase):
             'title': self.title,
             'body': self.body,
             'status': self.status,
-            'user_id': self.user_id
+            'user_id': self.user_id,
+            'photos': [ photo.to_dict() for photo in self.photos ]
         }
 
         if req_creation_date:

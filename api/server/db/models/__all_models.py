@@ -4,7 +4,8 @@ from . import (
     follows,
     likes,
     comments,
-    pfps
+    pfps,
+    photos
 )
 
 User = users.User
@@ -13,3 +14,4 @@ Follow = follows.Follow
 Like = likes.Like
 Comment = comments.Comment
 PFP = pfps.PFP
+Photo = photos.Photo
