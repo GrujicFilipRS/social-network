@@ -17,7 +17,7 @@ export const GetProfile = async (
     })
 }
 
-const GetSelfProfile = async () => {
+export const GetSelfProfile = async () => {
     const token = localStorage.getItem('jwt');
 
     return fetch(`${API_ROUTE}/user/get_current_user_profile/`, {
