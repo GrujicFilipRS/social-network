@@ -23,7 +23,7 @@ const data: ProfileData = ref<ProfileData>(fetchData.value.data).value;
 </script>
 
 <template>
-    <div class="profile-info">
-        <p>Edit profile</p>
+    <div class="profile-editor">
+        
     </div>
 </template>
