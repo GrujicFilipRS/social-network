@@ -19,7 +19,7 @@ if (fetchData.value.status === 404) {
     router.push('/feed');
 }
 
-const data: ProfileData = ref<ProfileData>(fetchData.value.data).value;
+// const data: ProfileData = ref<ProfileData>(fetchData.value.data).value;
 </script>
 
 <template>

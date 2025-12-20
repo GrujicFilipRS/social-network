@@ -1,0 +1,24 @@
+services:
+  social-frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.prod
+    expose:
+      - "80"
+    networks:
+      - web
+
+  social-backend:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
+    env_file:
+      - .env
+    expose:
+      - "5000"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
