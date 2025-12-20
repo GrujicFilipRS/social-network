@@ -6,12 +6,12 @@ from dotenv import load_dotenv
 from fastapi.responses import JSONResponse
 import traceback
 
-from .server.db import db_session
-from .server.db.models.__all_models import *
+from server.db import db_session
+from server.db.models.__all_models import *
 
-from .server.conf import Config
+from server.conf import Config
 
-from .router import configure_routing
+from router import configure_routing
 
 db_session.global_init(Config.DBNAME)
 load_dotenv()

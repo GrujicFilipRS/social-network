@@ -2,11 +2,11 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Annotated
 
-from ..server.db.models.comments import Comment
-from api.server.db.models.posts import Post
-from ..server.db.db_session import create_session
+from server.db.models.comments import Comment
+from server.db.models.posts import Post
+from server.db.db_session import create_session
 
-from ..server.utils import jwt_tokens
+from server.utils import jwt_tokens
 from .authorization import AuthorizationHeader
 
 from fastapi import APIRouter, Header

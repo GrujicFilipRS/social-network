@@ -1,0 +1,23 @@
+services:
+  social-frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+  
+  social-backend:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    container_name: backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    volumes:
+      - ./api:/app

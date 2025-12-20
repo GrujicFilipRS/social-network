@@ -4,13 +4,13 @@ from pydantic import BaseModel
 from datetime import datetime, timezone
 from typing import Annotated
 
-from ..server.db.models.posts import Post
-from ..server.db.models.users import User
-from ..server.db.db_session import create_session
+from server.db.models.posts import Post
+from server.db.models.users import User
+from server.db.db_session import create_session
 
-from ..server.utils import jwt_tokens
+from server.utils import jwt_tokens
 
-from ..services.literals import PostLiterals
+from services.literals import PostLiterals
 
 from .authorization import AuthorizationHeader
 

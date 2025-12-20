@@ -4,11 +4,11 @@ from pydantic import BaseModel
 from datetime import datetime, timezone
 from typing import Annotated
 
-from ..server.db.models.follows import Follow
-from ..server.db.models.users import User
-from ..server.db.db_session import create_session
+from server.db.models.follows import Follow
+from server.db.models.users import User
+from server.db.db_session import create_session
 
-from ..server.utils import jwt_tokens
+from server.utils import jwt_tokens
 from .authorization import AuthorizationHeader
 
 from fastapi import APIRouter

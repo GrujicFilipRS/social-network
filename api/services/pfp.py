@@ -8,10 +8,10 @@ import os, io
 
 from fastapi import APIRouter
 
-from ..server.db.models.pfps import PFP
-from ..server.db.db_session import create_session
+from server.db.models.pfps import PFP
+from server.db.db_session import create_session
 
-from ..server.utils import jwt_tokens
+from server.utils import jwt_tokens
 from .authorization import AuthorizationHeader
 
 router = APIRouter()
