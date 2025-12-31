@@ -1,16 +1,17 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Text
+from sqlalchemy import Column, ForeignKey, UUID, String, DateTime, Text
 from sqlalchemy.orm import relationship
 from ..db_session import SqlAlchemyBase
+from uuid import uuid4
 
 class Post(SqlAlchemyBase):
     __tablename__ = 'posts'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(UUID, primary_key=True, default=uuid4)
     title = Column(String, nullable=False)
     body = Column(Text)
     status = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
 
     user = relationship('User', back_populates='posts')
     likes = relationship('Like', back_populates='post')
@@ -19,11 +20,11 @@ class Post(SqlAlchemyBase):
 
     def to_dict(self, req_creation_date=False) -> dict:
         output: dict = {
-            'id': self.id,
+            'id': str(self.id),
             'title': self.title,
             'body': self.body,
             'status': self.status,
-            'user_id': self.user_id,
+            'user_id': str(self.user_id),
             'photos': [ photo.to_dict() for photo in self.photos ]
         }
 

@@ -1,15 +1,16 @@
-from sqlalchemy import Column, Integer, DateTime, Text, ForeignKey
+from sqlalchemy import Column, UUID, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from ..db_session import SqlAlchemyBase
+from uuid import uuid4
 
 class Comment(SqlAlchemyBase):
     __tablename__ = 'comments'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(UUID, primary_key=True, default=uuid4)
     body = Column(Text, nullable=False)
-    post_id = Column(Integer, ForeignKey('posts.id'), nullable=False)
-    comment_id = Column(Integer, ForeignKey('comments.id'), nullable=True)
-    creator_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    post_id = Column(UUID, ForeignKey('posts.id'), nullable=False)
+    comment_id = Column(UUID, ForeignKey('comments.id'), nullable=True)
+    creator_id = Column(UUID, ForeignKey('users.id'), nullable=False)
     commented_at = Column(DateTime, nullable=True)
 
     post = relationship('Post', foreign_keys=[post_id], back_populates='comments')
@@ -18,7 +19,7 @@ class Comment(SqlAlchemyBase):
 
     def to_dict(self) -> dict:
         return {
-            'id': self.id,
+            'id': str(self.id),
             'body': self.body,
             'post': self.post.to_dict(),
             'comment': self.comment.to_dict(),

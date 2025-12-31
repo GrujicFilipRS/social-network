@@ -1,12 +1,13 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, UUID, String
 from sqlalchemy.orm import relationship
 from ..db_session import SqlAlchemyBase
+from uuid import uuid4
 
 class PFP(SqlAlchemyBase):
     __tablename__ = 'pfps'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, unique=True)
+    id = Column(UUID, primary_key=True, default=uuid4)
+    user_id = Column(UUID, ForeignKey('users.id'), nullable=False, unique=True)
     image_src = Column(String, nullable=False)
     image_id = Column(String, nullable=False)
 
@@ -14,7 +15,7 @@ class PFP(SqlAlchemyBase):
 
     def to_dict(self, req_user: bool = False) -> dict:
         content: dict = {
-            'id': self.id,
+            'id': str(self.id),
             'image_src': self.image_src,
             'image_id': self.image_id
         }

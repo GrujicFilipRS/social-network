@@ -1,5 +1,6 @@
+from uuid import UUID
 from fastapi.responses import JSONResponse
-from fastapi import Header
+from fastapi import Header, Request
 from pydantic import BaseModel
 from datetime import datetime, timezone
 from typing import Annotated
@@ -69,36 +70,29 @@ async def get_user(
         return JSONResponse(content=content, status_code=200)
     
     except Exception as e:
-        return JSONResponse(content={'message': f'An error occured: {str(e)}'}, status_code=40)
+        return JSONResponse(content={'message': f'An error occured: {str(e)}'}, status_code=500)
     
     finally:
         db_session.close()
 
 
 @router.get('/get_current_user/')
-def get_current_user(headers: Annotated[AuthorizationHeader, Header()]) -> JSONResponse:
+@jwt_tokens.require_auth
+def get_current_user(request: Request, user_id: UUID) -> JSONResponse:
     try:
-        token: str = headers.Authorization
-        if not token:
-            return JSONResponse(content={'message': 'Token required'}, status_code=401)
-        
-        user_id: int = jwt_tokens.get_user_from_token(token)
-        if user_id == -1:
-            return JSONResponse(content={'message': 'Invalid token'}, status_code=401)
-
         db_sess = create_session()
         if not db_sess.get(User, user_id):
             return JSONResponse(content={'message': 'Invalid token'}, status_code=401)
 
-        content: dict[str, str | int] = {
+        content: dict[str, str] = {
             'message': 'Successful verification',
-            'user_id': user_id
+            'user_id': str(user_id)
         }
 
         return JSONResponse(content=content, status_code=200)
     
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while creating user: {e}'}, status_code=400)
+        return JSONResponse(content={'message': f'Error while creating user: {e}'}, status_code=500)
 
 
 @router.post('/register/')
@@ -139,7 +133,7 @@ async def register(user_data: UserRegister) -> JSONResponse:
         return JSONResponse(content=content, status_code=201)
     
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while creating user: {e}'}, status_code=400)
+        return JSONResponse(content={'message': f'Error while creating user: {e}'}, status_code=500)
     
     finally:
         db_sess.close()
@@ -169,13 +163,13 @@ async def login(user: UserLogin) -> JSONResponse:
         content: dict = {
             'message': 'User logged in',
             'user': user.to_dict(),
-            'token': token
+            'token': str(token)
         }
 
         return JSONResponse(content=content, status_code=200)
     
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while logging in: {e}'}, status_code=400)
+        return JSONResponse(content={'message': f'Error while logging in: {e}'}, status_code=500)
 
     finally:
         db_sess.close()
@@ -211,7 +205,7 @@ async def set_user_name(
         return JSONResponse(content={'message': f'Name successfully changed to {new_name}'}, status_code=200)
 
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while setting name: {e}'}, status_code=400)
+        return JSONResponse(content={'message': f'Error while setting name: {e}'}, status_code=500)
 
     finally:
         db_sess.close()
@@ -259,7 +253,7 @@ async def change_username(
         return JSONResponse(content={'message': f'Username successfully changed to {new_username}'}, status_code=200)
         
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while changing username: {e}'}, status_code=400)
+        return JSONResponse(content={'message': f'Error while changing username: {e}'}, status_code=500)
     
     finally:
         db_sess.close()
@@ -306,7 +300,7 @@ async def change_password(
         return JSONResponse(content={'message': 'Successfully changed password'}, status_code=200)
     
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while changing password: {e}'}, status_code=400)
+        return JSONResponse(content={'message': f'Error while changing password: {e}'}, status_code=500)
     
     finally:
         db_sess.close()

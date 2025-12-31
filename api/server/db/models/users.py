@@ -1,12 +1,13 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, UUID, String, DateTime
 from sqlalchemy.orm import relationship
 from ..db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash, check_password_hash
+from uuid import uuid4
 
 class User(SqlAlchemyBase):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(UUID, primary_key=True, default=uuid4)
     username = Column(String, unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     name = Column(String)
@@ -25,7 +26,7 @@ class User(SqlAlchemyBase):
 
     def to_dict(self, req_name=False, req_creation_date=False) -> dict:
         output: dict = {
-            'id': self.id,
+            'id': str(self.id),
             'username': self.username,
             'pfp': self.pfp.image_src if self.pfp else ''
         }
