@@ -1,47 +1,19 @@
 from uuid import UUID
 from fastapi.responses import JSONResponse
-from fastapi import Header, Request
-from pydantic import BaseModel
+from fastapi import Request
 from datetime import datetime, timezone
-from typing import Annotated
+from typing import Any
 
 from server.db.models.users import User
 from server.db.models.follows import Follow
 from server.db.db_session import create_session
 
 from server.utils import jwt_tokens
-from .authorization import AuthorizationHeader
+from server.utils.jwt_tokens import require_auth
 
 from fastapi import APIRouter
 
 router = APIRouter()
-
-class UserRegister(BaseModel):
-    username: str
-    password: str
-    name: str | None
-
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
-
-
-class NameSetter(BaseModel):
-    new_name: str
-
-
-class UsernameSetter(BaseModel):
-    username: str
-
-
-class PasswordSetter(BaseModel):
-    old_password: str
-    new_password: str
-
-
-class AuthorizationHeader(BaseModel):
-    Authorization: str
 
 
 @router.get('/get_user/')
@@ -77,8 +49,11 @@ async def get_user(
 
 
 @router.get('/get_current_user/')
-@jwt_tokens.require_auth
-def get_current_user(request: Request, user_id: UUID) -> JSONResponse:
+@require_auth
+def get_current_user(
+    request: Request,
+    user_id: UUID | None = None,
+) -> JSONResponse:
     try:
         db_sess = create_session()
         if not db_sess.get(User, user_id):
@@ -96,10 +71,12 @@ def get_current_user(request: Request, user_id: UUID) -> JSONResponse:
 
 
 @router.post('/register/')
-async def register(user_data: UserRegister) -> JSONResponse:
-    username: str = user_data.username
-    password: str = user_data.password
-    name: str | None = user_data.name
+async def register(request: Request) -> JSONResponse:
+    data = await request.json()
+
+    username: str | None = data.get('username')
+    password: str | None = data.get('password')
+    name: str | None = data.get('name')
 
     if not username or not password:
         return JSONResponse(content={'message': 'Username and password required'}, status_code=400)
@@ -140,9 +117,11 @@ async def register(user_data: UserRegister) -> JSONResponse:
 
 
 @router.post('/login/')
-async def login(user: UserLogin) -> JSONResponse:
-    username = user.username
-    password = user.password
+async def login(request: Request) -> JSONResponse:
+    data = await request.json()
+
+    username: str | None = data.get('username')
+    password: str | None = data.get('password')
 
     if not username or not password:
         return JSONResponse(content={'message': 'Username and password required'}, status_code=400)
@@ -176,20 +155,17 @@ async def login(user: UserLogin) -> JSONResponse:
 
 
 @router.put('/set_name/')
+@require_auth
 async def set_user_name(
-    body: NameSetter,
-    headers: Annotated[AuthorizationHeader, Header()]
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
-    new_name: str = body.new_name
-    token: str = headers.Authorization
+    data: Any = await request.json()
+    
+    new_name: str | None = data.get('new_name')
 
-    if not new_name or not token:
-        return JSONResponse(content={'message': 'New name and token required'}, status_code=400)
-
-    user_id: int = jwt_tokens.get_user_from_token(token)
-
-    if user_id == -1:
-        return JSONResponse(content={'message': 'Invalid authorization'}, status_code=400)
+    if not new_name:
+        return JSONResponse(content={'message': 'New name required'}, status_code=400)
     
     db_sess = create_session()
 
@@ -212,31 +188,26 @@ async def set_user_name(
 
 
 @router.put('/change_username/')
+@require_auth
 async def change_username(
-    body: UsernameSetter,
-    headers: Annotated[AuthorizationHeader, Header()]
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
-    new_username: str = body.username
+    data: Any = await request.json()
+
+    new_username: str | None = data.get('new_username')
+    if not new_username:
+        return JSONResponse(content={'Invalid username format'}, status_code=400)
 
     if not User.validate_username(new_username):
         return JSONResponse(content={'Invalid username format'}, status_code=400)
-
-    token: str = headers.Authorization
-
-    if not new_username or not token:
-        return JSONResponse(content={'message': 'New username and token required'}, status_code=400)
-    
-    user_id: int = jwt_tokens.get_user_from_token(token)
-
-    if user_id == -1:
-        return JSONResponse(content={'message': 'Invalid authorization'}, status_code=401)
 
     db_sess = create_session()
 
     try:
         user: User | None = db_sess.query(User).filter_by(id=user_id).first()
 
-        if user.username == new_username: # Didn't actually change the username
+        if user.username == new_username:
             return JSONResponse(content={'message': 'That doesn\'t change the username'}, status_code=400)
 
         if db_sess.query(User).filter_by(username=new_username).first():
@@ -260,39 +231,36 @@ async def change_username(
 
 
 @router.put('/change_password/')
-async def change_password(
-    data: PasswordSetter,
-    headers: Annotated[AuthorizationHeader, Header()]
+@require_auth
+async def change_username(
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
+    data: Any = await request.json()
+    old_password: str | None = data.get('old_password')
+    new_password: str | None = data.get('new_password')
     
-    if not data.old_password or not data.new_password:
+    if not old_password or not new_password:
         return JSONResponse(content={'message': 'New password and old password required'}, status_code=400)
-
-    token: str = headers.Authorization
-
-    if not token:
-        return JSONResponse(content={'message': 'Token required'}, status_code=401)
     
-    if data.old_password == data.new_password:
+    if old_password == new_password:
         return JSONResponse(content={'message': 'New password must be different than old password'}, status_code=400)
     
-    if not User.validate_password(data.new_password):
+    if not User.validate_password(new_password):
         return JSONResponse(content={'message': 'Invalid new password format'}, status_code=400)
-
-    user_id: int = jwt_tokens.get_user_from_token(token)
-
-    if user_id == -1:
-        return JSONResponse(content={'message': 'Invalid authorization'}, status_code=401)
 
     try:
         db_sess = create_session()
 
         user: User | None = db_sess.query(User).filter_by(id=user_id).first()
 
-        if not user.check_password(data.old_password):
+        if not user:
+            return JSONResponse(content={'message': 'Not authenticated'}, status_code=401)
+
+        if not user.check_password(old_password):
             return JSONResponse(content={'message': 'Invalid old password'}, status_code=401)
         
-        user.set_password(data.new_password)
+        user.set_password(new_password)
 
         db_sess.add(user)
         db_sess.commit()
@@ -307,17 +275,15 @@ async def change_password(
 
 
 @router.get('/get_user_profile/')
-def get_user_profile(
-    username: str,
-    headers: Annotated[AuthorizationHeader, Header()]
+async def get_user_profile(
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
     try:
-        db_sess = create_session()
+        data = await request.json()
+        username: str | None = data.get('username')
 
-        token: str = headers.Authorization
-        user_id: int = jwt_tokens.get_user_from_token(token)
-        if user_id == -1:
-            return JSONResponse(content={'message': 'Unauthorized'}, status_code=401)
+        db_sess = create_session()
         
         user: User | None = db_sess.query(User).filter_by(username=username).first()
         if not user:
@@ -327,7 +293,7 @@ def get_user_profile(
 
         content: dict = {
             'message': 'User profile found',
-            'user_id': user.id,
+            'user_id': str(user.id),
             'username': user.username,
             'user_name': user.name,
             'num_followers': len(user.followers),
@@ -349,16 +315,12 @@ def get_user_profile(
         db_sess.close()
 
 @router.get('/get_current_user_profile/')
+@require_auth
 def get_current_user_profile(
-    headers: Annotated[AuthorizationHeader, Header()]
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
     try:
-        token: str = headers.Authorization
-        user_id: int = jwt_tokens.get_user_from_token(token)
-        
-        if user_id == -1:
-            return JSONResponse(content={'message': 'Unauthorized'}, status_code=401)
-        
         db_sess = create_session()
 
         user: User | None = db_sess.get(User, user_id)
@@ -367,7 +329,7 @@ def get_current_user_profile(
         
         content: dict = {
             'message': 'User profile found',
-            'user_id': user.id,
+            'user_id': str(user.id),
             'username': user.username,
             'user_name': user.name,
             'num_followers': len(user.followers),

@@ -1,8 +1,10 @@
 from functools import wraps
-from fastapi import HTTPException, Request
+from fastapi import Request
+from fastapi.responses import JSONResponse
 import jwt
 from datetime import datetime, timezone, timedelta
 from uuid import UUID
+import inspect
 
 from ..conf import Config
 
@@ -41,16 +43,39 @@ def get_user_from_token(token: str) -> UUID:
     return user_id
 
 def require_auth(func):
+    is_async = inspect.iscoroutinefunction(func)
+
     @wraps(func)
-    async def wrapper(request: Request, *args, **kwargs):
+    async def async_wrapper(*args, **kwargs):
+        request = kwargs.get('request') or next(
+            (arg for arg in args if isinstance(arg, Request)),
+            None,
+        )
+
+        if request is None:
+            raise RuntimeError(
+                '@require_auth requires `request: Request` parameter'
+            )
+
         token = request.headers.get('Authorization')
         if not token:
-            raise HTTPException(status_code=401, detail="Missing Authorization header")
+            raise JSONResponse(
+                status_code=401,
+                detail='Missing Authorization header',
+            )
 
         user_id = decode_token(token)
         if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid or expired token")
+            raise JSONResponse(
+                status_code=401,
+                detail='Invalid or expired token',
+            )
 
-        return await func(request, *args, user_id=user_id, **kwargs)
+        kwargs["user_id"] = user_id
 
-    return wrapper
+        if is_async:
+            return await func(*args, **kwargs)
+        else:
+            return func(*args, **kwargs)
+
+    return async_wrapper
