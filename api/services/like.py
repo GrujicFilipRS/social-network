@@ -87,16 +87,13 @@ async def like_post(
     
 
 @router.delete('/unlike_post/')
-def unlike_post(
-    post_id: int,
-    headers: Annotated[AuthorizationHeader, Header()]
+@require_auth
+async def unlike_post(
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
     try:
-        token: str = headers.Authorization
-        user_id: int = jwt_tokens.get_user_from_token(token)
-        if user_id == -1:
-            return JSONResponse(content={'message': 'You must be logged in to like a message'}, status_code=401)
-
+        post_id = UUID((await request.json()).get('post_id'))
         db_sess = create_session()
 
         user = db_sess.get(User, user_id)
@@ -124,8 +121,9 @@ def unlike_post(
 
 
 @router.get('/get_user_likes/')
-def get_user_likes(user_id: int) -> JSONResponse:
+def get_user_likes(user_id: str) -> JSONResponse:
     try:
+        user_id = UUID(user_id)
         db_sess = create_session()
         user: User | None = db_sess.get(User, user_id)
 
