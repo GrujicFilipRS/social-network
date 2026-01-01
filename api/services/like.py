@@ -1,5 +1,6 @@
+from uuid import UUID
 from fastapi.responses import JSONResponse
-from fastapi import Header
+from fastapi import Header, Request
 from datetime import datetime, timezone
 from typing import Annotated
 
@@ -8,8 +9,7 @@ from server.db.models.users import User
 from server.db.models.posts import Post
 from server.db.db_session import create_session
 
-from server.utils import jwt_tokens
-from .authorization import AuthorizationHeader
+from server.utils.jwt_tokens import optional_auth, require_auth
 from .literals import PostLiterals
 
 from fastapi import APIRouter
@@ -18,24 +18,22 @@ router = APIRouter()
 
 
 @router.get('/get_like/')
+@optional_auth
 def get_like(
-    like_id: int,
-    headers: Annotated[AuthorizationHeader, Header()]
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
     try:
         db_sess = create_session()
-
+        like_id = UUID(request.query_params.get('like_id'))
         like: Like | None = db_sess.get(Like, like_id)
 
         if not like:
             return JSONResponse(content={'message': 'Like not found'}, status_code=404)
         
-        if like.post.status == PostLiterals.PRIVATE:
-            token: str = headers.Authorization
-            user_id: int = jwt_tokens.get_user_from_token(token)
-            
-            if not user_id == like.post.user_id:
-                return JSONResponse(content={'message': 'The liked post is private'}, status_code=401)
+        if (like.post.status == PostLiterals.PRIVATE and
+            user_id != like.post.user_id):
+            return JSONResponse(content={'message': 'The liked post is private'}, status_code=401)
 
         content: dict = {
             'message': 'Like successfully found',
@@ -52,16 +50,13 @@ def get_like(
 
 
 @router.post('/like_post/')
-def like_post(
-    post_id: int,
-    headers: Annotated[AuthorizationHeader, Header()]
+@require_auth
+async def like_post(
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
     try:
-        token: str = headers.Authorization
-        user_id: int = jwt_tokens.get_user_from_token(token)
-        if user_id == -1:
-            return JSONResponse(content={'message': 'You must be logged in to like a message'}, status_code=401)
-
+        post_id = UUID((await request.json()).get('post_id'))
         db_sess = create_session()
 
         user = db_sess.get(User, user_id)
