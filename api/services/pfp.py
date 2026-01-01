@@ -1,4 +1,5 @@
-from fastapi import Header, UploadFile, File
+from uuid import UUID
+from fastapi import Header, Request, UploadFile, File
 from fastapi.responses import JSONResponse
 from typing import Annotated
 
@@ -11,8 +12,7 @@ from fastapi import APIRouter
 from server.db.models.pfps import PFP
 from server.db.db_session import create_session
 
-from server.utils import jwt_tokens
-from .authorization import AuthorizationHeader
+from server.utils.jwt_tokens import require_auth
 
 router = APIRouter()
 
@@ -25,8 +25,9 @@ cloudinary.config(
 
 
 @router.get('/get_user_pfp/')
-def get_user_pfp(user_id: int) -> JSONResponse:
+def get_user_pfp(user_id: str | UUID) -> JSONResponse:
     try:
+        user_id = UUID(user_id)
         db_sess = create_session()
         pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
 
@@ -48,18 +49,15 @@ def get_user_pfp(user_id: int) -> JSONResponse:
 
 
 @router.post('/create_user_pfp/')
+@require_auth
 async def create_user_pfp(
-    headers: Annotated[AuthorizationHeader, Header()],
-    image: UploadFile = File(...)
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
-    
+    image = request.form().get('image')
+
     try:
         db_sess = create_session()
-        token: str = headers.Authorization
-        user_id: int = jwt_tokens.get_user_from_token(token)
-
-        if user_id == -1:
-            return JSONResponse(content={'message': 'You are not authorized to do this'}, status_code=401)
 
         if not image.content_type.startswith('image/'):
             return JSONResponse(content={'message': 'File must be an image!'}, status_code=400)
@@ -70,7 +68,7 @@ async def create_user_pfp(
             io.BytesIO(file_bytes),
             folder='fastapi_uploads_pfp',
             resource_type='image',
-            public_id=image.filename.split(".")[0],
+            public_id=image.filename.split('.')[0],
             overwrite=True
         )
 
@@ -104,14 +102,11 @@ async def create_user_pfp(
 
 @router.delete('/delete_pfp/')
 async def delete_pfp(
-    headers: Annotated[AuthorizationHeader, Header()]
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
     try:
         db_sess = create_session()
-        token: str = headers.Authorization
-        user_id: int = jwt_tokens.get_user_from_token(token)
-        if user_id == -1:
-            return JSONResponse(content={'message': 'You are not authorized to do this'}, status_code=401)
 
         pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
 
