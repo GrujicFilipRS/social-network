@@ -1,14 +1,13 @@
+from uuid import UUID
 from fastapi.responses import JSONResponse
-from fastapi import Header
-from pydantic import BaseModel
+from fastapi import Header, Request
 from datetime import datetime, timezone
-from typing import Annotated
 
 from server.db.models.posts import Post
-from server.db.models.users import User
 from server.db.db_session import create_session
 
 from server.utils import jwt_tokens
+from server.utils.jwt_tokens import optional_auth, require_auth
 
 from services.literals import PostLiterals
 
@@ -18,48 +17,33 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-class PostCreator(BaseModel):
-    title: str
-    body: str
-    status: str
-
-
-class PostEditor(BaseModel):
-    id: int
-    title: str
-    body: str
-    status: str
-
 
 @router.get('/get_post/')
+@optional_auth
 async def get_post(
-    post_id: int | None,
-    headers: Annotated[AuthorizationHeader, Header()],
-    req_creation_date: bool=False,
-    req_user: bool=False
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
-    
-    token: str = headers.Authorization
-
     db_sess = create_session()
-
-    if not post_id:
-        return JSONResponse(content={'message': '`post_id` parameter is necessary'}, status_code=400)
     
     try:
+        post_id: UUID | None = UUID(request.query_params.get('post_id'))
+
         post = db_sess.get(Post, post_id)
         
         if not post:
             return JSONResponse(content={'message': 'Post not found'}, status_code=404)
         
-        post_info: dict = post.to_dict(req_creation_date=req_creation_date)
+        post_info: dict = post.to_dict(
+            req_creation_date=request.query_params.get('req_creation_date') is not None
+        )
 
         content: dict = {
             'message': 'Post found',
             'post': post_info
         }
 
-        if req_user:
+        if request.query_params.get('req_user'):
             content['user'] = post.user.to_dict(req_name=True)
         else:
             content['user'] = post.user.username
@@ -67,11 +51,7 @@ async def get_post(
         if post.status == PostLiterals.PUBLIC:
             return JSONResponse(content=content, status_code=200)
         
-        if not token:
-            return JSONResponse(content={'message': 'You are not authorized to view this post'}, status_code=401)
-        
-        user_id: int = jwt_tokens.get_user_from_token(token)
-        if user_id == -1 or user_id != post.user_id:
+        if user_id != post.user_id:
             return JSONResponse(content={'message': 'You are not authorized to view this post'}, status_code=401)
 
         return JSONResponse(content=content, status_code=200)
@@ -84,27 +64,19 @@ async def get_post(
 
 
 @router.post('/create_post/')
-def create_post(
-    data: PostCreator,
-    headers: Annotated[AuthorizationHeader, Header()]
+@require_auth
+async def create_post(
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
-    
-    token: str = headers.Authorization
-
     try:
-        if not token:
-            return JSONResponse(content={'message': 'You are not authorized to create posts'}, status_code=401)
-        
-        user_id: int = jwt_tokens.get_user_from_token(token)
-        if user_id == -1:
-            return JSONResponse(content={'message': 'You are not authorized to create posts'}, status_code=401)
-        
+        data = await request.json()
         db_sess = create_session()
 
         post = Post()
-        post.set_title(data.title)
-        post.set_body(data.body)
-        post.set_status(data.status)
+        post.set_title(data.get('title'))
+        post.set_body(data.get('body'))
+        post.set_status(data.get('status'))
         post.user_id = user_id
         post.created_at = datetime.now(timezone.utc)
 
@@ -126,20 +98,13 @@ def create_post(
 
 
 @router.put('/edit_post/')
-def edit_post(
-    data: PostEditor,
-    headers: Annotated[AuthorizationHeader, Header()]
+@require_auth
+async def edit_post(
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
-    
-    token: str = headers.Authorization
-
     try:
-        if not token:
-            return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
-        
-        user_id: int = jwt_tokens.get_user_from_token(token)
-        if user_id == -1:
-            return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
+        data = await request.json()
 
         db_sess = create_session()
         post = db_sess.get(Post, data.id)
@@ -147,9 +112,9 @@ def edit_post(
         if post.user_id != user_id:
             return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
         
-        post.set_title(data.title)
-        post.set_body(data.body)
-        post.set_status(data.status)
+        post.set_title(data.get('title'))
+        post.set_body(data.get('body'))
+        post.set_status(data.get('status'))
 
         db_sess.add(post)
         db_sess.commit()
@@ -169,23 +134,16 @@ def edit_post(
 
 
 @router.delete('/delete_post/')
-def delete_post(
-    post_id: int | None,
-    headers: Annotated[AuthorizationHeader, Header()]
+@require_auth
+async def delete_post(
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
-    
-    token: str = headers.Authorization
-
     try:
-        if not token:
-            return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
-                
-        user_id: int = jwt_tokens.get_user_from_token(token)
-        if user_id == -1:
-            return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
-        
         db_sess = create_session()
-
+        
+        data = await request.json()
+        post_id = UUID(data.get('post_id'))
         post = db_sess.get(Post, post_id)
 
         if post.user_id != user_id:
