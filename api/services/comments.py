@@ -1,23 +1,16 @@
+from uuid import UUID
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-from typing import Annotated
 
 from server.db.models.comments import Comment
 from server.db.models.posts import Post
 from server.db.db_session import create_session
 
-from server.utils import jwt_tokens
-from .authorization import AuthorizationHeader
+from server.utils.jwt_tokens import optional_auth, require_auth
 
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Request
+import literals
 
 router = APIRouter()
-
-
-class CommentCreator(BaseModel):
-    body: str
-    post_id: int
-    comment_id: int | None
 
 
 @router.get('/get_comment/')
@@ -45,26 +38,21 @@ def get_comment(comment_id: int) -> JSONResponse:
 
 
 @router.post('/post_comment/')
-def post_comment(
-    data: CommentCreator,
-    headers: Annotated[AuthorizationHeader, Header()]
+@require_auth
+async def post_comment(
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
     try:
-        token: str = headers.Authorization
-        if not token:
-            return JSONResponse(content={'message': 'You are not authorized to post comments'}, status_code=401)
-        
-        user_id: int = jwt_tokens.get_user_from_token(token)
-        if user_id == -1:
-            return JSONResponse(content={'message': 'You are not authorized to post comments'}, status_code=401)
-
+        data = await request.json()
         db_sess = create_session()
         
-        new_comment = Comment()
-        new_comment.body = data.body
-        new_comment.post_id = data.post_id
-        new_comment.comment_id = data.comment_id
-        new_comment.creator_id = user_id
+        new_comment = Comment(
+            body=data.get('body'),
+            post_id=UUID(data.get('post_id')),
+            comment_id=UUID(data.get('comment_id')) if data.get('comment_id') else None,
+            creator_id=user_id
+        )
 
         db_sess.add(new_comment)
         db_sess.commit()
@@ -84,16 +72,13 @@ def post_comment(
 
 
 @router.delete('/remove_comment/')
-def delete_comment(
-    comment_id: int,
-    headers: Annotated[AuthorizationHeader, Header()]
+@require_auth
+async def delete_comment(
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
     try:
-        token: str = headers.Authorization
-        user_id: int = jwt_tokens.get_user_from_token(token)
-
-        if user_id == -1:
-            return JSONResponse(content={'message': 'You are not authorized to delete this comment'}, status_code=401)
+        comment_id = UUID((await request.json()).get('comment_id'))
 
         db_sess = create_session()
         comment: Comment | None = db_sess.get(Comment, comment_id)
@@ -117,20 +102,33 @@ def delete_comment(
 
 
 @router.get('/get_post_comments/')
-def get_post_comments(post_id: int) -> JSONResponse:
+@optional_auth
+def get_post_comments(
+    request: Request,
+    user_id: UUID | None = None
+) -> JSONResponse:
     try:
         db_sess = create_session()
         
+        post_id = UUID(request.query_params.get('post_id'))
         post: Post | None = db_sess.get(Post, post_id)
         
         if post is None:
             return JSONResponse(content={'message': 'Post not found'}, status_code=404)
-
+        
         content: dict = {
             'message': 'Successfully gotten comments of post',
             'comments': [comm.to_dict() for comm in post.comments]
         }
 
+        if post.status == literals.PostLiterals.PUBLIC:
+            return JSONResponse(content=content, status_code=200)
+
+        if post.user_id != user_id:
+            return JSONResponse(content={
+                'message': 'You are not authorized to view this post'
+            }, status_code=401)
+        
         return JSONResponse(content=content, status_code=200)
     
     except Exception as e:
