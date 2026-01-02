@@ -1,8 +1,8 @@
 export interface PostData {
-    id: number,
+    id: string,
     body: string,
     title: string,
     status: 'PUBLIC' | 'PRIVATE',
-    user_id: number,
+    user_id: string,
     created_at: string | null
 }

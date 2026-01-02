@@ -7,7 +7,7 @@ const props = defineProps<{
 }>();
 
 const pfpToShow = ref<string>(props.user.pfp || './default-pfp.png');
-const linkToProfile = ref<string>(`./profile?user=${props.user.username}`);
+const linkToProfile = ref<string>(`/profile?user=${props.user.username}`);
 
 </script>
 

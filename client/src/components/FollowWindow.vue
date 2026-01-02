@@ -10,7 +10,7 @@ import type { FollowsData } from '../interfaces/FollowData';
 import FollowBox from './FollowBox.vue';
 
 const props = defineProps<{
-    userId?: number,
+    userId?: string,
 }>();
 
 const showRef = ref<boolean>(false);

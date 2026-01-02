@@ -9,7 +9,7 @@ import { handleLogin } from "../functions/Login";
 const router = useRouter();
 
 const userId = await verifyUser();
-if (userId !== -1) {
+if (!userId) {
     router.push("/feed");
 }
 

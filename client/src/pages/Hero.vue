@@ -8,7 +8,7 @@ const route = useRoute();
 
 async function verifyAndRedirect() {
     const userId = await verifyUser();
-    if (userId !== -1) {
+    if (!userId) {
         router.push('/feed');
     }
 }

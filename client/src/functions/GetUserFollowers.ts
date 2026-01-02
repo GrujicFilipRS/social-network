@@ -1,7 +1,7 @@
 import { API_ROUTE } from "../api"
 import type { FollowsData } from "../interfaces/FollowData";
 
-export const GetUserFollowers = async (userId: number) => {
+export const GetUserFollowers = async (userId: string) => {
     return fetch(`${API_ROUTE}/follow/get_user_followers/?user_id=${userId}`,
         {
             method: 'GET',

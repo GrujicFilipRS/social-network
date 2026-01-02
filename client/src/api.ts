@@ -1,16 +1,16 @@
 export const API_ROUTE = import.meta.env.VITE_API_ROUTE;
 
-export async function verifyUser(): Promise<number> {
+export async function verifyUser(): Promise<string> {
     const token = localStorage.getItem("jwt");
-    if (!token) return -1;
+    if (!token) return '';
 
     const res = await fetch(`${API_ROUTE}/user/get_current_user/`, {
         headers: { Authorization: `${token}` },
     });
 
 
-    if (!res.ok) return -1;
+    if (!res.ok) return '';
 
     const data = await res.json();
-    return data.user_id || -1;
+    return data.user_id || '';
 }

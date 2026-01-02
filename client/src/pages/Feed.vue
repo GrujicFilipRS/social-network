@@ -7,7 +7,7 @@ import { verifyUser } from '../api';
 const router = useRouter();
 
 const userId = await verifyUser();
-if (userId == -1) {
+if (!userId) {
     router.push('/join');
 }
 

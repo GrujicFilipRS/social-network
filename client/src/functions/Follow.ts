@@ -2,7 +2,7 @@ import type { Ref } from "vue";
 import { API_ROUTE } from "../api"
 
 export const Follow = async (
-    userId: number,
+    userId: string,
     followedRef: Ref<boolean>
 ) => {
     const token = localStorage.getItem('jwt');
@@ -21,7 +21,7 @@ export const Follow = async (
 }
 
 export const Unfollow = async (
-    userId: number,
+    userId: string,
     followedRef: Ref<boolean>
 ) => {
     const token = localStorage.getItem('jwt');

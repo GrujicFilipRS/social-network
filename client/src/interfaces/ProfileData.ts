@@ -1,7 +1,7 @@
 import type { PostData } from './PostData';
 
 export interface ProfileData {
-    user_id: number,
+    user_id: string,
     username: string,
     user_name: string | null,
     num_followers: number,
