@@ -1,23 +1,17 @@
+from uuid import UUID
 from fastapi.responses import JSONResponse
-from fastapi import Header
-from pydantic import BaseModel
+from fastapi import Request
 from datetime import datetime, timezone
-from typing import Annotated
 
 from server.db.models.follows import Follow
 from server.db.models.users import User
 from server.db.db_session import create_session
 
-from server.utils import jwt_tokens
-from .authorization import AuthorizationHeader
+from server.utils.jwt_tokens import require_auth
 
 from fastapi import APIRouter
 
 router = APIRouter()
-
-
-class ToFollowData(BaseModel):
-    to_follow_id: int
 
 
 @router.get('/get_follow/')
@@ -45,31 +39,24 @@ def get_follow(follow_id: int, req_names: bool = False) -> JSONResponse:
 
 
 @router.post('/follow_user/')
-def follow_user(
-    data: ToFollowData,
-    headers: Annotated[AuthorizationHeader, Header()]
+@require_auth
+async def follow_user(
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
     try:
-        token: str = headers.Authorization
-
-        if not token:
-            return JSONResponse(content={'message': 'Invalid authorization'}, status_code=401)
-
-        user_id: int = jwt_tokens.get_user_from_token(token)
-
-        if user_id == -1:
-            return JSONResponse(content={'message': 'Invalid authorization'}, status_code=401)
+        to_follow_id: UUID = UUID((await request.json()).get('to_follow_id'))
 
         db_sess = create_session()
 
-        if not db_sess.get(User, data.to_follow_id):
+        if not db_sess.get(User, to_follow_id):
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
 
-        if db_sess.query(Follow).filter_by(follower_id=user_id, followed_id=data.to_follow_id).first():
+        if db_sess.query(Follow).filter_by(follower_id=user_id, followed_id=to_follow_id).first():
             return JSONResponse(content={'message', 'You already follow this user'}, status_code=400)
 
         follow = Follow()
-        follow.followed_id = data.to_follow_id
+        follow.followed_id = to_follow_id
         follow.follower_id = user_id
         follow.followed_datetime = datetime.now(timezone.utc)
 
@@ -86,26 +73,18 @@ def follow_user(
 
 
 @router.delete('/unfollow_user/')
-def unfollow_user(
-    data: ToFollowData,
-    headers: Annotated[AuthorizationHeader, Header()]
+@require_auth
+async def unfollow_user(
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
     try:
-        token: str = headers.Authorization
-
-        if not token:
-            return JSONResponse(content={'message': 'Invalid authorization'}, status_code=401)
-
-        user_id: int = jwt_tokens.get_user_from_token(token)
-
-        if user_id == -1:
-            return JSONResponse(content={'message': 'Invalid authorization'}, status_code=401)
-
+        to_follow_id = UUID((await request.json()).get('to_follow_id'))
         db_sess = create_session()
 
         follow = db_sess.query(Follow).filter_by(
             follower_id=user_id,
-            followed_id=data.to_follow_id
+            followed_id=to_follow_id
         ).first()
 
         db_sess.delete(follow)
@@ -122,9 +101,10 @@ def unfollow_user(
 
 @router.get('/get_user_follows/')
 def get_user_follows(
-    user_id: int
+    user_id: str | UUID
 ) -> JSONResponse:
     try:
+        user_id: UUID = UUID(user_id)
         db_sess = create_session()
 
         if not db_sess.get(User, user_id):
@@ -154,9 +134,10 @@ def get_user_follows(
 
 @router.get('/get_user_followers/')
 def get_user_followers(
-    user_id: int
+    user_id: str | UUID
 ) -> JSONResponse:
     try:
+        user_id: UUID = UUID(user_id)
         db_sess = create_session()
 
         if not db_sess.get(User, user_id):
@@ -186,14 +167,14 @@ def get_user_followers(
 
 @router.get('/check_if_following/')
 def check_if_following(
-    user_id: int,
-    headers: Annotated[AuthorizationHeader, Header()]
+    request: Request,
+    user_id: UUID | None = None
 ) -> JSONResponse:
     try:
         db_sess = create_session()
-        user_from_id: int = jwt_tokens.get_user_from_token(headers.Authorization)
+        user_to_id: UUID = UUID(request.query_params.get('user_id'))
         return JSONResponse(content={
-            'following': bool(db_sess.query(Follow).filter_by(follower_id=user_from_id, followed_id=user_id).first())
+            'following': bool(db_sess.query(Follow).filter_by(follower_id=user_id, followed_id=user_to_id).first())
         }, status_code=200)
     
     except Exception as e:
