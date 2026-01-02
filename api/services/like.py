@@ -1,8 +1,7 @@
 from uuid import UUID
 from fastapi.responses import JSONResponse
-from fastapi import Header, Request
+from fastapi import Request
 from datetime import datetime, timezone
-from typing import Annotated
 
 from server.db.models.likes import Like
 from server.db.models.users import User
@@ -10,7 +9,7 @@ from server.db.models.posts import Post
 from server.db.db_session import create_session
 
 from server.utils.jwt_tokens import optional_auth, require_auth
-from .literals import PostLiterals
+from server.utils.literals import PostLiterals
 
 from fastapi import APIRouter
 

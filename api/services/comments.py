@@ -6,9 +6,9 @@ from server.db.models.posts import Post
 from server.db.db_session import create_session
 
 from server.utils.jwt_tokens import optional_auth, require_auth
+from server.utils.literals import PostLiterals
 
 from fastapi import APIRouter, Request
-import literals
 
 router = APIRouter()
 
@@ -121,7 +121,7 @@ def get_post_comments(
             'comments': [comm.to_dict() for comm in post.comments]
         }
 
-        if post.status == literals.PostLiterals.PUBLIC:
+        if post.status == PostLiterals.PUBLIC:
             return JSONResponse(content=content, status_code=200)
 
         if post.user_id != user_id:

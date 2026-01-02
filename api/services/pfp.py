@@ -1,7 +1,6 @@
 from uuid import UUID
-from fastapi import Header, Request, UploadFile, File
+from fastapi import Request
 from fastapi.responses import JSONResponse
-from typing import Annotated
 
 import cloudinary
 import cloudinary.uploader

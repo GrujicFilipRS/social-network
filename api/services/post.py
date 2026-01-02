@@ -1,17 +1,14 @@
 from uuid import UUID
 from fastapi.responses import JSONResponse
-from fastapi import Header, Request
+from fastapi import Request
 from datetime import datetime, timezone
 
 from server.db.models.posts import Post
 from server.db.db_session import create_session
 
-from server.utils import jwt_tokens
 from server.utils.jwt_tokens import optional_auth, require_auth
 
-from services.literals import PostLiterals
-
-from .authorization import AuthorizationHeader
+from server.utils.literals import PostLiterals
 
 from fastapi import APIRouter
 
