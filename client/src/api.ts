@@ -1,16 +1,52 @@
 export const API_ROUTE = import.meta.env.VITE_API_ROUTE;
 
-export async function verifyUser(): Promise<string> {
-    const token = localStorage.getItem("jwt");
-    if (!token) return '';
+interface FetchOptions {
+    method?: string,
+    body?: string,
+    headers?: Record<string, string>
+};
 
-    const res = await fetch(`${API_ROUTE}/user/get_current_user/`, {
-        headers: { Authorization: `${token}` },
+export const Fetch = async (
+    endpoint: string,
+    {
+        method = 'GET',
+        body = '{}',
+        headers = {}
+    }: FetchOptions = {}
+): Promise<Response> => {
+
+    const options: RequestInit = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            ...headers,
+        },
+        credentials: 'include',
+    };
+
+    if (body && method !== "GET") {
+        options.body = body;
+    }
+
+    return fetch(`${API_ROUTE}/${endpoint}`, options);
+}
+
+interface VerificationData {
+    statusCode: number;
+    result: any;
+}
+
+export async function verifyUser(): Promise<VerificationData> {
+    return Fetch('user/current_user')
+    .then(async (res) => {
+        return {
+            statusCode: res.status,
+            result: res,
+        } as VerificationData;
+    })
+    .catch((err) => {
+        console.log(err);
+        return { statusCode: 0, result: "" } as VerificationData;
     });
-
-
-    if (!res.ok) return '';
-
-    const data = await res.json();
-    return data.user_id || '';
 }

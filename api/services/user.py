@@ -1,6 +1,6 @@
 from uuid import UUID
 from fastapi.responses import JSONResponse
-from fastapi import Request
+from fastapi import Request, Response
 from datetime import datetime, timezone
 from typing import Any
 
@@ -9,7 +9,7 @@ from server.db.models.follows import Follow
 from server.db.db_session import create_session
 
 from server.utils import jwt_tokens
-from server.utils.jwt_tokens import require_auth
+from server.utils.jwt_tokens import require_auth, AUTH_COOKIE_NAME
 
 from fastapi import APIRouter
 
@@ -71,7 +71,7 @@ def get_current_user(
 
 
 @router.post('/register/')
-async def register(request: Request) -> JSONResponse:
+async def register(request: Request) -> JSONResponse | Response:
     data = await request.json()
 
     username: str | None = data.get('username')
@@ -103,11 +103,14 @@ async def register(request: Request) -> JSONResponse:
 
         content: dict = {
             'message': 'User created and logged in',
-            'user': user.to_dict(),
-            'token': token
+            'user': user.to_dict()
         }
 
-        return JSONResponse(content=content, status_code=201)
+        response = Response()
+        response.set_cookie(AUTH_COOKIE_NAME, token)
+        response.body = content
+
+        return response
     
     except Exception as e:
         return JSONResponse(content={'message': f'Error while creating user: {e}'}, status_code=500)
@@ -117,7 +120,7 @@ async def register(request: Request) -> JSONResponse:
 
 
 @router.post('/login/')
-async def login(request: Request) -> JSONResponse:
+async def login(request: Request) -> JSONResponse | Response:
     data = await request.json()
 
     username: str | None = data.get('username')
@@ -142,11 +145,14 @@ async def login(request: Request) -> JSONResponse:
         content: dict = {
             'message': 'User logged in',
             'user': user.to_dict(),
-            'token': str(token)
         }
 
-        return JSONResponse(content=content, status_code=200)
-    
+        response = Response()
+        response.set_cookie(AUTH_COOKIE_NAME, token)
+        response.body = content
+
+        return response
+
     except Exception as e:
         return JSONResponse(content={'message': f'Error while logging in: {e}'}, status_code=500)
 

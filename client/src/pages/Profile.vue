@@ -13,10 +13,12 @@ import FollowsWindow from '../components/FollowWindow.vue';
 
 const router = useRouter();
 
-const userId = await verifyUser();
-if (!userId) {
+const verificationData = await verifyUser();
+if (verificationData.result !== 200) {
     router.push('/join');
 }
+
+const userId: string = verificationData.result['user_id'];
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);

@@ -31,16 +31,7 @@ def decode_token(token: str) -> UUID | None:
         return None
 
 
-def get_user_from_token(token: str) -> UUID:
-    if not token:
-        return ''
-    
-    user_id = decode_token(token)
-
-    if not user_id:
-        return ''
-    
-    return user_id
+AUTH_COOKIE_NAME: str = 'access_token'
 
 def require_auth(func):
     is_async = inspect.iscoroutinefunction(func)
@@ -57,7 +48,7 @@ def require_auth(func):
                 '@require_auth requires `request: Request` parameter'
             )
 
-        token = request.headers.get('Authorization')
+        token = request.cookies.get(AUTH_COOKIE_NAME)
         if not token:
             raise JSONResponse(
                 status_code=401,
@@ -96,7 +87,7 @@ def optional_auth(func):
                 '@require_auth requires `request: Request` parameter'
             )
 
-        token = request.headers.get('Authorization')
+        token = request.cookies.get(AUTH_COOKIE_NAME)
         if not token:
             raise JSONResponse(
                 status_code=401,

@@ -6,8 +6,8 @@ import { verifyUser } from '../api';
 
 const router = useRouter();
 
-const userId = await verifyUser();
-if (!userId) {
+const verificationData = await verifyUser();
+if (verificationData.result !== 200) {
     router.push('/join');
 }
 

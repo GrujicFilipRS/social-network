@@ -8,9 +8,9 @@ import { handleLogin } from "../functions/Login";
 
 const router = useRouter();
 
-const userId = await verifyUser();
-if (!userId) {
-    router.push("/feed");
+const verificationData = await verifyUser();
+if (verificationData.result !== 200) {
+    router.push('/join');
 }
 
 const signupMode = ref(true);
