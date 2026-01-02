@@ -18,7 +18,7 @@ if (verificationData.result !== 200) {
     router.push('/join');
 }
 
-const userId: string = verificationData.result['user_id'];
+const userId: string = verificationData.result['user']['id'];
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
