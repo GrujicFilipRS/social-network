@@ -71,7 +71,7 @@ def get_current_user(
 
 
 @router.post('/register/')
-async def register(request: Request) -> JSONResponse | Response:
+async def register(request: Request) -> JSONResponse:
     data = await request.json()
 
     username: str | None = data.get('username')
@@ -101,26 +101,33 @@ async def register(request: Request) -> JSONResponse | Response:
         
         token = jwt_tokens.encode_token(user.id)
 
-        content: dict = {
-            'message': 'User created and logged in',
-            'user': user.to_dict()
-        }
-
-        response = Response()
-        response.set_cookie(AUTH_COOKIE_NAME, token)
-        response.body = content
+        response = JSONResponse(
+            content={
+                'message': 'User created and logged in',
+                'user': user.to_dict(),
+            },
+            status_code=200
+        )
+        
+        response.set_cookie(
+            key=AUTH_COOKIE_NAME,
+            value=token,
+            httponly=True,
+            samesite='none',
+            path='/',
+        )
 
         return response
     
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while creating user: {e}'}, status_code=500)
+        return Response(content={'message': f'Error while creating user: {e}'}, status_code=500)
     
     finally:
         db_sess.close()
 
 
 @router.post('/login/')
-async def login(request: Request) -> JSONResponse | Response:
+async def login(request: Request) -> JSONResponse:
     data = await request.json()
 
     username: str | None = data.get('username')
@@ -142,19 +149,26 @@ async def login(request: Request) -> JSONResponse | Response:
         
         token = jwt_tokens.encode_token(user.id)
 
-        content: dict = {
-            'message': 'User logged in',
-            'user': user.to_dict(),
-        }
-
-        response = Response()
-        response.set_cookie(AUTH_COOKIE_NAME, token)
-        response.body = content
+        response = JSONResponse(
+            content={
+                'message': 'User logged in',
+                'user': user.to_dict(),
+            },
+            status_code=200
+        )
+        
+        response.set_cookie(
+            key=AUTH_COOKIE_NAME,
+            value=token,
+            httponly=True,
+            samesite='none',
+            path='/',
+        )
 
         return response
 
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while logging in: {e}'}, status_code=500)
+        return Response(content={'message': f'Error while logging in: {e}'}, status_code=500)
 
     finally:
         db_sess.close()

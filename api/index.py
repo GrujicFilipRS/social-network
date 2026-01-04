@@ -18,7 +18,7 @@ load_dotenv()
 
 app = FastAPI()
 
-FRONTEND_URL: str = os.getenv('FRONTEND_URL', '*')
+FRONTEND_URL: str = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 
 app.add_middleware(
     CORSMiddleware,

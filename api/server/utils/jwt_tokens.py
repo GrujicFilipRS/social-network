@@ -50,16 +50,16 @@ def require_auth(func):
 
         token = request.cookies.get(AUTH_COOKIE_NAME)
         if not token:
-            raise JSONResponse(
+            return JSONResponse(
                 status_code=401,
-                detail='Missing Authorization header',
+                content={'message': 'Missing Authorization Cookie'}
             )
 
         user_id: UUID | None = decode_token(token)
         if not user_id:
-            raise JSONResponse(
+            return JSONResponse(
                 status_code=401,
-                detail='Invalid or expired token',
+                content={'message': 'Invalid or expired token'}
             )
 
         kwargs['user_id'] = user_id
@@ -88,13 +88,8 @@ def optional_auth(func):
             )
 
         token = request.cookies.get(AUTH_COOKIE_NAME)
-        if not token:
-            raise JSONResponse(
-                status_code=401,
-                detail='Missing Authorization header',
-            )
 
-        user_id: UUID | None = decode_token(token)
+        user_id: UUID | None = decode_token(token) if token else None
         kwargs['user_id'] = user_id
 
         if is_async:

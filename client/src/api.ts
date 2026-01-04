@@ -38,7 +38,7 @@ interface VerificationData {
 }
 
 export async function verifyUser(): Promise<VerificationData> {
-    return Fetch('user/current_user')
+    return Fetch('user/get_current_user/')
     .then(async (res) => {
         return {
             statusCode: res.status,
