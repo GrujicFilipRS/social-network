@@ -3,7 +3,9 @@ from fastapi.responses import JSONResponse
 from fastapi import Request, Response
 from datetime import datetime, timezone
 from typing import Any
+import os
 
+from server.conf import Config
 from server.db.models.users import User
 from server.db.models.follows import Follow
 from server.db.db_session import create_session
@@ -113,8 +115,10 @@ async def register(request: Request) -> JSONResponse:
             key=AUTH_COOKIE_NAME,
             value=token,
             httponly=True,
-            samesite='none',
+            samesite='None',
             path='/',
+            secure=os.getenv('FLASK_ENV') == 'production',
+            expires=Config.JWT_EXPIRATION_HOURS * 3600
         )
 
         return response
@@ -161,8 +165,10 @@ async def login(request: Request) -> JSONResponse:
             key=AUTH_COOKIE_NAME,
             value=token,
             httponly=True,
-            samesite='none',
+            samesite='None',
             path='/',
+            secure=os.getenv('FLASK_ENV') == 'production',
+            expires=Config.JWT_EXPIRATION_HOURS * 3600
         )
 
         return response

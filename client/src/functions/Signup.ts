@@ -19,6 +19,7 @@ export const handleSignup = async (
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: "include"
     })
     .then(async (res) => {
         if (res.status == 201) {

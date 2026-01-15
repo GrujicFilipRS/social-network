@@ -9,11 +9,12 @@ import inspect
 from ..conf import Config
 
 def encode_token(user_id: UUID) -> str:
-    expiration = datetime.now(timezone.utc) + timedelta(hours=Config.JWT_EXPIRATION_HOURS)
+    now = datetime.now(timezone.utc)
+    expiration = now + timedelta(hours=Config.JWT_EXPIRATION_HOURS)
     payload = {
         'user_id': str(user_id),
-        'exp': expiration,
-        'iat': datetime.now(timezone.utc)
+        'iat': int(now.timestamp()),
+        'exp': int(expiration.timestamp()),
     }
     token = jwt.encode(payload, Config.SECRET_KEY, algorithm='HS256')
     return token
