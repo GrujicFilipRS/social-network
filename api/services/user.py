@@ -115,7 +115,7 @@ async def register(request: Request) -> JSONResponse:
             key=AUTH_COOKIE_NAME,
             value=token,
             httponly=True,
-            samesite='None',
+            samesite='Lax',
             path='/',
             secure=os.getenv('FLASK_ENV') == 'production',
             expires=Config.JWT_EXPIRATION_HOURS * 3600
@@ -165,7 +165,7 @@ async def login(request: Request) -> JSONResponse:
             key=AUTH_COOKIE_NAME,
             value=token,
             httponly=True,
-            samesite='None',
+            samesite='Lax',
             path='/',
             secure=os.getenv('FLASK_ENV') == 'production',
             expires=Config.JWT_EXPIRATION_HOURS * 3600
