@@ -1,4 +1,4 @@
-export const API_ROUTE = import.meta.env.VITE_API_ROUTE;
+const API_ROUTE = import.meta.env.VITE_API_ROUTE;
 
 interface FetchOptions {
     method?: string,
@@ -25,7 +25,7 @@ export const Fetch = async (
         credentials: 'include',
     };
 
-    if (body && method !== "GET") {
+    if (body && method !== 'GET') {
         options.body = body;
     }
 
@@ -40,13 +40,14 @@ interface VerificationData {
 export async function verifyUser(): Promise<VerificationData> {
     return Fetch('user/get_current_user/')
     .then(async (res) => {
+        const data = await res.json();
         return {
             statusCode: res.status,
-            result: res,
+            result: data,
         } as VerificationData;
     })
     .catch((err) => {
         console.log(err);
-        return { statusCode: 0, result: "" } as VerificationData;
+        return { statusCode: 0, result: '' } as VerificationData;
     });
 }

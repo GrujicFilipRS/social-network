@@ -14,7 +14,7 @@ if (verificationData.statusCode !== 200) {
 }
 
 const signupMode = ref(true);
-const errorText = ref("");
+const errorText = ref<string>('');
 
 interface SignupData {
     username: string;

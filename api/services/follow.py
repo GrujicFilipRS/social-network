@@ -46,6 +46,8 @@ async def follow_user(
 ) -> JSONResponse:
     try:
         to_follow_id: UUID = UUID((await request.json()).get('to_follow_id'))
+        if to_follow_id == user_id:
+            return JSONResponse(content={'message': 'You cannot follow yourself'}, status_code=400)
 
         db_sess = create_session()
 
