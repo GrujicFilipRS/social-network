@@ -22,9 +22,7 @@ export const handleLogin = async (
     })
     .then(async (res) => {
         if (res.status == 200) {
-            const data = await res.json();
-            localStorage.setItem("jwt", data["token"]);
-            router.push("/feed");
+            router.push('/feed');
             return;
         }
 

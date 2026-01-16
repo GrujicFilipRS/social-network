@@ -8,7 +8,7 @@ const route = useRoute();
 
 async function verifyAndRedirect() {
     const verificationData = await verifyUser();
-    if (verificationData.result !== 200) {
+    if (verificationData.statusCode !== 200) {
         router.push('/join');
     }
 }

@@ -301,13 +301,15 @@ async def change_username(
 
 
 @router.get('/get_user_profile/')
+@require_auth
 async def get_user_profile(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
     try:
-        data = await request.json()
-        username: str | None = data.get('username')
+        username: str | None = request.query_params.get('username')
+        if not username:
+            return JSONResponse(content={'message': '`username` parameter is required'}, status_code=400)
 
         db_sess = create_session()
         

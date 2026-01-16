@@ -23,13 +23,11 @@ export const handleSignup = async (
     })
     .then(async (res) => {
         if (res.status == 201) {
-            const data = await res.json();
-            localStorage.setItem("jwt", data["token"]);
-            router.push("/feed");
+            router.push('/feed');
             return;
         }
 
-        const errMessage = (await res.json())["message"];
+        const errMessage = (await res.json())['message'];
         errorText.value = errMessage;
     })
     .catch((err) => {

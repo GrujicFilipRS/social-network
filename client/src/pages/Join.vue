@@ -9,7 +9,7 @@ import { handleLogin } from "../functions/Login";
 const router = useRouter();
 
 const verificationData = await verifyUser();
-if (verificationData.result !== 200) {
+if (verificationData.statusCode !== 200) {
     router.push('/join');
 }
 
