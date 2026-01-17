@@ -45,11 +45,11 @@ async def follow_user(
     user_id: UUID | None = None
 ) -> JSONResponse:
     try:
+        db_sess = create_session()
+
         to_follow_id: UUID = UUID((await request.json()).get('to_follow_id'))
         if to_follow_id == user_id:
             return JSONResponse(content={'message': 'You cannot follow yourself'}, status_code=400)
-
-        db_sess = create_session()
 
         if not db_sess.get(User, to_follow_id):
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
@@ -68,7 +68,7 @@ async def follow_user(
         return JSONResponse(content={'message': 'Successfully followed user'}, status_code=201)
         
     except Exception as e:
-        return JSONResponse(content={'message': f'Error while following: {e}'}, status_code=400)
+        return JSONResponse(content={'message': f'Error while following: {e}'}, status_code=500)
     
     finally:
         db_sess.close()
@@ -81,8 +81,8 @@ async def unfollow_user(
     user_id: UUID | None = None
 ) -> JSONResponse:
     try:
-        to_follow_id = UUID((await request.json()).get('to_follow_id'))
         db_sess = create_session()
+        to_follow_id = UUID((await request.json()).get('to_follow_id'))
 
         follow = db_sess.query(Follow).filter_by(
             follower_id=user_id,
@@ -95,7 +95,7 @@ async def unfollow_user(
         return JSONResponse(content={'message': 'Successfully unfollowed user'}, status_code=200)
     
     except Exception as e:
-        return JSONResponse(content={'message': f'Unexpected error while unfollowing user: {e}'})
+        return JSONResponse(content={'message': f'Unexpected error while unfollowing user: {e}'}, status_code=500)
 
     finally:
         db_sess.close()
@@ -106,8 +106,8 @@ def get_user_follows(
     user_id: str | UUID
 ) -> JSONResponse:
     try:
-        user_id: UUID = UUID(user_id)
         db_sess = create_session()
+        user_id: UUID = UUID(user_id)
 
         if not db_sess.get(User, user_id):
             return JSONResponse(content={'message': 'User with provided id not found'}, status_code=404)
@@ -139,8 +139,8 @@ def get_user_followers(
     user_id: str | UUID
 ) -> JSONResponse:
     try:
-        user_id: UUID = UUID(user_id)
         db_sess = create_session()
+        user_id: UUID = UUID(user_id)
 
         if not db_sess.get(User, user_id):
             return JSONResponse(content={'message': 'User with provided id not found'}, status_code=404)
