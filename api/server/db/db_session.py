@@ -48,3 +48,16 @@ def create_session():
     if not __factory:
         raise Exception("Database session not initialized. Call global_init first.")
     return __factory()
+
+
+class DBSessionManager:
+    def __init__(self):
+        self.db_sess = create_session()
+
+    def __enter__(self):
+        return self.db_sess
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.db_sess.close()
+        if exc_type:
+            print(f"Exception in DB session: {exc_type}, {exc_val}")

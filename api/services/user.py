@@ -8,7 +8,7 @@ import os
 from server.conf import Config
 from server.db.models.users import User
 from server.db.models.follows import Follow
-from server.db.db_session import create_session
+from server.db.db_session import DBSessionManager
 
 from server.utils import jwt_tokens
 from server.utils.jwt_tokens import require_auth, AUTH_COOKIE_NAME
@@ -25,13 +25,11 @@ async def get_user(
     req_creation_date: bool = False,
     req_pfp: bool = False
 ) -> JSONResponse:
-    db_session = create_session()
+    with DBSessionManager() as db_sess:
+        if user_id is None:
+            return JSONResponse(content={'message': '`user_id` parameter is necessary'}, status_code=400)
 
-    if user_id is None:
-        return JSONResponse(content={'message': '`user_id` parameter is necessary'}, status_code=400)
-
-    try:
-        user = db_session.get(User, user_id)
+        user: User | None = db_sess.get(User, user_id)
 
         if not user:
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
@@ -42,12 +40,6 @@ async def get_user(
         }
 
         return JSONResponse(content=content, status_code=200)
-    
-    except Exception as e:
-        return JSONResponse(content={'message': f'An error occured: {str(e)}'}, status_code=500)
-    
-    finally:
-        db_session.close()
 
 
 @router.get('/get_current_user/')
@@ -56,20 +48,17 @@ def get_current_user(
     request: Request,
     user_id: UUID | None = None,
 ) -> JSONResponse:
-    try:
-        db_sess = create_session()
-        if not db_sess.get(User, user_id):
+    with DBSessionManager() as db_sess:
+        user: User | None = db_sess.get(User, user_id)
+        if not user:
             return JSONResponse(content={'message': 'Invalid token'}, status_code=401)
 
-        content: dict[str, str] = {
+        content: dict = {
             'message': 'Successful verification',
-            'user_id': str(user_id)
+            'user': user.to_dict()
         }
 
         return JSONResponse(content=content, status_code=200)
-    
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while creating user: {e}'}, status_code=500)
 
 
 @router.post('/register/')
@@ -85,10 +74,8 @@ async def register(request: Request) -> JSONResponse:
 
     if not User.validate_username(username) or not User.validate_password(password):
         return JSONResponse(content={'message': 'Invalid username or password format'}, status_code=400)
-    
-    db_sess = create_session()
 
-    try:
+    with DBSessionManager() as db_sess:
         if db_sess.query(User).filter_by(username=username).first():
             return JSONResponse(content={'message': 'User with such username already exists'}, status_code=400)
         
@@ -122,12 +109,6 @@ async def register(request: Request) -> JSONResponse:
         )
 
         return response
-    
-    except Exception as e:
-        return Response(content={'message': f'Error while creating user: {e}'}, status_code=500)
-    
-    finally:
-        db_sess.close()
 
 
 @router.post('/login/')
@@ -140,15 +121,10 @@ async def login(request: Request) -> JSONResponse:
     if not username or not password:
         return JSONResponse(content={'message': 'Username and password required'}, status_code=400)
 
-    db_sess = create_session()
+    with DBSessionManager() as db_sess:
+        user: User | None = db_sess.query(User).filter_by(username=username).first()
 
-    try:
-        if not db_sess.query(User).filter_by(username=username).first():
-            return JSONResponse(content={'message': 'Incorrect credentials'}, status_code=400)
-        
-        user = db_sess.query(User).filter_by(username=username).first()
-
-        if not user.check_password(password):
+        if not user or not user.check_password(password):
             return JSONResponse(content={'message': 'Incorrect credentials'}, status_code=400)
         
         token = jwt_tokens.encode_token(user.id)
@@ -173,12 +149,6 @@ async def login(request: Request) -> JSONResponse:
 
         return response
 
-    except Exception as e:
-        return Response(content={'message': f'Error while logging in: {e}'}, status_code=500)
-
-    finally:
-        db_sess.close()
-
 
 @router.put('/set_name/')
 @require_auth
@@ -192,12 +162,10 @@ async def set_user_name(
 
     if not new_name:
         return JSONResponse(content={'message': 'New name required'}, status_code=400)
-    
-    db_sess = create_session()
 
-    try:
-        user: User | None = db_sess.query(User).filter_by(id=user_id).first()
-        if User is None:
+    with DBSessionManager() as db_sess:
+        user: User | None = db_sess.get(User, user_id)
+        if user is None:
             return JSONResponse(content={'message': 'User doesn\'t exist'}, status_code=400)
         
         user.set_name(new_name)
@@ -205,12 +173,6 @@ async def set_user_name(
         db_sess.commit()
 
         return JSONResponse(content={'message': f'Name successfully changed to {new_name}'}, status_code=200)
-
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while setting name: {e}'}, status_code=500)
-
-    finally:
-        db_sess.close()
 
 
 @router.put('/change_username/')
@@ -228,10 +190,11 @@ async def change_username(
     if not User.validate_username(new_username):
         return JSONResponse(content={'Invalid username format'}, status_code=400)
 
-    db_sess = create_session()
+    with DBSessionManager() as db_sess:
+        user: User | None = db_sess.get(User, user_id)
 
-    try:
-        user: User | None = db_sess.query(User).filter_by(id=user_id).first()
+        if user is None:
+            return JSONResponse(content={'message': 'User doesn\'t exist'}, status_code=400)
 
         if user.username == new_username:
             return JSONResponse(content={'message': 'That doesn\'t change the username'}, status_code=400)
@@ -239,21 +202,12 @@ async def change_username(
         if db_sess.query(User).filter_by(username=new_username).first():
             return JSONResponse(content={'message': 'User with such username already exists'}, status_code=400)
         
-        if user is None:
-            return JSONResponse(content={'message': 'User doesn\'t exist'}, status_code=400)
-        
         user.set_username(new_username)
 
         db_sess.add(user)
         db_sess.commit()
 
         return JSONResponse(content={'message': f'Username successfully changed to {new_username}'}, status_code=200)
-        
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while changing username: {e}'}, status_code=500)
-    
-    finally:
-        db_sess.close()
 
 
 @router.put('/change_password/')
@@ -275,29 +229,21 @@ async def change_username(
     if not User.validate_password(new_password):
         return JSONResponse(content={'message': 'Invalid new password format'}, status_code=400)
 
-    try:
-        db_sess = create_session()
+    with DBSessionManager() as db_sess:
+        user: User | None = db_sess.get(User, user_id)
 
-        user: User | None = db_sess.query(User).filter_by(id=user_id).first()
-
-        if not user:
-            return JSONResponse(content={'message': 'Not authenticated'}, status_code=401)
+        if user is None:
+            return JSONResponse(content={'message': 'User doesn\'t exist'}, status_code=400)
 
         if not user.check_password(old_password):
-            return JSONResponse(content={'message': 'Invalid old password'}, status_code=401)
+            return JSONResponse(content={'message': 'Old password is incorrect'}, status_code=400)
         
         user.set_password(new_password)
 
         db_sess.add(user)
         db_sess.commit()
 
-        return JSONResponse(content={'message': 'Successfully changed password'}, status_code=200)
-    
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while changing password: {e}'}, status_code=500)
-    
-    finally:
-        db_sess.close()
+        return JSONResponse(content={'message': 'Password successfully changed'}, status_code=200)
 
 
 @router.get('/get_user_profile/')
@@ -306,13 +252,11 @@ async def get_user_profile(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
-        username: str | None = request.query_params.get('username')
-        if not username:
-            return JSONResponse(content={'message': '`username` parameter is required'}, status_code=400)
+    username: str | None = request.query_params.get('username')
+    if not username:
+        return JSONResponse(content={'message': '`username` parameter is required'}, status_code=400)
 
-        db_sess = create_session()
-        
+    with DBSessionManager() as db_sess:
         user: User | None = db_sess.query(User).filter_by(username=username).first()
         if not user:
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
@@ -333,24 +277,13 @@ async def get_user_profile(
 
         return JSONResponse(content=content, status_code=200)
 
-    except Exception as e:
-        return JSONResponse(
-            content={'message': f'Error while getting user profile: {e}'},
-            status_code=500
-        )
-    
-    finally:
-        db_sess.close()
-
 @router.get('/get_current_user_profile/')
 @require_auth
 def get_current_user_profile(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
-        db_sess = create_session()
-
+    with DBSessionManager() as db_sess:
         user: User | None = db_sess.get(User, user_id)
         if not user:
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
@@ -367,12 +300,3 @@ def get_current_user_profile(
         }
         
         return JSONResponse(content=content, status_code=200)
-
-    except Exception as e:
-        return JSONResponse(
-            content={'message': f'Error while getting user profile: {e}'},
-            status_code=500
-        )
-    
-    finally:
-        db_sess.close()
