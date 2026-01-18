@@ -10,6 +10,8 @@ async function verifyAndRedirect() {
     const verificationData = await verifyUser();
     if (verificationData.statusCode !== 200) {
         router.push('/join');
+    } else {
+        router.push('/feed');
     }
 }
 
