@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 
 from server.db.models.comments import Comment
 from server.db.models.posts import Post
-from server.db.db_session import create_session
+from server.db.db_session import DBSessionManager
 
 from server.utils.jwt_tokens import optional_auth, require_auth
 from server.utils.literals import PostLiterals
@@ -14,11 +14,12 @@ router = APIRouter()
 
 
 @router.get('/get_comment/')
-def get_comment(comment_id: int) -> JSONResponse:
-    try:
-        db_sess = create_session()
-        
-        comment: Comment | None = db_sess.get(Comment, comment_id)
+def get_comment(comment_id: UUID | str) -> JSONResponse:
+    with DBSessionManager() as db_sess:
+        try:
+            comment: Comment | None = db_sess.get(Comment, UUID(comment_id))
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid comment_id'}, status_code=400)
 
         if not comment:
             return JSONResponse(content={'message': 'Comment not found'}, status_code=404)
@@ -30,12 +31,6 @@ def get_comment(comment_id: int) -> JSONResponse:
 
         return JSONResponse(content=content, status_code=200)
 
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while getting comment: {e}'}, status_code=400)
-    
-    finally:
-        db_sess.close()
-
 
 @router.post('/post_comment/')
 @require_auth
@@ -43,10 +38,9 @@ async def post_comment(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
+    with DBSessionManager() as db_sess:
         data = await request.json()
-        db_sess = create_session()
-        
+            
         new_comment = Comment(
             body=data.get('body'),
             post_id=UUID(data.get('post_id')),
@@ -64,12 +58,6 @@ async def post_comment(
 
         return JSONResponse(content=content, status_code=201)
 
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while getting comment: {e}'}, status_code=400)
-
-    finally:
-        db_sess.close()
-
 
 @router.delete('/remove_comment/')
 @require_auth
@@ -77,10 +65,13 @@ async def delete_comment(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
-        comment_id = UUID((await request.json()).get('comment_id'))
+    with DBSessionManager() as db_sess:
+        data = await request.json()
+        try:
+            comment_id = UUID(data.get('comment_id'))
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid comment_id'}, status_code=400)
 
-        db_sess = create_session()
         comment: Comment | None = db_sess.get(Comment, comment_id)
 
         if comment is None:
@@ -93,12 +84,6 @@ async def delete_comment(
         db_sess.commit()
 
         return JSONResponse(content={'message': 'Comment successfully deleted'}, status_code=200)
-    
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while deleting comment: {e}'}, status_code=400)
-    
-    finally:
-        db_sess.close()
 
 
 @router.get('/get_post_comments/')
@@ -107,12 +92,14 @@ def get_post_comments(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
-        db_sess = create_session()
-        
-        post_id = UUID(request.query_params.get('post_id'))
+    with DBSessionManager() as db_sess:
+        try:
+            post_id: UUID | None = UUID(request.query_params.get('post_id'))
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid post_id'}, status_code=400)
+
         post: Post | None = db_sess.get(Post, post_id)
-        
+
         if post is None:
             return JSONResponse(content={'message': 'Post not found'}, status_code=404)
         
@@ -130,9 +117,3 @@ def get_post_comments(
             }, status_code=401)
         
         return JSONResponse(content=content, status_code=200)
-    
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while getting post comments: {e}'}, status_code=400)
-    
-    finally:
-        db_sess.close()
