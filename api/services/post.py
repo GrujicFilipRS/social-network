@@ -4,7 +4,7 @@ from fastapi import Request
 from datetime import datetime, timezone
 
 from server.db.models.posts import Post
-from server.db.db_session import create_session
+from server.db.db_session import DBSessionManager
 
 from server.utils.jwt_tokens import optional_auth, require_auth
 
@@ -21,10 +21,11 @@ async def get_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    db_sess = create_session()
-    
-    try:
-        post_id: UUID | None = UUID(request.query_params.get('post_id'))
+    with DBSessionManager() as db_sess:
+        try:
+            post_id: UUID | None = UUID(request.query_params.get('post_id'))
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid post_id'}, status_code=400)
 
         post = db_sess.get(Post, post_id)
         
@@ -52,12 +53,6 @@ async def get_post(
             return JSONResponse(content={'message': 'You are not authorized to view this post'}, status_code=401)
 
         return JSONResponse(content=content, status_code=200)
-    
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while getting post: {e}'}, status_code=400)
-
-    finally:
-        db_sess.close()
 
 
 @router.post('/create_post/')
@@ -66,9 +61,8 @@ async def create_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
+    with DBSessionManager() as db_sess:
         data = await request.json()
-        db_sess = create_session()
 
         post = Post()
         post.set_title(data.get('title'))
@@ -87,12 +81,6 @@ async def create_post(
 
         return JSONResponse(content=content, status_code=201)
 
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while creating post: {e}'}, status_code=400)
-    
-    finally:
-        db_sess.close()
-
 
 @router.put('/edit_post/')
 @require_auth
@@ -100,11 +88,18 @@ async def edit_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
+    with DBSessionManager() as db_sess:
         data = await request.json()
 
-        db_sess = create_session()
-        post = db_sess.get(Post, data.id)
+        try:
+            post_id: UUID = UUID(data.get('id'))
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid post id'}, status_code=400)
+        
+        post = db_sess.get(Post, post_id)
+
+        if not post:
+            return JSONResponse(content={'message': 'Post not found'}, status_code=404)
 
         if post.user_id != user_id:
             return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
@@ -123,12 +118,6 @@ async def edit_post(
 
         return JSONResponse(content=content, status_code=200)
 
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while editing post: {e}'}, status_code=400)
-
-    finally:
-        db_sess.close()
-
 
 @router.delete('/delete_post/')
 @require_auth
@@ -136,23 +125,22 @@ async def delete_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
-        db_sess = create_session()
-        
+    with DBSessionManager() as db_sess:
         data = await request.json()
-        post_id = UUID(data.get('post_id'))
+        try:
+            post_id: UUID | None = UUID(data.get('post_id'))
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid post_id'}, status_code=400)
+
         post = db_sess.get(Post, post_id)
 
+        if not post:
+            return JSONResponse(content={'message': 'Post not found'}, status_code=404)
+
         if post.user_id != user_id:
-            return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
+            return JSONResponse(content={'message': 'You are not authorized to delete this post'}, status_code=401)
         
         db_sess.delete(post)
         db_sess.commit()
 
-        return JSONResponse(content={'message': 'Successully deleted post'}, status_code=200)
-    
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while deleting post: {e}'}, status_code=400)
-    
-    finally:
-        db_sess.close()
+        return JSONResponse(content={'message': 'Successfully deleted post'}, status_code=200)

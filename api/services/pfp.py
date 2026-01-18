@@ -9,7 +9,7 @@ import os, io
 from fastapi import APIRouter
 
 from server.db.models.pfps import PFP
-from server.db.db_session import create_session
+from server.db.db_session import DBSessionManager
 
 from server.utils.jwt_tokens import require_auth
 
@@ -25,10 +25,13 @@ cloudinary.config(
 
 @router.get('/get_user_pfp/')
 def get_user_pfp(user_id: str | UUID) -> JSONResponse:
-    try:
-        user_id = UUID(user_id)
-        db_sess = create_session()
-        pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
+    with DBSessionManager() as db_sess:
+        try:
+            user_uuid: UUID = UUID(str(user_id))
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid user_id'}, status_code=400)
+
+        pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_uuid).first()
 
         if pfp is None:
             return JSONResponse(content={'message': 'pfp not found'}, status_code=404)
@@ -40,24 +43,14 @@ def get_user_pfp(user_id: str | UUID) -> JSONResponse:
 
         return JSONResponse(content=content, status_code=200)
 
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while getting user pfp: {e}'}, status_code=400)
-    
-    finally:
-        db_sess.close()
-
-
 @router.post('/create_user_pfp/')
 @require_auth
 async def create_user_pfp(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    image = request.form().get('image')
-
-    try:
-        db_sess = create_session()
-
+    with DBSessionManager() as db_sess:
+        image = request.form().get('image')
         if not image.content_type.startswith('image/'):
             return JSONResponse(content={'message': 'File must be an image!'}, status_code=400)
 
@@ -92,21 +85,13 @@ async def create_user_pfp(
 
         return JSONResponse(content=content, status_code=201)
 
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while creating user pfp: {e}'}, status_code=400)
-    
-    finally:
-        db_sess.close()
-
-
 @router.delete('/delete_pfp/')
+@require_auth
 async def delete_pfp(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
-        db_sess = create_session()
-
+    with DBSessionManager() as db_sess:
         pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
 
         if pfp is None:
@@ -118,9 +103,3 @@ async def delete_pfp(
         db_sess.commit()
 
         return JSONResponse(content={'message': 'pfp successfully deleted'}, status_code=200)
-
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while deleting user pfp: {e}'}, status_code=400)
-    
-    finally:
-        db_sess.close()

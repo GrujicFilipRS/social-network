@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from server.db.models.likes import Like
 from server.db.models.users import User
 from server.db.models.posts import Post
-from server.db.db_session import create_session
+from server.db.db_session import DBSessionManager
 
 from server.utils.jwt_tokens import optional_auth, require_auth
 from server.utils.literals import PostLiterals
@@ -22,9 +22,12 @@ def get_like(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
-        db_sess = create_session()
-        like_id = UUID(request.query_params.get('like_id'))
+    with DBSessionManager() as db_sess:
+        try:
+            like_id: UUID | None = UUID(request.query_params.get('like_id'))
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid like_id'}, status_code=400)
+
         like: Like | None = db_sess.get(Like, like_id)
 
         if not like:
@@ -40,12 +43,6 @@ def get_like(
         }
 
         return JSONResponse(content=content, status_code=200)
-    
-    except Exception as e:
-        return JSONResponse(content={'message': f'Unexpected error while getting like: {e}'}, status_code=400)
-    
-    finally:
-        db_sess.close()
 
 
 @router.post('/like_post/')
@@ -54,18 +51,22 @@ async def like_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
-        post_id = UUID((await request.json()).get('post_id'))
-        db_sess = create_session()
+    with DBSessionManager() as db_sess:
+        data = await request.json()
+        try:
+            post_id: UUID = UUID(data.get('post_id'))
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid post_id'}, status_code=400)
 
-        user = db_sess.get(User, user_id)
+        user: User | None = db_sess.get(User, user_id)
         if not user:
             return JSONResponse(content={'message': 'You must be logged in to like a message'}, status_code=401)
 
         if any([like.post_id == post_id for like in user.likes]):
             return JSONResponse(content={'message': 'You already liked this post'}, status_code=400)
         
-        if not db_sess.get(Post, post_id):
+        post: Post | None = db_sess.get(Post, post_id)
+        if not post:
             return JSONResponse(content={'message': 'Post not found'}, status_code=404)
         
         like = Like()
@@ -77,12 +78,6 @@ async def like_post(
         db_sess.commit()
 
         return JSONResponse(content={'message': 'Successfully liked post'}, status_code=201)
-
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while liking post: {e}'}, status_code=400)
-    
-    finally:
-        db_sess.close()
     
 
 @router.delete('/unlike_post/')
@@ -91,13 +86,16 @@ async def unlike_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
-        post_id = UUID((await request.json()).get('post_id'))
-        db_sess = create_session()
+    with DBSessionManager() as db_sess:
+        data = await request.json()
+        try:
+            post_id: UUID = UUID(data.get('post_id'))
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid post_id'}, status_code=400)
 
-        user = db_sess.get(User, user_id)
+        user: User | None = db_sess.get(User, user_id)
         if not user:
-            return JSONResponse(content={'message': 'You must be logged in to like a message'}, status_code=401)
+            return JSONResponse(content={'message': 'You must be logged in to unlike a message'}, status_code=401)
 
         if not any([like.post_id == post_id for like in user.likes]):
             return JSONResponse(content={'message': 'The post isn\'t liked'}, status_code=400)
@@ -111,20 +109,17 @@ async def unlike_post(
         db_sess.commit()
 
         return JSONResponse(content={'message': 'Successfully unliked post'}, status_code=200)
-        
-    except Exception as e:
-        return JSONResponse({'message': f'Error while unliking post: {e}'}, status_code=400)
-    
-    finally:
-        db_sess.close()
 
 
 @router.get('/get_user_likes/')
 def get_user_likes(user_id: str) -> JSONResponse:
-    try:
-        user_id = UUID(user_id)
-        db_sess = create_session()
-        user: User | None = db_sess.get(User, user_id)
+    with DBSessionManager() as db_sess:
+        try:
+            user_uuid: UUID = UUID(str(user_id))
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid user_id'}, status_code=400)
+
+        user: User | None = db_sess.get(User, user_uuid)
 
         if not user:
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
@@ -135,9 +130,3 @@ def get_user_likes(user_id: str) -> JSONResponse:
         }
 
         return JSONResponse(content=content, status_code=200)
-
-    except Exception as e:
-        return JSONResponse(content={'message': f'Error while getting user likes: {e}'}, status_code=400)
-
-    finally:
-        db_sess.close()
