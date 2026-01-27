@@ -1,6 +1,7 @@
+import re
 from sqlalchemy import Column, UUID, String, DateTime
 from sqlalchemy.orm import relationship
-from ..db_session import SqlAlchemyBase
+from db.db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash, check_password_hash
 from uuid import uuid4
 
@@ -56,12 +57,9 @@ class User(SqlAlchemyBase):
     
     @staticmethod
     def validate_username(username: str) -> bool:
-        if username.lower() != username:
-            return False
-        
-        ALLOWED_CHARS: str = set([c for c in 'abcdefghijklmnopqrstuvwxyz0123456789_']) # conv to set for performance
+        pattern = re.compile(r'[a-zA-Z0-9_]*')
 
-        if not all([char in ALLOWED_CHARS for char in username]):
+        if not pattern.match(username):
             return False
 
         if len(username) < 7 or len(username) > 15:

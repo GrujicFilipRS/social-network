@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 from fastapi.responses import JSONResponse
 import traceback
 
-from server.db import db_session
-from server.db.models.__all_models import *
+from db import db_session
+from models.__all_models import *
 
 from server.conf import Config
 

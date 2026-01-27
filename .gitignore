@@ -2,3 +2,4 @@
 .vscode
 .env
 nginx.conf
+*.sql

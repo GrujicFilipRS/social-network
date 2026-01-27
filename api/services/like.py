@@ -3,13 +3,13 @@ from fastapi.responses import JSONResponse
 from fastapi import Request
 from datetime import datetime, timezone
 
-from server.db.models.likes import Like
-from server.db.models.users import User
-from server.db.models.posts import Post
-from server.db.db_session import DBSessionManager
+from models.likes import Like
+from models.users import User
+from models.posts import Post
+from db.db_session import DBSessionManager
 
-from server.utils.jwt_tokens import optional_auth, require_auth
-from server.utils.literals import PostLiterals
+from utils.jwt_tokens import optional_auth, require_auth
+from utils.literals import PostLiterals
 
 from fastapi import APIRouter
 

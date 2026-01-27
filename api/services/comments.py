@@ -1,12 +1,12 @@
 from uuid import UUID
 from fastapi.responses import JSONResponse
 
-from server.db.models.comments import Comment
-from server.db.models.posts import Post
-from server.db.db_session import DBSessionManager
+from models.comments import Comment
+from models.posts import Post
+from db.db_session import DBSessionManager
 
-from server.utils.jwt_tokens import optional_auth, require_auth
-from server.utils.literals import PostLiterals
+from utils.jwt_tokens import optional_auth, require_auth
+from utils.literals import PostLiterals
 
 from fastapi import APIRouter, Request
 

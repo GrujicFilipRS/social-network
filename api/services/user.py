@@ -1,17 +1,18 @@
 from uuid import UUID
 from fastapi.responses import JSONResponse
-from fastapi import Request, Response
+from fastapi import Request
+from pydantic import BaseModel
 from datetime import datetime, timezone
 from typing import Any
 import os
 
 from server.conf import Config
-from server.db.models.users import User
-from server.db.models.follows import Follow
-from server.db.db_session import DBSessionManager
+from models.users import User
+from models.follows import Follow
+from db.db_session import DBSessionManager
 
-from server.utils import jwt_tokens
-from server.utils.jwt_tokens import require_auth, AUTH_COOKIE_NAME
+from utils import jwt_tokens
+from utils.jwt_tokens import require_auth, AUTH_COOKIE_NAME
 
 from fastapi import APIRouter
 
@@ -20,16 +21,18 @@ router = APIRouter()
 
 @router.get('/get_user/')
 async def get_user(
-    user_id: int | None,
+    user_id: str,
     req_name: bool = False,
     req_creation_date: bool = False,
     req_pfp: bool = False
 ) -> JSONResponse:
     with DBSessionManager() as db_sess:
-        if user_id is None:
-            return JSONResponse(content={'message': '`user_id` parameter is necessary'}, status_code=400)
-
-        user: User | None = db_sess.get(User, user_id)
+        try:
+            user_uuid = UUID(user_id)
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid user UUID provided'}, status_code=400)
+        
+        user: User | None = db_sess.get(User, user_uuid)
 
         if not user:
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
@@ -61,16 +64,24 @@ def get_current_user(
         return JSONResponse(content=content, status_code=200)
 
 
-@router.post('/register/')
-async def register(request: Request) -> JSONResponse:
-    data = await request.json()
+class RegistrationData(BaseModel):
+    username: str
+    password: str
+    name: str | None
 
-    username: str | None = data.get('username')
-    password: str | None = data.get('password')
-    name: str | None = data.get('name')
+@router.post('/register/')
+async def register(data: RegistrationData) -> JSONResponse:
+    username = data.username
+    password = data.password
+    name = data.name
 
     if not username or not password:
         return JSONResponse(content={'message': 'Username and password required'}, status_code=400)
+    
+    username = username.strip()
+    password = password.strip()
+    if name is not None:
+        name = name.strip()
 
     if not User.validate_username(username) or not User.validate_password(password):
         return JSONResponse(content={'message': 'Invalid username or password format'}, status_code=400)

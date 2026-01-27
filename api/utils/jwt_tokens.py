@@ -6,7 +6,7 @@ from datetime import datetime, timezone, timedelta
 from uuid import UUID
 import inspect
 
-from ..conf import Config
+from server.conf import Config
 
 def encode_token(user_id: UUID) -> str:
     now = datetime.now(timezone.utc)

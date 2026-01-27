@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, UUID, DateTime
 from sqlalchemy.orm import relationship
-from ..db_session import SqlAlchemyBase
+from db.db_session import SqlAlchemyBase
 from uuid import uuid4
 
 class Like(SqlAlchemyBase):

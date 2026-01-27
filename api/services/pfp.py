@@ -8,10 +8,10 @@ import os, io
 
 from fastapi import APIRouter
 
-from server.db.models.pfps import PFP
-from server.db.db_session import DBSessionManager
+from models.pfps import PFP
+from db.db_session import DBSessionManager
 
-from server.utils.jwt_tokens import require_auth
+from utils.jwt_tokens import require_auth
 
 router = APIRouter()
 

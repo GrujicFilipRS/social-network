@@ -38,7 +38,7 @@ def global_init(db_file: str = None):
 
     __factory = orm.sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
-    from .models import __all_models
+    from models import __all_models
 
     SqlAlchemyBase.metadata.create_all(engine)
 
