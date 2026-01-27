@@ -83,7 +83,9 @@ async def register(data: RegistrationData) -> JSONResponse:
     if name is not None:
         name = name.strip()
 
-    if not User.validate_username(username) or not User.validate_password(password):
+    if (not User.validate_username(username) or
+        not User.validate_password(password) or
+        not User.validate_name(name)):
         return JSONResponse(content={'message': 'Invalid username or password format'}, status_code=400)
 
     with DBSessionManager() as db_sess:
@@ -122,20 +124,19 @@ async def register(data: RegistrationData) -> JSONResponse:
         return response
 
 
+class LoginData(BaseModel):
+    username: str
+    password: str
+
 @router.post('/login/')
-async def login(request: Request) -> JSONResponse:
-    data = await request.json()
-
-    username: str | None = data.get('username')
-    password: str | None = data.get('password')
-
-    if not username or not password:
-        return JSONResponse(content={'message': 'Username and password required'}, status_code=400)
+async def login(data: LoginData) -> JSONResponse:
+    username = data.username.strip()
+    password = data.password.strip()
 
     with DBSessionManager() as db_sess:
         user: User | None = db_sess.query(User).filter_by(username=username).first()
 
-        if not user or not user.check_password(password):
+        if not (user and user.check_password(password)):
             return JSONResponse(content={'message': 'Incorrect credentials'}, status_code=400)
         
         token = jwt_tokens.encode_token(user.id)
@@ -167,12 +168,15 @@ async def set_user_name(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    data: Any = await request.json()
+    data = await request.json()
     
     new_name: str | None = data.get('new_name')
 
     if not new_name:
         return JSONResponse(content={'message': 'New name required'}, status_code=400)
+    
+    if not User.validate_name(new_name):
+        return JSONResponse(content={'message': 'Invalid format for new name'}, status_code=400)
 
     with DBSessionManager() as db_sess:
         user: User | None = db_sess.get(User, user_id)

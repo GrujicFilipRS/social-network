@@ -70,3 +70,9 @@ class User(SqlAlchemyBase):
     @staticmethod
     def validate_password(password: str) -> bool:
         return len(password) > 7 and len(password) < 15
+
+    @staticmethod
+    def validate_name(name: str | None) -> bool:
+        if name == '' or name is None: return True
+
+        return len(name) > 3 and len(name) < 30
