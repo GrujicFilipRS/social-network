@@ -21,12 +21,12 @@ async def get_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    with DBSessionManager() as db_sess:
-        try:
-            post_id: UUID | None = UUID(request.query_params.get('post_id'))
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid post_id'}, status_code=400)
+    try:
+        post_id: UUID | None = UUID(request.query_params.get('post_id'))
+    except ValueError:
+        return JSONResponse(content={'message': 'Invalid post_id'}, status_code=400)
 
+    with DBSessionManager() as db_sess:
         post = db_sess.get(Post, post_id)
         
         if not post:
@@ -61,13 +61,20 @@ async def create_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    with DBSessionManager() as db_sess:
-        data = await request.json()
+    data = await request.json()
 
+    if not Post.verify_creation(data):
+        return JSONResponse(content={'message': 'Invalid creation data'}, status_code=400)
+
+    title: str = data.get('title').strip()
+    body: str = data.get('body').strip()
+    status: str = data.get('status').strip().upper()
+
+    with DBSessionManager() as db_sess:
         post = Post()
-        post.set_title(data.get('title'))
-        post.set_body(data.get('body'))
-        post.set_status(data.get('status'))
+        post.set_title(title)
+        post.set_body(body)
+        post.set_status(status)
         post.user_id = user_id
         post.created_at = datetime.now(timezone.utc)
 
