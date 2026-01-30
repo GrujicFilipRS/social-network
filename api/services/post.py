@@ -98,6 +98,13 @@ async def edit_post(
     with DBSessionManager() as db_sess:
         data = await request.json()
 
+        if not Post.verify_creation(data):
+            return JSONResponse(content={'message': 'Invalid creation data'}, status_code=400)
+
+        title: str = data.get('title').strip()
+        body: str = data.get('body').strip()
+        status: str = data.get('status').strip().upper()
+
         try:
             post_id: UUID = UUID(data.get('id'))
         except ValueError:
@@ -111,9 +118,9 @@ async def edit_post(
         if post.user_id != user_id:
             return JSONResponse(content={'message': 'You are not authorized to edit this post'}, status_code=401)
         
-        post.set_title(data.get('title'))
-        post.set_body(data.get('body'))
-        post.set_status(data.get('status'))
+        post.set_title(title)
+        post.set_body(body)
+        post.set_status(status)
 
         db_sess.add(post)
         db_sess.commit()
