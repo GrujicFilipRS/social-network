@@ -117,7 +117,7 @@ async def register(data: RegistrationData) -> JSONResponse:
             httponly=True,
             samesite='Lax',
             path='/',
-            secure=os.getenv('FLASK_ENV') == 'production',
+            secure=Env.FLASK_ENV == 'production',
             expires=Env.JWT_EXPIRATION_HOURS * 3600
         )
 
@@ -155,7 +155,7 @@ async def login(data: LoginData) -> JSONResponse:
             httponly=True,
             samesite='Lax',
             path='/',
-            secure=os.getenv('FLASK_ENV') == 'production',
+            secure=Env.FLASK_ENV == 'production',
             expires=Env.JWT_EXPIRATION_HOURS * 3600
         )
 

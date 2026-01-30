@@ -4,10 +4,11 @@ from fastapi.responses import JSONResponse
 
 import cloudinary
 import cloudinary.uploader
-import os, io
+import io
 
 from fastapi import APIRouter
 
+from env import Env
 from models.pfps import PFP
 from db.db_session import DBSessionManager
 
@@ -16,9 +17,9 @@ from utils.jwt_tokens import require_auth
 router = APIRouter()
 
 cloudinary.config(
-    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
-    api_key=os.getenv('CLOUDINARY_API_KEY'),
-    api_secret=os.getenv('CLOUDINARY_API_SECRET'),
+    cloud_name=Env.CLOUDINARY_CLOUD_NAME,
+    api_key=Env.CLOUDINARY_API_KEY,
+    api_secret=Env.CLOUDINARY_API_SECRET,
     secure=True
 )
 

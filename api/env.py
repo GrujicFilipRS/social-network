@@ -39,3 +39,4 @@ class Env:
     FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
     JWT_EXPIRATION_HOURS = float(os.getenv('JWT_EXPIRATION_HOURS', '24'))
     DATABASE_URL = os.getenv('DATABASE_URL', get_local_db_string('network'))
+    FLASK_ENV = os.getenv('FLASK_ENV', 'development')
