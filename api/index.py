@@ -1,28 +1,22 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-import os
-from dotenv import load_dotenv
 
 from fastapi.responses import JSONResponse
 import traceback
 
+from env import Env
 from db import db_session
 from models.__all_models import *
 
-from server.conf import Config
-
 from router import configure_routing
 
-db_session.global_init(Config.DBNAME)
-load_dotenv()
+db_session.global_init()
 
 app = FastAPI()
 
-FRONTEND_URL: str = os.getenv('FRONTEND_URL', 'http://localhost:5173')
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL],
+    allow_origins=[Env.FRONTEND_URL],
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],

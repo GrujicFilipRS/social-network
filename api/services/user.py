@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from typing import Any
 import os
 
-from server.conf import Config
+from env import Env
 from models.users import User
 from models.follows import Follow
 from db.db_session import DBSessionManager
@@ -118,7 +118,7 @@ async def register(data: RegistrationData) -> JSONResponse:
             samesite='Lax',
             path='/',
             secure=os.getenv('FLASK_ENV') == 'production',
-            expires=Config.JWT_EXPIRATION_HOURS * 3600
+            expires=Env.JWT_EXPIRATION_HOURS * 3600
         )
 
         return response
@@ -156,7 +156,7 @@ async def login(data: LoginData) -> JSONResponse:
             samesite='Lax',
             path='/',
             secure=os.getenv('FLASK_ENV') == 'production',
-            expires=Config.JWT_EXPIRATION_HOURS * 3600
+            expires=Env.JWT_EXPIRATION_HOURS * 3600
         )
 
         return response

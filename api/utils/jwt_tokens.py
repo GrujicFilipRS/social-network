@@ -4,25 +4,24 @@ from fastapi.responses import JSONResponse
 import jwt
 from datetime import datetime, timezone, timedelta
 from uuid import UUID
+from env import Env
 import inspect
-
-from server.conf import Config
 
 def encode_token(user_id: UUID) -> str:
     now = datetime.now(timezone.utc)
-    expiration = now + timedelta(hours=Config.JWT_EXPIRATION_HOURS)
+    expiration = now + timedelta(hours=Env.JWT_EXPIRATION_HOURS)
     payload = {
         'user_id': str(user_id),
         'iat': int(now.timestamp()),
         'exp': int(expiration.timestamp()),
     }
-    token = jwt.encode(payload, Config.SECRET_KEY, algorithm='HS256')
+    token = jwt.encode(payload, Env.SECRET_KEY, algorithm='HS256')
     return token
 
 
 def decode_token(token: str) -> UUID | None:
     try:
-        payload = jwt.decode(token, Config.SECRET_KEY, algorithms=['HS256'])
+        payload = jwt.decode(token, Env.SECRET_KEY, algorithms=['HS256'])
         return UUID(payload.get('user_id'))
     except jwt.ExpiredSignatureError:
         print("JWT Error: Signature has expired.")
