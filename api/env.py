@@ -40,3 +40,4 @@ class Env:
     JWT_EXPIRATION_HOURS = float(os.getenv('JWT_EXPIRATION_HOURS', '24'))
     DATABASE_URL = os.getenv('DATABASE_URL', get_local_db_string('network'))
     FLASK_ENV = os.getenv('FLASK_ENV', 'development')
+    CLOUDINARY_PFP_FOLDER = os.getenv('CLOUDINARY_PFP_FOLDER', 'fastapi_uploads_pfp')

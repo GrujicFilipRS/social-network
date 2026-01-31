@@ -59,7 +59,7 @@ async def create_user_pfp(
 
         result = cloudinary.uploader.upload(
             io.BytesIO(file_bytes),
-            folder='fastapi_uploads_pfp',
+            folder=Env.CLOUDINARY_PFP_FOLDER,
             resource_type='image',
             public_id=image.filename.split('.')[0],
             overwrite=True
