@@ -51,9 +51,11 @@ async def create_user_pfp(
     user_id: UUID | None = None
 ) -> JSONResponse:
     with DBSessionManager() as db_sess:
-        image = request.form().get('image')
-        if not image.content_type.startswith('image/'):
-            return JSONResponse(content={'message': 'File must be an image!'}, status_code=400)
+        form = await request.form()
+        image = form.get('image')
+
+        if not PFP.approve_pfp_file(image):
+            return JSONResponse(content={'message': 'Invalid image file'}, status_code=400)
 
         file_bytes = await image.read()
 

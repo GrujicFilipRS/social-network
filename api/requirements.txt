@@ -8,3 +8,4 @@ psycopg2-binary==2.9.10
 cloudinary==1.44.1
 python-multipart==0.0.20
 dotenv==0.9.9
+pillow==12.1.0
