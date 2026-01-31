@@ -20,7 +20,7 @@ export const Unfollow = async (
 ) => {
     return Fetch('follow/unfollow_user/', {
         method: 'DELETE',
-        body: JSON.stringify({ to_follow_id: userId })
+        body: JSON.stringify({ to_unfollow_id: userId })
     }).then(async (res) => {
         followedRef.value = false;
         return res;

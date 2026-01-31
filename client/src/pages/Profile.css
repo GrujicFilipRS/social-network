@@ -46,3 +46,28 @@
 .follows .bold:hover {
     cursor: pointer;
 }
+
+@media (max-width: 1200px) {
+    .profile-info {
+        width: 80%;
+    }
+}
+
+@media (max-width: 850px) {
+    .profile-info {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .lside-info {
+        text-align: center;
+        gap: 25px;
+        flex-direction: column;
+    }
+
+    .rside-info {
+        text-align: center;
+        gap: 25px;
+        flex-direction: column;
+    }
+}
