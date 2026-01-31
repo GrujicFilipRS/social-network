@@ -1,28 +1,29 @@
+# This file is meant to be imported at the start of the app.
+# It checks if the required environment variables are loaded,
+# as well as init a class that's used to store environment variables
+
 from dotenv import load_dotenv
 from os import getenv, path, environ, makedirs
 
 load_dotenv()
 
-def verify_env_vars() -> None:
-    REQUIRED_ENV_VARS = (
-        'CLOUDINARY_CLOUD_NAME',
-        'CLOUDINARY_API_KEY',
-        'CLOUDINARY_API_SECRET',
-        'SECRET_KEY',
-    )
+REQUIRED_ENV_VARS = (
+    'CLOUDINARY_CLOUD_NAME',
+    'CLOUDINARY_API_KEY',
+    'CLOUDINARY_API_SECRET',
+    'SECRET_KEY',
+)
 
-    raise_exc: bool = False
-    missing_vars: list[str] = []
+raise_exc: bool = False
+missing_vars: list[str] = []
 
-    for var in REQUIRED_ENV_VARS:
-        if var not in environ.keys():
-            raise_exc = True
-            missing_vars.append(var)
+for var in REQUIRED_ENV_VARS:
+    if var not in environ.keys():
+        raise_exc = True
+        missing_vars.append(var)
     
-    if raise_exc:
-        raise Exception(f'Missing required environment variables: { ', '.join(missing_vars) }')
-
-verify_env_vars()
+if raise_exc:
+    raise Exception(f'Missing required environment variables: { ', '.join(missing_vars) }')
 
 def get_local_db_string(db_name: str) -> str:
     base_dir = path.abspath(path.join(path.dirname(__file__), '..'))
@@ -33,6 +34,9 @@ def get_local_db_string(db_name: str) -> str:
     return f'sqlite://{path.join(db_dir, f"{db_name.strip()}.sqlite")}?check_same_thread=False'
 
 class Env:
+    def __new__(cls):
+        raise TypeError('Env is a static configuration class')
+    
     CLOUDINARY_CLOUD_NAME = getenv('CLOUDINARY_CLOUD_NAME')
     CLOUDINARY_API_KEY = getenv('CLOUDINARY_API_KEY')
     CLOUDINARY_API_SECRET = getenv('CLOUDINARY_API_SECRET')
