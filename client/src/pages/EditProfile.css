@@ -1,0 +1,47 @@
+.profile-editor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.text-editor, .name-editor-button {
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.name-editor-text:hover {
+    color: var(--grey);
+}
+
+.username-editor-text {
+    color: var(--grey);
+}
+
+.name-editor-button {
+    color: white;
+    background-color: var(--dark);
+    padding: 2px 4px;
+    border: 1px solid var(--grey);
+    border-radius: 5px;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.editor-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.pfp img {
+    width: 150px;
+    height: 150px;
+    border-radius: 100px;
+    cursor: pointer;
+    background-blend-mode: screen;
+    transition: 0.2s;
+}
+
+.pfp img:hover {
+    opacity: 0.5;
+}

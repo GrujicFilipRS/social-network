@@ -24,12 +24,36 @@ if (profileData.value.status === 404) {
 
 <template>
     <div class="profile-editor">
+        <h1>Edit your profile</h1>
+
         <div class="pfp">
-            <img :src="profileData.pfp_src" />
+            <img
+                :src="profileData.pfp_src"
+                title="Click to change your profile picture"
+            />
+        </div>
+        
+        <div class="editor-wrapper name-editor-wrapper">
+            <h1
+                class="text-editor name-editor-text"
+                title="Click to change name"
+            >
+                {{ profileData.name }}
+            </h1>
+
+            <button class="name-editor-button">✎</button>
         </div>
 
-        <h1 class="name-editor">{{ profileData.name }}</h1>
-        <p class="username-editor">{{ profileData.username }}</p>
+        <div class="editor-wrapper username-editor-wrapper">
+            <h3
+                class="text-editor username-editor-text"
+                title="Click to change username"
+            >
+                {{ profileData.username }}
+            </h3>
+
+            <button class="name-editor-button">✎</button>
+        </div>
     </div>
 </template>
 
