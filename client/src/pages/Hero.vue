@@ -19,9 +19,6 @@ verifyAndRedirect();
 
 watch(() => route.fullPath, verifyAndRedirect);
 
-function goToJoin() {
-    router.push("/join");
-}
 </script>
 
 <template>
@@ -34,7 +31,7 @@ function goToJoin() {
                 Share your story
             </p>
 
-            <button class="primary-btn" @click="goToJoin">JOIN NOW</button>
+            <button class="primary-btn" @click="() => router.push('/join')">JOIN NOW</button>
         </div>
 
         <div class="rside-hero">

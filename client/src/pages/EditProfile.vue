@@ -13,17 +13,30 @@ if (verificationData.statusCode !== 200) {
     router.push('/join');
 }
 
-const fetchData = ref<{status: number, data: ProfileData}>(await GetSelfProfile() as {status: number, data: ProfileData});
+interface FetchStatusData {
+    status: number;
+    data: ProfileData;
+}
+
+const fetchData = ref<FetchStatusData>(
+    await GetSelfProfile() as FetchStatusData
+);
 
 if (fetchData.value.status === 404) {
     router.push('/feed');
 }
 
-// const data: ProfileData = ref<ProfileData>(fetchData.value.data).value;
+const profileData: ProfileData = ref<ProfileData>(fetchData.value.data).value;
 </script>
 
 <template>
     <div class="profile-editor">
-        
+        <div class="pfp">
+            <img :src="profileData.pfp_src ?? '/default-pfp.png'" />
+        </div>
     </div>
 </template>
+
+<style>
+@import url('./EditProfile.css');
+</style>

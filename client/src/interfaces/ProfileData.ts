@@ -7,6 +7,6 @@ export interface ProfileData {
     num_followers: number,
     num_followed: number,
     posts: PostData[],
-    pfp_src: string,
+    pfp_src: string | null,
     user_followed: boolean
 };

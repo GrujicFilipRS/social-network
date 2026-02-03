@@ -49,7 +49,7 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
     <div class="profile-info">
         <div class="lside-info">
             <div class="pfp">
-                <img :src="data.pfp_src || '/default-pfp.png'" />
+                <img :src="data.pfp_src ?? '/default-pfp.png'" />
             </div>
 
             <div class="names">
