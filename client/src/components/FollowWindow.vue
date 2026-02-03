@@ -59,14 +59,14 @@ defineExpose({ showWindow });
                 <div class='lside-follows-header'>
                     <p
                         :class='followsTextClass'
-                        @click='setWindowMode('FOLLOWING')'
+                        @click='setWindowMode("FOLLOWING")'
                     >
                         Follows
                     </p>
 
                     <p
                         :class='followersTextClass'
-                        @click='setWindowMode('FOLLOWERS')'
+                        @click='setWindowMode("FOLLOWERS")'
                     >
                         Followers
                     </p>
@@ -80,7 +80,7 @@ defineExpose({ showWindow });
 
             <div
                 class='follows-list'
-                v-show='mode == 'FOLLOWING''
+                v-show='mode == "FOLLOWING"'
             >
                 <FollowBox
                     v-for='(user, index) in userFollows?.users'
@@ -91,7 +91,7 @@ defineExpose({ showWindow });
 
             <div
                 class='follows-list'
-                v-show='mode == 'FOLLOWERS''
+                v-show='mode == "FOLLOWERS"'
             >
                 <FollowBox
                     v-for='(user, index) in userFollowers?.users'

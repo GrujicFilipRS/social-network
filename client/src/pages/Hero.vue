@@ -31,7 +31,7 @@ watch(() => route.fullPath, verifyAndRedirect);
                 Share your story
             </p>
 
-            <button class='primary-btn' @click='() => router.push('/join')'>JOIN NOW</button>
+            <button class='primary-btn' @click='() => router.push("/join")'>JOIN NOW</button>
         </div>
 
         <div class='rside-hero'>

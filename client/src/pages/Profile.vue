@@ -49,7 +49,7 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
     <div class='profile-info'>
         <div class='lside-info'>
             <div class='pfp'>
-                <img :src='data.pfp_src ?? '/default-pfp.png'' />
+                <img :src='data.pfp_src ?? "/default-pfp.png"' />
             </div>
 
             <div class='names'>
@@ -65,7 +65,7 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
                     <span
                         class='bold'
                         title='See follows'
-                        @click='() => {showFollows('FOLLOWING')}'
+                        @click='() => {showFollows("FOLLOWING")}'
                     >
                         {{ data.num_followed }}
                     </span>
@@ -76,7 +76,7 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
                     <span
                         class='bold'
                         title='See followers'
-                        @click='() => {showFollows('FOLLOWERS')}'
+                        @click='() => {showFollows("FOLLOWERS")}'
                     >
                         {{ data.num_followers }}
                     </span>
