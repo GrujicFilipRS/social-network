@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang='ts'>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { verifyUser } from '../api';
@@ -22,7 +22,7 @@ const userId: string = verificationData.result['user']['id'];
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-const username: string | null = urlParams.get("user");
+const username: string | null = urlParams.get('user');
 
 const fetchData = ref<{status: number, data: ProfileData}>(await GetProfile(username) as {status: number, data: ProfileData});
 
@@ -46,26 +46,26 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
 </script>
 
 <template>
-    <div class="profile-info">
-        <div class="lside-info">
-            <div class="pfp">
-                <img :src="data.pfp_src ?? '/default-pfp.png'" />
+    <div class='profile-info'>
+        <div class='lside-info'>
+            <div class='pfp'>
+                <img :src='data.pfp_src ?? '/default-pfp.png'' />
             </div>
 
-            <div class="names">
+            <div class='names'>
                 <h2>{{ firstRow }}</h2>
                 <p>{{ secondRow }}</p>
             </div>
         </div>
 
-        <div class="rside-info">
-            <div class="follows">
+        <div class='rside-info'>
+            <div class='follows'>
                 <p>
                     Following:
                     <span
-                        class="bold"
-                        title="See follows"
-                        @click="() => {showFollows('FOLLOWING')}"
+                        class='bold'
+                        title='See follows'
+                        @click='() => {showFollows('FOLLOWING')}'
                     >
                         {{ data.num_followed }}
                     </span>
@@ -74,9 +74,9 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
                 <p>
                     Followers:
                     <span
-                        class="bold"
-                        title="See followers"
-                        @click="() => {showFollows('FOLLOWERS')}"
+                        class='bold'
+                        title='See followers'
+                        @click='() => {showFollows('FOLLOWERS')}'
                     >
                         {{ data.num_followers }}
                     </span>
@@ -84,25 +84,25 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
             </div>
 
             <button
-                class="primary-btn"
-                v-show="userId !== data.user_id && !followingUser"
-                @click="handleFollow"
+                class='primary-btn'
+                v-show='userId !== data.user_id && !followingUser'
+                @click='handleFollow'
             >
                 FOLLOW
             </button>
 
             <button
-                class="secondary-btn"
-                v-show="userId !== data.user_id && followingUser"
-                @click="handleUnfollow"
+                class='secondary-btn'
+                v-show='userId !== data.user_id && followingUser'
+                @click='handleUnfollow'
             >
                 Unfollow
             </button>
 
             <button
-                class="secondary-btn"
-                v-show="userId == data.user_id"
-                @click="handleEdit"
+                class='secondary-btn'
+                v-show='userId == data.user_id'
+                @click='handleEdit'
             >
                 Edit profile
             </button>
@@ -110,8 +110,8 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
     </div>
 
     <FollowsWindow
-        ref="followWindowRef"
-        :userId="data.user_id"
+        ref='followWindowRef'
+        :userId='data.user_id'
     />
 </template>
 

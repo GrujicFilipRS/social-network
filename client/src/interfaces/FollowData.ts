@@ -1,4 +1,4 @@
-import type { UserData } from "./UserData";
+import type { UserData } from './UserData';
 
 export interface FollowsData {
     message: string,

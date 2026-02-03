@@ -1,5 +1,5 @@
-import type { Ref } from "vue";
-import { Fetch } from "../api"
+import type { Ref } from 'vue';
+import { Fetch } from '../api'
 
 export const Follow = async (
     userId: string,

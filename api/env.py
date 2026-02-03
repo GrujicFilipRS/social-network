@@ -31,7 +31,7 @@ def get_local_db_string(db_name: str) -> str:
 
     makedirs(db_dir, exist_ok=True)
 
-    return f'sqlite://{path.join(db_dir, f"{db_name.strip()}.sqlite")}?check_same_thread=False'
+    return f'sqlite://{path.join(db_dir, f'{db_name.strip()}.sqlite')}?check_same_thread=False'
 
 class Env:
     def __new__(cls):

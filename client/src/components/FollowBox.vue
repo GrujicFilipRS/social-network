@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script lang='ts' setup>
 import { ref } from 'vue';
 import type { UserData } from '../interfaces/UserData';
 
@@ -12,12 +12,12 @@ const linkToProfile = ref<string>(`/profile?user=${props.user.username}`);
 </script>
 
 <template>
-    <div class="follow-box">
-        <img :src="pfpToShow" class="follow-pfp" />
+    <div class='follow-box'>
+        <img :src='pfpToShow' class='follow-pfp' />
         <a
-            :href="linkToProfile"
-            class="follow-profile-link"
-            title="Visit profile"
+            :href='linkToProfile'
+            class='follow-profile-link'
+            title='Visit profile'
         >{{ props.user.username }}</a>
     </div>
 </template>

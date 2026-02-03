@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script lang='ts' setup>
 import { onMounted, ref } from 'vue';
 
 import { GetUserFollowers } from '../functions/GetUserFollowers';
@@ -51,52 +51,52 @@ defineExpose({ showWindow });
 
 <template>
     <div
-        v-show="showRef"
-        class="follows-window-overlay"
+        v-show='showRef'
+        class='follows-window-overlay'
     >
-        <div class="follows-window">
-            <div class="follows-header">
-                <div class="lside-follows-header">
+        <div class='follows-window'>
+            <div class='follows-header'>
+                <div class='lside-follows-header'>
                     <p
-                        :class="followsTextClass"
-                        @click="setWindowMode('FOLLOWING')"
+                        :class='followsTextClass'
+                        @click='setWindowMode('FOLLOWING')'
                     >
                         Follows
                     </p>
 
                     <p
-                        :class="followersTextClass"
-                        @click="setWindowMode('FOLLOWERS')"
+                        :class='followersTextClass'
+                        @click='setWindowMode('FOLLOWERS')'
                     >
                         Followers
                     </p>
                 </div>
 
                 <button
-                    class="close-follows-btn"
-                    @click="closeWindow"
+                    class='close-follows-btn'
+                    @click='closeWindow'
                 >✖</button>
             </div>
 
             <div
-                class="follows-list"
-                v-show="mode == 'FOLLOWING'"
+                class='follows-list'
+                v-show='mode == 'FOLLOWING''
             >
                 <FollowBox
-                    v-for="(user, index) in userFollows?.users"
-                    :key="user.id || index"
-                    :user="user"
+                    v-for='(user, index) in userFollows?.users'
+                    :key='user.id || index'
+                    :user='user'
                 />
             </div>
 
             <div
-                class="follows-list"
-                v-show="mode == 'FOLLOWERS'"
+                class='follows-list'
+                v-show='mode == 'FOLLOWERS''
             >
                 <FollowBox
-                    v-for="(user, index) in userFollowers?.users"
-                    :key="user.id || index"
-                    :user="user"
+                    v-for='(user, index) in userFollowers?.users'
+                    :key='user.id || index'
+                    :user='user'
                 />
             </div>
         </div>

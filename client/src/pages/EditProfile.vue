@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang='ts'>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -20,40 +20,50 @@ if (profileData.value.status === 404) {
     router.push('/feed');
 }
 
+const formChanged = ref<boolean>(false);
+// const formData = ref<EditProfileData>(profileData.value);
+
 </script>
 
 <template>
-    <div class="profile-editor">
+    <div class='profile-editor'>
         <h1>Edit your profile</h1>
 
-        <div class="pfp">
+        <div class='pfp'>
             <img
-                :src="profileData.pfp_src"
-                title="Click to change your profile picture"
+                :src='profileData.pfp_src'
+                title='Click to change your profile picture'
             />
         </div>
         
-        <div class="editor-wrapper name-editor-wrapper">
+        <div class='editor-wrapper name-editor-wrapper'>
             <h1
-                class="text-editor name-editor-text"
-                title="Click to change name"
+                class='text-editor name-editor-text'
+                title='Click to change name'
             >
                 {{ profileData.nameText }}
             </h1>
 
-            <button class="name-editor-button">✎</button>
+            <button class='name-editor-button'>✎</button>
         </div>
 
-        <div class="editor-wrapper username-editor-wrapper">
+        <div class='editor-wrapper username-editor-wrapper'>
             <h3
-                class="text-editor username-editor-text"
-                title="Click to change username"
+                class='text-editor username-editor-text'
+                title='Click to change username'
             >
                 {{ profileData.usernameText }}
             </h3>
 
-            <button class="name-editor-button">✎</button>
+            <button class='name-editor-button'>✎</button>
         </div>
+
+        <button
+            class=''
+            :disabled='formChanged'
+        >
+            Apply changes
+        </button>
     </div>
 </template>
 

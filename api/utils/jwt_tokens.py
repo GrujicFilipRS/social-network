@@ -24,10 +24,10 @@ def decode_token(token: str) -> UUID | None:
         payload = jwt.decode(token, Env.SECRET_KEY, algorithms=['HS256'])
         return UUID(payload.get('user_id'))
     except jwt.ExpiredSignatureError:
-        print("JWT Error: Signature has expired.")
+        print('JWT Error: Signature has expired.')
         return None
     except jwt.InvalidTokenError as e:
-        print(f"JWT Error: Invalid token. {e}")
+        print(f'JWT Error: Invalid token. {e}')
         return None
 
 

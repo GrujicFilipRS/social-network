@@ -1,7 +1,7 @@
-import type { Router } from "vue-router";
-import type { Ref } from "vue";
+import type { Router } from 'vue-router';
+import type { Ref } from 'vue';
 
-import { Fetch } from "../api";
+import { Fetch } from '../api';
 
 export const handleLogin = async (
     username: string,

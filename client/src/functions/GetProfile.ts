@@ -1,4 +1,4 @@
-import { Fetch } from "../api"
+import { Fetch } from '../api'
 
 export const GetProfile = async (
     username: string | null

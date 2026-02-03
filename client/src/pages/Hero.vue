@@ -1,7 +1,7 @@
-<script lang="ts" setup>
-import { useRoute, useRouter } from "vue-router";
-import { watch } from "vue";
-import { verifyUser } from "../api";
+<script lang='ts' setup>
+import { useRoute, useRouter } from 'vue-router';
+import { watch } from 'vue';
+import { verifyUser } from '../api';
 
 const router = useRouter();
 const route = useRoute();
@@ -22,8 +22,8 @@ watch(() => route.fullPath, verifyAndRedirect);
 </script>
 
 <template>
-    <div class="hero">
-        <div class="lside-hero">
+    <div class='hero'>
+        <div class='lside-hero'>
             <h1>SOCIAL</h1>
             <p>
                 Explore new experiences<br />
@@ -31,16 +31,16 @@ watch(() => route.fullPath, verifyAndRedirect);
                 Share your story
             </p>
 
-            <button class="primary-btn" @click="() => router.push('/join')">JOIN NOW</button>
+            <button class='primary-btn' @click='() => router.push('/join')'>JOIN NOW</button>
         </div>
 
-        <div class="rside-hero">
-            <img class="image-1" src="/hero-1.jpg" alt="" />
-            <img class="image-2" src="/hero-2.jpg" alt="" />
+        <div class='rside-hero'>
+            <img class='image-1' src='/hero-1.jpg' alt='' />
+            <img class='image-2' src='/hero-2.jpg' alt='' />
         </div>
     </div>
 </template>
 
 <style>
-@import url("./Hero.css");
+@import url('./Hero.css');
 </style>

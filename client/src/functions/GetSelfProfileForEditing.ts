@@ -1,5 +1,5 @@
-import { Fetch } from "../api";
-import type { ProfileData } from "../interfaces/ProfileData";
+import { Fetch } from '../api';
+import type { ProfileData } from '../interfaces/ProfileData';
 
 export interface EditProfileData {
     status: number;

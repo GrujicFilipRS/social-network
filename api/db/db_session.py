@@ -15,7 +15,7 @@ def global_init():
 
     connection_string = Env.DATABASE_URL
 
-    print(f"Connecting to remote DB at {connection_string}")
+    print(f'Connecting to remote DB at {connection_string}')
     engine = create_engine(connection_string, echo=False, future=True)
     __factory = orm.sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
@@ -27,7 +27,7 @@ def global_init():
 def create_session():
     global __factory
     if not __factory:
-        raise Exception("Database session not initialized. Call global_init first.")
+        raise Exception('Database session not initialized. Call global_init first.')
     return __factory()
 
 
@@ -41,4 +41,4 @@ class DBSessionManager:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.db_sess.close()
         if exc_type:
-            print(f"Exception in DB session: {exc_type}, {exc_val}")
+            print(f'Exception in DB session: {exc_type}, {exc_val}')
