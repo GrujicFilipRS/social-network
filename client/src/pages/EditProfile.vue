@@ -38,7 +38,7 @@ if (profileData.value.status === 404) {
                 class="text-editor name-editor-text"
                 title="Click to change name"
             >
-                {{ profileData.name }}
+                {{ profileData.nameText }}
             </h1>
 
             <button class="name-editor-button">✎</button>
@@ -49,7 +49,7 @@ if (profileData.value.status === 404) {
                 class="text-editor username-editor-text"
                 title="Click to change username"
             >
-                {{ profileData.username }}
+                {{ profileData.usernameText }}
             </h3>
 
             <button class="name-editor-button">✎</button>

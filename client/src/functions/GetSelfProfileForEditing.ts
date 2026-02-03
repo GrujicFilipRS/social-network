@@ -3,9 +3,9 @@ import type { ProfileData } from "../interfaces/ProfileData";
 
 export interface EditProfileData {
     status: number;
-    username: string;
+    usernameText: string;
     pfp_src: string;
-    name: string;
+    nameText: string;
 }
 
 export const GetSelfProfileForEditing = async (): Promise<EditProfileData> => {
@@ -16,9 +16,9 @@ export const GetSelfProfileForEditing = async (): Promise<EditProfileData> => {
 
         return {
             status: status,
-            username: data.username,
+            usernameText: data.username,
             pfp_src: data.pfp_src ?? '/default-pfp.png',
-            name: data.user_name ?? 'Set your name here'
+            nameText: data.user_name ?? 'Set your name here'
         }
     });
 }
