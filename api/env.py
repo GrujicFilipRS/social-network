@@ -28,7 +28,7 @@ if raise_exc:
 
 def get_local_db_string(db_name: str) -> str:
     base_dir = Path(__file__).resolve().parent.parent
-    db_dir = base_dir / 'api/db'
+    db_dir = base_dir / 'db'
     db_dir.mkdir(exist_ok=True)
 
     db_file = db_dir / f'{db_name.strip()}.sqlite'
