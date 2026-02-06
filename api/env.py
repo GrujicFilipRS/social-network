@@ -2,8 +2,9 @@
 # It checks if the required environment variables are loaded,
 # as well as init a class that's used to store environment variables
 
+from pathlib import Path
 from dotenv import load_dotenv
-from os import getenv, path, environ, makedirs
+from os import getenv, environ
 
 load_dotenv()
 
@@ -26,12 +27,13 @@ if raise_exc:
     raise Exception(f'Missing required environment variables: { ', '.join(missing_vars) }')
 
 def get_local_db_string(db_name: str) -> str:
-    base_dir = path.abspath(path.join(path.dirname(__file__), '..'))
-    db_dir = path.join(base_dir, 'db')
+    base_dir = Path(__file__).resolve().parent.parent
+    db_dir = base_dir / 'api/db'
+    db_dir.mkdir(exist_ok=True)
 
-    makedirs(db_dir, exist_ok=True)
+    db_file = db_dir / f'{db_name.strip()}.sqlite'
 
-    return f'sqlite://{path.join(db_dir, f'{db_name.strip()}.sqlite')}?check_same_thread=False'
+    return f'sqlite:///{db_file.as_posix()}?check_same_thread=False'
 
 class Env:
     def __new__(cls):
