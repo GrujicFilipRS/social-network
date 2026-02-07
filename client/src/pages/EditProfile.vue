@@ -5,6 +5,8 @@ import { useRouter } from 'vue-router';
 import { verifyUser } from '../api';
 import { GetSelfProfileForEditing, type EditProfileData } from '../functions/GetSelfProfileForEditing';
 
+import ChangePopup from '../components/ChangePopup.vue';
+
 const router = useRouter();
 
 const verificationData = await verifyUser();
@@ -23,10 +25,17 @@ if (profileData.value.status === 404) {
 const formChanged = ref<boolean>(false);
 // const formData = ref<EditProfileData>(profileData.value);
 
+
+const showPopup = ref(true);
 </script>
 
 <template>
     <div class='profile-editor'>
+        <ChangePopup
+            v-model:visible='showPopup'
+            title='Test window'
+        />
+
         <h1>Edit your profile</h1>
 
         <div class='pfp'>
