@@ -32,8 +32,9 @@ const showPopup = ref(true);
 <template>
     <div class='profile-editor'>
         <ChangePopup
-            v-model:visible='showPopup'
+            :visible='showPopup'
             title='Test window'
+            :close-window='() => showPopup = false'
         />
 
         <h1>Edit your profile</h1>
