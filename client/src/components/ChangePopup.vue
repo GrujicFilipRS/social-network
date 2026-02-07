@@ -52,7 +52,3 @@ watch(
         </div>
     </Dialog>
 </template>
-
-<!-- <style>
-@import url('./ChangePopup.css');
-</style> -->
