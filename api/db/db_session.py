@@ -16,7 +16,14 @@ def global_init():
     connection_string = Env.DATABASE_URL
 
     print(f'Connecting to remote DB at {connection_string}')
-    engine = create_engine(connection_string, echo=False, future=True)
+
+    engine = create_engine(
+        connection_string,
+        echo=False,
+        future=True,
+        pool_pre_ping=True
+    )
+    
     __factory = orm.sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
     from models import __all_models
