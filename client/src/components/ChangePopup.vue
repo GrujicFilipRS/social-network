@@ -2,12 +2,23 @@
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
+import { ref, watch } from 'vue';
 
 const props = defineProps<{
     title: string;
+    originalValue: string;
     visible: boolean;
     handleClose: () => void;
 }>();
+
+const inputValue = ref<string>(props.originalValue);
+
+watch(
+    () => props.originalValue,
+    (newValue) => {
+        inputValue.value = newValue;
+    }
+)
 
 </script>
 
@@ -15,15 +26,15 @@ const props = defineProps<{
     <Dialog
         :visible='visible'
         modal
-        :header='props.title'
+        :header='`Change your ${title}`'
         @update:visible='props.handleClose'
     >
         <div class='flex flex-col items-center'>
-            <span class='text-surface-500 dark:text-surface-400 block mb-2'>Update your username</span>
-
             <div class='flex items-center gap-4 mb-4'>
-                <label for='username' class='font-semibold w-24'>Username</label>
-                <InputText id='username' class='flex-auto' autocomplete='off' />
+                <label for='username' class='font-semibold w-24'>
+                    {{ title.charAt(0).toUpperCase() + title.slice(1) }}:
+                </label>
+                <InputText id='username' class='flex-auto' autocomplete='off' v-model='inputValue' />
             </div>
         </div>
 
