@@ -23,18 +23,17 @@ if (profileData.value.status === 404) {
 }
 
 const formChanged = ref<boolean>(false);
-// const formData = ref<EditProfileData>(profileData.value);
 
+const showPopup = ref<boolean>(true);
 
-const showPopup = ref(true);
 </script>
 
 <template>
     <div class='profile-editor'>
         <ChangePopup
-            :visible='showPopup'
             title='Test window'
-            :close-window='() => showPopup = false'
+            :visible='showPopup'
+            :handle-close='() => showPopup = false'
         />
 
         <h1>Edit your profile</h1>

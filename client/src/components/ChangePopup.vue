@@ -4,9 +4,9 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 
 const props = defineProps<{
-    visible: boolean,
-    title: string,
-    closeWindow: () => void
+    title: string;
+    visible: boolean;
+    handleClose: () => void;
 }>();
 
 </script>
@@ -16,6 +16,7 @@ const props = defineProps<{
         :visible='visible'
         modal
         :header='props.title'
+        @update:visible='props.handleClose'
     >
         <div class='flex flex-col items-center'>
             <span class='text-surface-500 dark:text-surface-400 block mb-2'>Update your username</span>
@@ -30,12 +31,12 @@ const props = defineProps<{
             <Button
                 label='Cancel'
                 severity='secondary'
-                @click='props.closeWindow'
+                @click='props.handleClose'
             />
 
             <Button
                 label='Save'
-                @click='props.closeWindow'
+                @click='props.handleClose'
             />
         </div>
     </Dialog>
