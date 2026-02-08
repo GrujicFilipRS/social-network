@@ -1,4 +1,4 @@
-import re
+import re, regex
 from sqlalchemy import Column, UUID, String, DateTime
 from sqlalchemy.orm import relationship
 from db.db_session import SqlAlchemyBase
@@ -75,7 +75,7 @@ class User(SqlAlchemyBase):
     def validate_name(name: str | None) -> bool:
         if name == '' or name is None: return True
         
-        name_regex = re.compile(r'^[\p{L}][\p{L}\p{M}\'\-.\s]*$')
+        name_regex = regex.compile(r'^[\p{L}][\p{L}\p{M}\'\-.\s]*$')
         if not bool(name_regex.match(name)):
             return False
 
