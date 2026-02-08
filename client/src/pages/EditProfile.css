@@ -2,6 +2,22 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 50px;
+}
+
+.profile-editor h1 {
+    font-size: 28pt;
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+.profile-editor .pfp {
+    margin-bottom: 25px;
+}
+
+.profile-editor h2 {
+    font-size: 24pt;
+    font-weight: 600;
 }
 
 .text-editor, .name-editor-button {

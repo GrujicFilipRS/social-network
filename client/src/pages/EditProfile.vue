@@ -77,13 +77,13 @@ const loadNamePopup = () => {
         </div>
         
         <div class='editor-wrapper name-editor-wrapper'>
-            <h1
+            <h2
                 class='text-editor name-editor-text'
                 title='Click to change name'
                 @click='loadNamePopup'
             >
                 {{ displayProfileData!.nameText }}
-            </h1>
+            </h2>
 
             <button
                 class='name-editor-button'
