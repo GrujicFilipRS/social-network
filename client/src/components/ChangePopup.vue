@@ -9,6 +9,8 @@ const props = defineProps<{
     originalValue: string;
     visible: boolean;
     handleClose: () => void;
+    editFunction?: (value: string) => void;
+    refreshFunction: () => void;
 }>();
 
 const inputValue = ref<string>(props.originalValue);
@@ -19,6 +21,17 @@ watch(
         inputValue.value = newValue;
     }
 )
+
+const sendEditRequest = () => {
+    if (props.editFunction)
+        props.editFunction(inputValue.value);
+}
+
+const commitValue = () => {
+    sendEditRequest();
+    props.handleClose();
+    props.refreshFunction();
+}
 
 </script>
 
@@ -47,7 +60,7 @@ watch(
 
             <Button
                 label='Save'
-                @click='props.handleClose'
+                @click='commitValue'
             />
         </div>
     </Dialog>

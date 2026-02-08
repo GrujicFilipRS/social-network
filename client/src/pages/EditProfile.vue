@@ -10,6 +10,9 @@ import {
 from '../functions/GetSelfProfileForEditing';
 
 import ChangePopup from '../components/ChangePopup.vue';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue';
+import { EditUsername, EditName } from '../functions/UpdateProfile';
 
 const router = useRouter();
 
@@ -31,28 +34,37 @@ await setProfileDatas();
 const showPopup = ref<boolean>(false);
 const popupTitle = ref<string>('');
 const selectedElementValue = ref<string>('');
+const editFunction = ref<(username: string) => void>();
+
+const toast = useToast();
 
 const loadUsernamePopup = () => {
     popupTitle.value = 'username';
     selectedElementValue.value = actualProfileData.value!.usernameText;
     showPopup.value = true;
+    editFunction.value = (username: string) => EditUsername(username, toast.add);
 }
 
 const loadNamePopup = () => {
     popupTitle.value = 'name';
     selectedElementValue.value = actualProfileData.value!.nameText;
     showPopup.value = true;
+    editFunction.value = (username: string) => EditName(username, toast.add);
 }
 
 </script>
 
 <template>
     <div class='profile-editor'>
+        <Toast />
+
         <ChangePopup
             :title='popupTitle'
             :visible='showPopup'
             :original-value='selectedElementValue'
             :handle-close='() => showPopup = false'
+            :edit-function='editFunction'
+            :refresh-function='setProfileDatas'
         />
 
         <h1>Edit your profile</h1>
@@ -73,7 +85,12 @@ const loadNamePopup = () => {
                 {{ displayProfileData!.nameText }}
             </h1>
 
-            <button class='name-editor-button'>✎</button>
+            <button
+                class='name-editor-button'
+                @click='loadNamePopup'
+            >
+                ✎
+            </button>
         </div>
 
         <div class='editor-wrapper username-editor-wrapper'>
@@ -85,7 +102,12 @@ const loadNamePopup = () => {
                 {{ displayProfileData!.usernameText }}
             </h3>
 
-            <button class='name-editor-button'>✎</button>
+            <button
+                class='name-editor-button'
+                @click='loadUsernamePopup'
+            >
+                ✎
+            </button>
         </div>
     </div>
 </template>
