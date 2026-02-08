@@ -113,5 +113,10 @@ const verifyName = (name: string): [boolean, string | null] => {
     if (name.length < 3 || name.length > 30)
         return [false, 'Name must be between (not including) 3 and 30 characters long'];
 
+    const pattern = /^[\p{L}][\p{L}\p{M}'\-.\s]*$/u;
+    if (!pattern.test(name)) {
+        return [false, 'Name must contain only normal characters'];
+    }
+
     return [true, null];
 }
