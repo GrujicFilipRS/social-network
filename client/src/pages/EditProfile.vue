@@ -119,6 +119,7 @@ const onUploadImage = (event: FileUploadUploaderEvent) => {
         />
 
         <Button
+            class='mb-2 mt-2'
             label='Upload'
             @click='uploadImage'
             severity='secondary'
