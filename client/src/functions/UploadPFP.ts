@@ -4,7 +4,8 @@ import { FetchWithFileUpload } from '../api';
 export const UploadPFP = (
     image: File, toastAdd:
     (message: ToastMessageOptions) => void,
-    setLoading: (value: boolean) => void
+    setLoading: (value: boolean) => void,
+    refreshImage: () => void
 ) => {
     setLoading(true);
     const data = new FormData();
@@ -34,5 +35,6 @@ export const UploadPFP = (
         });
     }).finally(() => {
         setLoading(false);
+        refreshImage();
     });
 }

@@ -77,7 +77,12 @@ const onUploadImage = (event: FileUploadUploaderEvent) => {
     const files = event.files;
     const image: File = Array.isArray(files) ? files[0]! : files;
 
-    UploadPFP(image, toast.add, (value: boolean) => imageLoadingRef.value = value);
+    UploadPFP(
+        image,
+        toast.add,
+        (value: boolean) => imageLoadingRef.value = value,
+        setProfileDatas
+    );
     imageUploadRef.value.clear();
 }
 
