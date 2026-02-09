@@ -66,6 +66,7 @@ const loadNamePopup = () => {
 }
 
 const imageUploadRef = ref();
+const imageLoadingRef = ref<boolean>(false);
 
 const uploadImage = () => {
     if (imageUploadRef.value)
@@ -76,8 +77,9 @@ const onUploadImage = (event: FileUploadUploaderEvent) => {
     const files = event.files;
     const image: File = Array.isArray(files) ? files[0]! : files;
 
-    UploadPFP(image, toast.add);
-} 
+    UploadPFP(image, toast.add, (value: boolean) => imageLoadingRef.value = value);
+    imageUploadRef.value.clear();
+}
 
 </script>
 
@@ -111,7 +113,12 @@ const onUploadImage = (event: FileUploadUploaderEvent) => {
             @uploader='onUploadImage'
         />
 
-        <Button label='Upload' @click='uploadImage' severity='secondary' />
+        <Button
+            label='Upload'
+            @click='uploadImage'
+            severity='secondary'
+            :loading='imageLoadingRef'
+        />
         
         <div class='editor-wrapper name-editor-wrapper'>
             <h2

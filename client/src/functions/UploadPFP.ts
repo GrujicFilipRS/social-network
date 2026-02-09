@@ -1,7 +1,12 @@
 import type { ToastMessageOptions } from 'primevue/toast';
 import { FetchWithFileUpload } from '../api';
 
-export const UploadPFP = (image: File, toastAdd: (message: ToastMessageOptions) => void) => {
+export const UploadPFP = (
+    image: File, toastAdd:
+    (message: ToastMessageOptions) => void,
+    setLoading: (value: boolean) => void
+) => {
+    setLoading(true);
     const data = new FormData();
     data.append('image', image);
 
@@ -19,7 +24,6 @@ export const UploadPFP = (image: File, toastAdd: (message: ToastMessageOptions) 
                 detail: data.message,
                 life: 3000
             });
-
             return;
         }
 
@@ -28,5 +32,7 @@ export const UploadPFP = (image: File, toastAdd: (message: ToastMessageOptions) 
             summary: 'Success',
             detail: 'Successfully uploaded new PFP'
         });
+    }).finally(() => {
+        setLoading(false);
     });
 }
