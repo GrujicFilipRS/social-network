@@ -53,11 +53,6 @@
     width: 150px;
     height: 150px;
     border-radius: 100px;
-    cursor: pointer;
     background-blend-mode: screen;
     transition: 0.2s;
-}
-
-.pfp img:hover {
-    opacity: 0.5;
 }

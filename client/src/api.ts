@@ -32,6 +32,41 @@ export const Fetch = async (
     return fetch(`${API_ROUTE}/${endpoint}`, options);
 }
 
+export const FetchWithFileUpload = async (
+    endpoint: string,
+    {
+        method = 'GET',
+        body = '{}',
+        headers = {}
+    }: FetchOptions = {},
+    file: File,
+    fileFieldName: string = 'file'
+): Promise<Response> => {
+
+    const formData = new FormData();
+
+    formData.append(fileFieldName, file);
+
+    if (body && typeof body === 'object') {
+        Object.entries(body).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                formData.append(key, String(value));
+            }
+        });
+    }
+
+    const options: RequestInit = {
+        method,
+        credentials: 'include',
+        headers: {
+            ...headers
+        },
+        body: formData,
+    };
+
+    return fetch(`${API_ROUTE}/${endpoint}`, options);
+}
+
 interface VerificationData {
     statusCode: number;
     result: any;
