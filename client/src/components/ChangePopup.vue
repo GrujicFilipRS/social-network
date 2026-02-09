@@ -9,8 +9,7 @@ const props = defineProps<{
     originalValue: string;
     visible: boolean;
     handleClose: () => void;
-    editFunction?: (value: string) => void;
-    refreshFunction: () => void;
+    editFunction?: (value: string ) => void;
 }>();
 
 const inputValue = ref<string>(props.originalValue);
@@ -24,13 +23,12 @@ watch(
 
 const sendEditRequest = () => {
     if (props.editFunction)
-        props.editFunction(inputValue.value);
+        props.editFunction(inputValue.value, );
 }
 
 const commitValue = () => {
     sendEditRequest();
     props.handleClose();
-    props.refreshFunction();
 }
 
 </script>

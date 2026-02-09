@@ -42,14 +42,24 @@ const loadUsernamePopup = () => {
     popupTitle.value = 'username';
     selectedElementValue.value = actualProfileData.value!.usernameText;
     showPopup.value = true;
-    editFunction.value = (username: string) => EditUsername(username, toast.add);
+    editFunction.value = (username: string) => EditUsername(username, toast.add, (username: string) => {
+        if (displayProfileData.value && actualProfileData.value) {
+            displayProfileData.value.usernameText = username;
+            actualProfileData.value.usernameText = username;
+        }
+    });
 }
 
 const loadNamePopup = () => {
     popupTitle.value = 'name';
     selectedElementValue.value = actualProfileData.value!.nameText;
     showPopup.value = true;
-    editFunction.value = (username: string) => EditName(username, toast.add);
+    editFunction.value = (username: string) => EditName(username, toast.add, (name: string) => {
+        if (displayProfileData.value && actualProfileData.value) {
+            displayProfileData.value.nameText = name;
+            actualProfileData.value.nameText = name;
+        }
+    });
 }
 
 </script>

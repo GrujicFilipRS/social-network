@@ -3,7 +3,8 @@ import { Fetch } from '../api';
 
 export const EditUsername = (
     username: string,
-    toastAdd: (message: ToastMessageOptions) => void
+    toastAdd: (message: ToastMessageOptions) => void,
+    setUsername: (value: string) => void
 ) => {
     const [usernameValid, usernameInvalidMessage] = verifyUsername(username); 
     if (!usernameValid) {
@@ -44,6 +45,8 @@ export const EditUsername = (
             detail: 'Successfully updated username',
             life: 3000
         });
+
+        setUsername(username);
     });
 }
 
@@ -63,7 +66,8 @@ const verifyUsername = (username: string): [boolean, string | null] => {
 
 export const EditName = (
     name: string,
-    toastAdd: (message: ToastMessageOptions) => void
+    toastAdd: (message: ToastMessageOptions) => void,
+    setName: (value: string) => void
 ) => {
     const [nameValid, nameInvalidMessage] = verifyName(name); 
     if (!nameValid) {
@@ -104,6 +108,8 @@ export const EditName = (
             detail: 'Successfully updated username',
             life: 3000
         });
+
+        setName(name);
     });
 }
 
