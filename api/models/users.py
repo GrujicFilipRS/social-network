@@ -1,9 +1,13 @@
+from datetime import datetime, timedelta, timezone
 import re, regex
 from sqlalchemy import Column, UUID, String, DateTime
 from sqlalchemy.orm import relationship
 from db.db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash, check_password_hash
 from uuid import uuid4
+
+class UserOptions:
+    USERNAME_UPDATE_LIMIT_HOURS = 24
 
 class User(SqlAlchemyBase):
     __tablename__ = 'users'
@@ -53,8 +57,17 @@ class User(SqlAlchemyBase):
     def set_name(self, name: str) -> None:
         self.name = name
     
-    def set_username(self, username: str) -> None:
-        self.username = username
+    def able_to_change_username(self) -> bool:
+        if self.last_username_edit is None:
+            return True
+
+        last_edit = self.last_username_edit.replace(tzinfo=timezone.utc)
+        delta = datetime.now(timezone.utc) - last_edit
+
+        if delta < timedelta(hours = UserOptions.USERNAME_UPDATE_LIMIT_HOURS):
+            return False
+
+        return True
     
     @staticmethod
     def validate_username(username: str) -> bool:

@@ -2,11 +2,11 @@ from uuid import UUID
 from fastapi.responses import JSONResponse
 from fastapi import Request
 from pydantic import BaseModel
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Any
 
 from env import Env
-from models.users import User
+from models.users import User, UserOptions
 from models.follows import Follow
 from db.db_session import DBSessionManager
 
@@ -217,19 +217,17 @@ async def change_username(
         if db_sess.query(User).filter_by(username=new_username).first():
             return JSONResponse(content={'message': 'User with such username already exists'}, status_code=400)
         
-        USERNAME_UPDATE_LIMIT_HOURS = 24
-        last_edit = user.last_username_edit.replace(tzinfo=timezone.utc)
-        delta = datetime.now(timezone.utc) - last_edit
-
-        if delta < timedelta(hours=USERNAME_UPDATE_LIMIT_HOURS):
+        able_to_change = user.able_to_change_username()
+        
+        if not able_to_change:
             return JSONResponse(content={
-                'message': f'You can only update your username once every {USERNAME_UPDATE_LIMIT_HOURS} hours'},
+                'message': f'You can only update your username once every {UserOptions.USERNAME_UPDATE_LIMIT_HOURS} hours'},
                 status_code=401
             )
-        
-        user.set_username(new_username)
-        user.last_username_edit = datetime.now(timezone.utc)
 
+        user.username = new_username
+        user.last_username_edit = datetime.now(timezone.utc)
+        
         db_sess.add(user)
         db_sess.commit()
 
