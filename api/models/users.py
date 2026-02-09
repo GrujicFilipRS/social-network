@@ -13,6 +13,7 @@ class User(SqlAlchemyBase):
     hashed_password = Column(String, nullable=False)
     name = Column(String)
     created_at = Column(DateTime)
+    last_username_edit = Column(DateTime)
 
     posts = relationship('Post', back_populates='user')
     

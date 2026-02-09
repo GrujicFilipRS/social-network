@@ -2,9 +2,8 @@ from uuid import UUID
 from fastapi.responses import JSONResponse
 from fastapi import Request
 from pydantic import BaseModel
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
-import os
 
 from env import Env
 from models.users import User
@@ -97,6 +96,7 @@ async def register(data: RegistrationData) -> JSONResponse:
         user.set_creation_date(datetime.now(timezone.utc))
         if name:
             user.set_name(name)
+        user.last_username_edit = datetime.now(timezone.utc)
 
         db_sess.add(user)
         db_sess.commit()
@@ -217,7 +217,18 @@ async def change_username(
         if db_sess.query(User).filter_by(username=new_username).first():
             return JSONResponse(content={'message': 'User with such username already exists'}, status_code=400)
         
+        USERNAME_UPDATE_LIMIT_HOURS = 24
+        last_edit = user.last_username_edit.replace(tzinfo=timezone.utc)
+        delta = datetime.now(timezone.utc) - last_edit
+
+        if delta < timedelta(hours=USERNAME_UPDATE_LIMIT_HOURS):
+            return JSONResponse(content={
+                'message': f'You can only update your username once every {USERNAME_UPDATE_LIMIT_HOURS} hours'},
+                status_code=401
+            )
+        
         user.set_username(new_username)
+        user.last_username_edit = datetime.now(timezone.utc)
 
         db_sess.add(user)
         db_sess.commit()
@@ -227,7 +238,7 @@ async def change_username(
 
 @router.put('/change_password/')
 @require_auth
-async def change_username(
+async def change_password(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
