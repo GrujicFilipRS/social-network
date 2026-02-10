@@ -3,7 +3,8 @@ import re, regex
 from sqlalchemy import Column, UUID, String, DateTime
 from sqlalchemy.orm import relationship
 from db.db_session import SqlAlchemyBase
-from werkzeug.security import generate_password_hash, check_password_hash
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 from uuid import uuid4
 
 class UserOptions:
@@ -45,11 +46,19 @@ class User(SqlAlchemyBase):
 
         return output
 
-    def set_password(self, password) -> None:
-        self.hashed_password = generate_password_hash(password)
+    def set_password(self, password: str) -> None:
+        password_hasher = PasswordHasher()
+        hashed_pwd = password_hasher.hash(password)
+        self.hashed_password = hashed_pwd
 
-    def check_password(self, password) -> str:
-        return check_password_hash(self.hashed_password, password)
+    def check_password(self, password: str) -> bool:
+        password_hasher = PasswordHasher()
+        try:
+            password_hasher.verify(self.hashed_password, password)
+        except VerifyMismatchError:
+            return False
+        
+        return True
     
     def set_creation_date(self, creation_date: DateTime) -> None:
         self.created_at = creation_date
