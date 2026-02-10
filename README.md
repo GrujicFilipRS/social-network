@@ -24,7 +24,7 @@ It supports user authentication, posts with image uploads, and scalable data sto
 - **SQLite** (local development)
 
 ### Media Storage
-- **Cloudinary** (image hosting and optimization)
+- **Cloudinary** (image hosting)
 
 ---
 
