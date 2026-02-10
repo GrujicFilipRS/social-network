@@ -113,7 +113,7 @@ const onUploadImage = (event: FileUploadUploaderEvent) => {
         <FileUpload
             ref='imageUploadRef'
             mode='basic'
-            accept='image/*'
+            accept='.jpg,.jpeg,.png,.webp'
             :customUpload='true'
             @uploader='onUploadImage'
         />
