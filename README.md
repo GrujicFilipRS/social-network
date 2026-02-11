@@ -9,15 +9,12 @@ It supports user authentication, posts with image uploads, and scalable data sto
 
 ### Frontend
 - **Vue.js**
-- Vue Router
 - Primevue
 - TailwindCSS
 
 ### Backend
 - **FastAPI**
 - SQLAlchemy
-- Pydantic
-- Uvicorn
 
 ### Database
 - **PostgreSQL** (production)
