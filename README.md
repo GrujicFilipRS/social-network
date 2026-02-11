@@ -25,15 +25,6 @@ It supports user authentication, posts with image uploads, and scalable data sto
 
 ---
 
-## Features
-
-- User authentication (JWT-based)
-- Create, edit, and delete posts
-- Image uploads via Cloudinary
-- User profiles
-- RESTful API
-
-
 ## Startup of local deployment
 
 ### Prerequisites
