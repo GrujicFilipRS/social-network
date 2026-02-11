@@ -7,7 +7,7 @@ from uuid import uuid4
 from typing import Any
 import string
 import unicodedata
-from photos import Photo
+from models.photos import Photo
 
 from utils.literals import PostLiterals
 
