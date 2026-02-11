@@ -47,6 +47,10 @@
     cursor: pointer;
 }
 
+.follow-button span {
+    font-weight: 800;
+}
+
 @media (max-width: 1200px) {
     .profile-info {
         width: 80%;

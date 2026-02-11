@@ -84,29 +84,27 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
                 </p>
             </div>
 
-            <button
-                class='primary-btn'
+            <Button
                 v-show='userId !== data.user_id && !followingUser'
                 @click='handleFollow'
-            >
-                FOLLOW
-            </button>
+                label='FOLLOW'
+                class='follow-button'
+            />
 
-            <button
-                class='secondary-btn'
+            <Button
                 v-show='userId !== data.user_id && followingUser'
                 @click='handleUnfollow'
-            >
-                Unfollow
-            </button>
+                label='Unfollow'
+                severity='secondary'
+            />
 
-            <button
-                class='secondary-btn'
+            <Button
                 v-show='userId == data.user_id'
                 @click='handleEdit'
-            >
-                Edit profile
-            </button>
+                label='Edit profile'
+                severity='secondary'
+                icon='pi pi-pencil'
+            />
         </div>
     </div>
 
@@ -115,12 +113,16 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
         :userId='data.user_id'
     />
 
-    <Button
-        v-if='userId == data.user_id'
-        label='Create new post'
-        severity='secondary'
-        @click='() => router.push("/create_post")'
-    />
+    <div class='w-[60%] mt-6'>
+        <Button
+            v-if='userId == data.user_id'
+            label='Create new post'
+            severity='secondary'
+            class='self-start'
+            @click='() => router.push("/create_post")'
+            icon='pi pi-plus'
+        />
+    </div>
 </template>
 
 <style>
