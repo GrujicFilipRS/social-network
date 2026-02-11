@@ -8,6 +8,7 @@ import { Follow, Unfollow } from '../functions/Follow';
 
 import type { ProfileData } from '../interfaces/ProfileData';
 import type { FollowWindowModeType } from '../interfaces/FollowWindowModeType';
+import Button from 'primevue/button';
 
 import FollowsWindow from '../components/FollowWindow.vue';
 
@@ -33,7 +34,7 @@ if (fetchData.value.status === 404) {
 const data = ref<ProfileData>(fetchData.value.data);
 
 const firstRow: string = data.value.user_name ? data.value.user_name : data.value.username;
-const secondRow: string | null= data.value.user_name ? data.value.username : null;
+const secondRow: string | null = data.value.user_name ? data.value.username : null;
 
 const followingUser = ref<boolean>(data.value.user_followed);
 const followWindowRef = ref<InstanceType<typeof FollowsWindow>>();
@@ -112,6 +113,13 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
     <FollowsWindow
         ref='followWindowRef'
         :userId='data.user_id'
+    />
+
+    <Button
+        v-if='userId == data.user_id'
+        label='Create new post'
+        severity='secondary'
+        @click='() => router.push("/create_post")'
     />
 </template>
 
