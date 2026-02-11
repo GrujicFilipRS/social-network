@@ -1,3 +1,5 @@
+from fastapi import UploadFile
+from fastapi.datastructures import FormData
 from sqlalchemy import Column, ForeignKey, UUID, String, DateTime, Text
 from sqlalchemy.orm import relationship
 from db.db_session import SqlAlchemyBase
@@ -5,6 +7,7 @@ from uuid import uuid4
 from typing import Any
 import string
 import unicodedata
+from photos import Photo
 
 from utils.literals import PostLiterals
 
@@ -48,7 +51,7 @@ class Post(SqlAlchemyBase):
         self.status = status
 
     @staticmethod
-    def verify_creation(data: Any) -> bool:
+    async def verify_creation(data: FormData) -> bool:
         title: Any = data.get('title')
         body: Any = data.get('body')
         status: Any = data.get('status')
@@ -93,5 +96,21 @@ class Post(SqlAlchemyBase):
         
         if any(unicodedata.category(c) in ('Cc', 'Cf') for c in body + title):
             return False
+
+        images = data.getlist('images')
+        MAX_IMAGES = 10
+        
+        if len(images) > MAX_IMAGES:
+            return False
+        
+        for image in images:
+            if not isinstance(image, UploadFile):
+                return False
+            
+            if not Photo.verify_valid_photo(image):
+                return False
+            
+            # Reset image byte pointer
+            image.seek(0)
         
         return True

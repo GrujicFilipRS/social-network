@@ -1,16 +1,18 @@
 from uuid import UUID
 from fastapi.responses import JSONResponse
-from fastapi import Request
+from fastapi import Request, UploadFile
 from datetime import datetime, timezone
 
 from models.posts import Post
+from models.photos import Photo
 from db.db_session import DBSessionManager
 
 from utils.jwt_tokens import optional_auth, require_auth
-
 from utils.literals import PostLiterals
 
 from fastapi import APIRouter
+
+from utils.image_controller import ImageController
 
 router = APIRouter()
 
@@ -96,7 +98,7 @@ async def edit_post(
     user_id: UUID | None = None
 ) -> JSONResponse:
     with DBSessionManager() as db_sess:
-        data = await request.json()
+        data = await request.form()
 
         if not Post.verify_creation(data):
             return JSONResponse(content={'message': 'Invalid creation data'}, status_code=400)
@@ -104,6 +106,7 @@ async def edit_post(
         title: str = data.get('title').strip()
         body: str = data.get('body').strip()
         status: str = data.get('status').strip().upper()
+        photos: list[UploadFile] = data.getlist('images')
 
         try:
             post_id: UUID = UUID(data.get('id'))
@@ -123,6 +126,21 @@ async def edit_post(
         post.set_status(status)
 
         db_sess.add(post)
+        db_sess.flush()
+        
+        # Create all individual photos
+        for position, photo in enumerate(photos):
+            image_src, public_id = await ImageController.create_image(photo)
+            
+            photo_obj = Photo(
+                post_id=post.id,
+                post_position=position,
+                image_src=image_src,
+                image_id=public_id
+            )
+            
+            db_sess.add(photo_obj)
+        
         db_sess.commit()
 
         content: dict = {

@@ -46,12 +46,12 @@ async def create_user_pfp(
         if not PFP.approve_pfp_file(image):
             return JSONResponse(content={'message': 'Invalid image file'}, status_code=400)
         
-        image_src, image_id = await ImageController.create_pfp(image)
+        image_src, image_id = await ImageController.create_image(image)
 
         previous_pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
 
         if not previous_pfp is None:
-            ImageController.destroy_pfp(previous_pfp.image_id)
+            ImageController.destroy_image(previous_pfp.image_id)
             db_sess.delete(previous_pfp)
             db_sess.commit()
         
@@ -78,7 +78,7 @@ async def delete_pfp(
         if pfp is None:
             return JSONResponse(content={'message': 'pfp not found'}, status_code=404)
 
-        ImageController.destroy_pfp(pfp.image_id)
+        ImageController.destroy_image(pfp.image_id)
 
         db_sess.delete(pfp)
         db_sess.commit()

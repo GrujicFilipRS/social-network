@@ -23,7 +23,7 @@ class ImageController:
             print(f'Cloudinary connection unsuccessful: {e}')
     
     @staticmethod
-    async def create_pfp(image: UploadFile) -> tuple[str, str]:
+    async def create_image(image: UploadFile) -> tuple[str, str]:
         file_bytes = await image.read()
 
         result = cloudinary.uploader.upload(
@@ -37,7 +37,7 @@ class ImageController:
         return (result['secure_url'], result['public_id'])
 
     @staticmethod
-    async def destroy_pfp(public_id: str) -> None:
+    async def destroy_image(public_id: str) -> None:
         cloudinary.uploader.destroy(public_id)
     
     def __new__():
