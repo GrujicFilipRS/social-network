@@ -9,6 +9,7 @@ from db import db_session
 from models.__all_models import *
 
 from router import configure_routing
+from utils.image_controller import ImageController
 
 db_session.global_init()
 
@@ -31,3 +32,6 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 configure_routing(app)
+
+ImageController.setup_connection()
+ImageController.test_connection()
