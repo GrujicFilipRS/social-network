@@ -67,6 +67,32 @@ export const FetchWithFileUpload = async (
     return fetch(`${API_ROUTE}/${endpoint}`, options);
 }
 
+interface FormDataFetchOptions {
+    method?: string,
+    body?: FormData,
+    headers?: Record<string, string>
+};
+
+export const FetchWithFormData = async (
+    endpoint: string,
+    {
+        method = 'GET',
+        body = new FormData(),
+        headers = {}
+    }: FormDataFetchOptions = {}
+): Promise<Response> => {
+    const options: RequestInit = {
+        method,
+        credentials: 'include',
+        headers: {
+            ...headers
+        },
+        body: body,
+    };
+
+    return fetch(`${API_ROUTE}/${endpoint}`, options);
+}
+
 interface VerificationData {
     statusCode: number;
     result: any;
