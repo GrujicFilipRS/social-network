@@ -9,15 +9,12 @@ It supports user authentication, posts with image uploads, and scalable data sto
 
 ### Frontend
 - **Vue.js**
-- Vue Router
 - Primevue
 - TailwindCSS
 
 ### Backend
 - **FastAPI**
 - SQLAlchemy
-- Pydantic
-- Uvicorn
 
 ### Database
 - **PostgreSQL** (production)
@@ -27,15 +24,6 @@ It supports user authentication, posts with image uploads, and scalable data sto
 - **Cloudinary** (image hosting)
 
 ---
-
-## Features
-
-- User authentication (JWT-based)
-- Create, edit, and delete posts
-- Image uploads via Cloudinary
-- User profiles
-- RESTful API
-
 
 ## Startup of local deployment
 
