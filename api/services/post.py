@@ -63,7 +63,7 @@ async def create_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    data = await request.json()
+    data = await request.form()
 
     if not Post.verify_creation(data):
         return JSONResponse(content={'message': 'Invalid creation data'}, status_code=400)
@@ -71,16 +71,33 @@ async def create_post(
     title: str = data.get('title').strip()
     body: str = data.get('body').strip()
     status: str = data.get('status').strip().upper()
+    photos: list[UploadFile] = data.getlist('images')
 
     with DBSessionManager() as db_sess:
-        post = Post()
-        post.set_title(title)
-        post.set_body(body)
-        post.set_status(status)
-        post.user_id = user_id
-        post.created_at = datetime.now(timezone.utc)
-
+        post = Post(
+            title=title,
+            body=body,
+            status=status,
+            created_at=datetime.now(timezone.utc),
+            user_id=user_id
+        )
+        
         db_sess.add(post)
+        db_sess.flush()
+        
+        # Create all individual photos
+        for position, photo in enumerate(photos):
+            image_src, public_id = await ImageController.create_image(photo)
+            
+            photo_obj = Photo(
+                post_id=post.id,
+                post_position=position,
+                image_src=image_src,
+                image_id=public_id
+            )
+            
+            db_sess.add(photo_obj)
+        
         db_sess.commit()
 
         content: dict = {

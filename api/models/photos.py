@@ -27,8 +27,6 @@ class Photo(SqlAlchemyBase):
 
         if req_post:
             ret['post'] = self.post.to_dict()
-        else:
-            ret['post_id'] = self.post_id
         
         return ret
 

@@ -30,8 +30,8 @@ export const CreatePost = async (
     formData.append('body', body);
     formData.append('status', status.toUpperCase());
 
-    images.forEach((image, index) => {
-        formData.append(`images[${index}]`, image);
+    images.forEach((image, _) => {
+        formData.append('images', image);
     });
 
     FetchWithFormData('post/create_post/', {
@@ -47,8 +47,8 @@ export const CreatePost = async (
             return;
         }
 
-        routerPush(`/post/${data.post_id}`);
+        routerPush(`/post/${data.post.post_id}`);
     }).finally(() => {
-        setLoading(false)
+        setLoading(false);
     });
 }
