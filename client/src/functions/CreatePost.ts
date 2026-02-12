@@ -47,7 +47,7 @@ export const CreatePost = async (
             return;
         }
 
-        routerPush(`/post/${data.post.post_id}`);
+        routerPush(`/post?post_id=${data.post.id}`);
     }).finally(() => {
         setLoading(false);
     });
