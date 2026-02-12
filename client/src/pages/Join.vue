@@ -6,6 +6,9 @@ import { verifyUser } from '../api';
 import { handleSignup } from '../functions/Signup';
 import { handleLogin } from '../functions/Login';
 
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+
 const router = useRouter();
 
 const verificationData = await verifyUser();
@@ -62,29 +65,29 @@ async function submitSignup() {
         <div class='form'>
             <div class='inputs'>
                 <p><b>Username</b></p>
-                <input
+                <InputText
                     type='text'
                     v-model='formData.username'
                     placeholder='Enter your username'
                 />
 
                 <p v-show='signupMode'>Your name</p>
-                <input
+                <InputText
                     v-show='signupMode'
                     type='text'
                     v-model='formData.name'
-                    placeholder='Enter your name (not required)'
+                    placeholder='Enter your name'
                 />
 
                 <p><b>Your password</b></p>
-                <input
+                <InputText
                     type='password'
                     v-model='formData.password'
                     placeholder='Enter your password'
                 />
 
                 <p v-show='signupMode'><b>Confirm password</b></p>
-                <input
+                <InputText
                     v-show='signupMode'
                     type='password'
                     v-model='formData.confirmPassword'
@@ -95,15 +98,18 @@ async function submitSignup() {
             </div>
 
             <div class='buttons'>
-                <button class='primary-btn' @click='submitSignup'>
-                    {{ signupMode ? 'Sign up' : 'Log in' }}
-                </button>
+                <Button
+                    @click='submitSignup'
+                    :label='signupMode ? "Sign up" : "Log in"'
+                />
 
                 <p>OR</p>
 
-                <button class='secondary-btn' @click='signupMode = !signupMode'>
-                    {{ signupMode ? 'Log in' : 'Sign up' }}
-                </button>
+                <Button
+                    @click='signupMode = !signupMode'
+                    :label='signupMode ? "Log in" : "Sign up"'
+                    severity='secondary'
+                />
             </div>
         </div>
     </div>
