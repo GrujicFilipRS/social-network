@@ -65,7 +65,7 @@ async def create_post(
 ) -> JSONResponse:
     data = await request.form()
 
-    if not Post.verify_creation(data):
+    if not await Post.verify_creation(data):
         return JSONResponse(content={'message': 'Invalid creation data'}, status_code=400)
 
     title: str = data.get('title').strip()
