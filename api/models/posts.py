@@ -107,7 +107,7 @@ class Post(SqlAlchemyBase):
             if not isinstance(image, UploadFile):
                 return False
             
-            if not Photo.verify_valid_photo(image):
+            if not await Photo.verify_valid_photo(image):
                 return False
             
             # Reset image byte pointer
