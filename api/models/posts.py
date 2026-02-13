@@ -32,7 +32,7 @@ class Post(SqlAlchemyBase):
             'title': self.title,
             'body': self.body,
             'status': self.status,
-            'user_id': str(self.user_id),
+            'user': self.user.to_dict(req_name=True),
             'photos': [ photo.to_dict() for photo in self.photos ]
         }
 

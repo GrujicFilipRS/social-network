@@ -31,6 +31,8 @@ const fetchPostData = async () => {
     if (postData.value === null) {
         router.push('/feed');
     }
+
+    console.log(postData.value);
 };
 
 fetchPostData();
@@ -38,6 +40,12 @@ fetchPostData();
 </script>
 
 <template>
+    <div class='user'>
+        <img :src='postData?.user.pfp ?? "/default-pfp.png"' class='pfp' />
+        <p class='text-3xl'>{{ postData?.user.name ?? postData?.user.username }}</p>
+        <p>{{ postData?.user.name ? postData?.user.username : '' }}</p>
+    </div>
+
     <div class='post'>
 
     </div>

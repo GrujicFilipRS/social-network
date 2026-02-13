@@ -35,7 +35,7 @@ class User(SqlAlchemyBase):
         output: dict = {
             'id': str(self.id),
             'username': self.username,
-            'pfp': self.pfp.image_src if self.pfp else ''
+            'pfp': self.pfp.image_src if self.pfp else None
         }
 
         if req_name:

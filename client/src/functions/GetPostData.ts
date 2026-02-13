@@ -1,4 +1,5 @@
 import { Fetch } from "../api";
+import type { UserData } from "../interfaces/UserData";
 
 interface PhotoData {
     id: string;
@@ -13,7 +14,7 @@ export interface PostData {
     body: string;
     status: 'PUBLIC' | 'PRIVATE';
     created_at: string;
-    user_id: string;
+    user: UserData;
     photos: PhotoData[];
 }
 
