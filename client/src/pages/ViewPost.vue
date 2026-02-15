@@ -66,3 +66,7 @@ fetchPostData();
 
     </div>
 </template>
+
+<style>
+@import url('./ViewPost.css');
+</style>
