@@ -1,22 +1,5 @@
 import { Fetch } from "../api";
-import type { UserData } from "../interfaces/UserData";
-
-interface PhotoData {
-    id: string;
-    post_position: number;
-    image_src: string;
-    image_id: string;
-}
-
-export interface PostData {
-    id: string;
-    title: string;
-    body: string;
-    status: 'PUBLIC' | 'PRIVATE';
-    created_at: string;
-    user: UserData;
-    photos: PhotoData[];
-}
+import { type PostData } from "../interfaces/PostData";
 
 export const GetPostData = async (postId: string): Promise<PostData | null> => {
     return Fetch(`post/get_post/?post_id=${postId}`)

@@ -78,11 +78,6 @@ async def get_post(
             'post': post_info
         }
 
-        if request.query_params.get('req_user'):
-            content['user'] = post.user.to_dict(req_name=True)
-        else:
-            content['user'] = post.user.username
-
         if post.status == PostLiterals.PUBLIC:
             return JSONResponse(content=content, status_code=200)
         

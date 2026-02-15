@@ -1,8 +1,12 @@
+import type { PhotoData } from "./PhotoData";
+import type { UserData } from "./UserData";
+
 export interface PostData {
-    id: string,
-    body: string,
-    title: string,
-    status: 'PUBLIC' | 'PRIVATE',
-    user_id: string,
-    created_at: string | null
+    id: string;
+    title: string;
+    body: string;
+    status: 'PUBLIC' | 'PRIVATE';
+    created_at: string;
+    user: UserData;
+    photos: PhotoData[];
 }
