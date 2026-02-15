@@ -35,7 +35,6 @@ async def get_post(
             return JSONResponse(content={'message': 'Post not found'}, status_code=404)
         
         post_info: dict = post.to_dict(
-            req_creation_date = request.query_params.get('req_creation_date') is not None,
             req_likes = True,
             req_comments = True
         )

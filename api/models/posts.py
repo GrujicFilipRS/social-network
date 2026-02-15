@@ -28,7 +28,6 @@ class Post(SqlAlchemyBase):
 
     def to_dict(
         self,
-        req_creation_date: bool = False,
         req_likes: bool = False,
         req_comments: bool = False
     ) -> dict:
@@ -38,11 +37,9 @@ class Post(SqlAlchemyBase):
             'body': self.body,
             'status': self.status,
             'user': self.user.to_dict(req_name=True),
-            'photos': [ photo.to_dict() for photo in self.photos ]
+            'photos': [ photo.to_dict() for photo in self.photos ],
+            'created_at': self.created_at.strftime('%d. %m. %Y. %H:%M')
         }
-
-        if req_creation_date:
-            output['created_at'] = str(self.created_at)
         
         if req_likes:
             output['likes'] = len(self.likes)

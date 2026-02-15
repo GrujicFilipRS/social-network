@@ -7,6 +7,8 @@ import { GetPostData } from '../functions/GetPostData';
 
 import type { PostData } from '../interfaces/PostData';
 
+import Button from 'primevue/button';
+
 const router = useRouter();
 
 verifyUser().then(async (res) => {
@@ -42,10 +44,22 @@ fetchPostData();
 </script>
 
 <template>
-    <div class='user'>
-        <img :src='postData?.user.pfp ?? "/default-pfp.png"' class='pfp' />
-        <p class='text-3xl'>{{ postData?.user.name ?? postData?.user.username }}</p>
-        <p>{{ postData?.user.name ? postData?.user.username : '' }}</p>
+    <div class='user-header'>
+        <div class='lside-user'>
+            <img :src='postData?.user.pfp ?? "/default-pfp.png"' class='pfp' />
+            <p class='text-3xl'>{{ postData?.user.name ?? postData?.user.username }}</p>
+            <p>{{ postData?.user.name ? postData?.user.username : '' }}</p>
+        </div>
+
+        <div class='rside-user'>
+            <Button
+                label='View Profile'
+                class='p-button-outlined p-button-sm'
+                @click='() => router.push(`/profile?user=${postData?.user.username}`)'
+            />
+
+            <p>{{ postData?.created_at }}</p>
+        </div>
     </div>
 
     <div class='post'>
