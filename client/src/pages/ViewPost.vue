@@ -3,7 +3,9 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { verifyUser } from '../api';
-import { type PostData, GetPostData } from '../functions/GetPostData';
+import { GetPostData } from '../functions/GetPostData';
+
+import type { PostData } from '../interfaces/PostData';
 
 const router = useRouter();
 
