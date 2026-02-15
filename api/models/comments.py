@@ -1,3 +1,4 @@
+from typing import Any
 from sqlalchemy import Column, UUID, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from db.db_session import SqlAlchemyBase
@@ -17,12 +18,14 @@ class Comment(SqlAlchemyBase):
     comment = relationship('Comment', foreign_keys=[comment_id])
     creator = relationship('User', foreign_keys=[creator_id], back_populates='comments')
 
-    def to_dict(self) -> dict:
-        return {
+    def to_dict(self) -> dict[str, Any]:
+        content: dict[str, Any] = {
             'id': str(self.id),
             'body': self.body,
-            'post': self.post.to_dict(),
-            'comment': self.comment.to_dict(),
+            'post_id': self.post_id,
+            'comment_id': str(self.comment_id) if self.comment_id else None,
             'creator': self.creator.to_dict(),
             'commented_at': str(self.commented_at)
         }
+        
+        return content

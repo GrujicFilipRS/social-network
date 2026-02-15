@@ -26,7 +26,12 @@ class Post(SqlAlchemyBase):
     comments = relationship('Comment', back_populates='post')
     photos = relationship('Photo', back_populates='post')
 
-    def to_dict(self, req_creation_date=False) -> dict:
+    def to_dict(
+        self,
+        req_creation_date: bool = False,
+        req_likes: bool = False,
+        req_comments: bool = False
+    ) -> dict:
         output: dict = {
             'id': str(self.id),
             'title': self.title,
@@ -38,6 +43,12 @@ class Post(SqlAlchemyBase):
 
         if req_creation_date:
             output['created_at'] = str(self.created_at)
+        
+        if req_likes:
+            output['likes'] = len(self.likes)
+        
+        if req_comments:
+            output['comments'] = [ comment.to_dict() for comment in self.comments ]
         
         return output
 
