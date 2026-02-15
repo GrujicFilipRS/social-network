@@ -1,3 +1,4 @@
+import type { CommentsData } from "./CommentsData";
 import type { PhotoData } from "./PhotoData";
 import type { UserData } from "./UserData";
 
@@ -9,4 +10,5 @@ export interface PostData {
     created_at: string;
     user: UserData;
     photos: PhotoData[];
+    comments: CommentsData[];
 }

@@ -23,39 +23,6 @@ async def get_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    """
-    {
-        "message": "Post found",
-        "post": {
-            "id": "UUID",
-            "title": "Post Title",
-            "body": "Post body content",
-            "status": "PUBLIC/PRIVATE",
-            "user": {
-                "id": "UUID",
-                "username": "author_username",
-                "name": "Author Name",
-                "pfp": "https://example.com/profile.jpg"
-            }
-            "created_at": "2024-06-01T12:00:00Z",
-            "photos": [
-                {
-                    "id": "UUID",
-                    "post_position": 0,
-                    "image_src": "https://example.com/image1.jpg",
-                    "image_id": "cloudinary_public_id_1"
-                },
-                {
-                    "id": "UUID",
-                    "post_position": 1,
-                    "image_src": "https://example.com/image2.jpg",
-                    "image_id": "cloudinary_public_id_2"
-                }
-            ]
-        },
-    }
-    """
-    
     try:
         post_id: UUID | None = UUID(request.query_params.get('post_id'))
     except ValueError:
