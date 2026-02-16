@@ -35,8 +35,6 @@ const fetchPostData = async () => {
     if (postData.value === null) {
         router.push('/feed');
     }
-
-    console.log(postData.value);
 };
 
 fetchPostData();
@@ -63,7 +61,26 @@ fetchPostData();
     </div>
 
     <div class='post'>
+        <h2 class='text-4xl font-bold'>{{ postData?.title }}</h2>
+        <p>{{ postData?.body }}</p>
 
+        <div class='image-list'>
+            <img
+                v-for='image in postData?.photos ?? []'
+                :key='image.post_position'
+                :src='image.image_src'
+                class='post-image'
+            />
+        </div>
+
+        <div class='flex items-center gap-2 mt-4'>
+            <Button
+                icon='pi pi-thumbs-up'
+                severity='secondary'
+            />
+
+            <p>{{ postData?.likes }}</p>
+        </div>
     </div>
 </template>
 
