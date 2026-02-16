@@ -81,6 +81,26 @@ fetchPostData();
 
             <p>{{ postData?.likes }}</p>
         </div>
+
+        <div class='comments'>
+            <h3 class='text-2xl font-bold'>Comments</h3>
+
+            <div
+                v-for='comment in postData?.comments ?? []'
+                :key='comment.id'
+                class='comment'
+            >
+                <div class='comment-header'>
+                    <img :src='comment.creator.pfp ?? "/default-pfp.png"' class='comment-pfp' />
+                    <p>{{ comment.creator.name ?? comment.creator.username }}</p>
+                    <p>{{ comment.commented_at }}</p>
+                </div>
+
+                <p>{{ comment.body }}</p>
+            </div>
+
+            <p v-if='postData?.comments.length === 0'>No comments</p>
+        </div>
     </div>
 </template>
 
