@@ -150,7 +150,7 @@ const pressLikeButton = async () => {
                 <p>{{ comment.body }}</p>
             </div>
 
-            <p v-if='postData?.comments.length === 0'>No comments</p>
+            <p v-if='postData?.comments.length === 0'>No comments yet</p>
         </div>
     </div>
 </template>
