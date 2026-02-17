@@ -4,10 +4,13 @@ import { useRouter } from 'vue-router';
 
 import { verifyUser } from '../api';
 import { GetPostData } from '../functions/GetPostData';
+import { LikePost, UnlikePost } from '../functions/LikePost';
 
 import type { PostData } from '../interfaces/PostData';
 
 import Button from 'primevue/button';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 
 const router = useRouter();
 
@@ -26,7 +29,11 @@ if (!postId) {
     router.push('/feed');
 }
 
+const toast = useToast();
+
 const postData = ref<PostData | null>(null);
+const likeLoading = ref(false);
+const postLiked = ref(postData.value?.liked_by_user ?? false);
 
 const fetchPostData = async () => {
     const data = await GetPostData(postId!);
@@ -34,14 +41,56 @@ const fetchPostData = async () => {
 
     if (postData.value === null) {
         router.push('/feed');
+        return;
     }
+
+    postLiked.value = postData.value!.liked_by_user;
 };
 
 fetchPostData();
 
+const pressLikeButton = async () => {
+    if (!postData.value) return;
+
+    if (!postData.value.liked_by_user) {
+        const result: boolean = await LikePost(
+            postData!.value.id,
+            (message: string) => toast.add({
+                severity: "error",
+                summary: message,
+                life: 3000
+            }),
+            (value: boolean) => postLiked.value = value,
+            (value: boolean) => likeLoading.value = value
+        );
+
+        if (result) {
+            postData.value.liked_by_user = true;
+            postData.value.likes += 1;
+        }
+    } else {
+        const result: boolean = await UnlikePost(
+            postData!.value.id,
+            (message: string) => toast.add({
+                severity: "error",
+                summary: message,
+                life: 3000
+            }),
+            (value: boolean) => postLiked.value = value,
+            (value: boolean) => likeLoading.value = value
+        );
+
+        if (result) {
+            postData.value.liked_by_user = false;
+            postData.value.likes -= 1;
+        }
+    }
+}
+
 </script>
 
 <template>
+    <Toast />
     <div class='user-header'>
         <div class='lside-user'>
             <img :src='postData?.user.pfp ?? "/default-pfp.png"' class='pfp' />
@@ -75,8 +124,10 @@ fetchPostData();
 
         <div class='flex items-center gap-2 mt-4'>
             <Button
-                icon='pi pi-thumbs-up'
+                :icon='postData?.liked_by_user ? "pi pi-thumbs-up-fill" : "pi pi-thumbs-up"'
                 severity='secondary'
+                :loading='likeLoading'
+                @click='pressLikeButton'
             />
 
             <p>{{ postData?.likes }}</p>

@@ -12,4 +12,5 @@ export interface PostData {
     user: UserData;
     photos: PhotoData[];
     comments: CommentsData[];
+    liked_by_user: boolean;
 }

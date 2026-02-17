@@ -4,6 +4,7 @@ from fastapi import Request, UploadFile
 from datetime import datetime, timezone
 
 from models.posts import Post
+from models.likes import Like
 from models.photos import Photo
 from db.db_session import DBSessionManager
 
@@ -43,6 +44,11 @@ async def get_post(
             'message': 'Post found',
             'post': post_info
         }
+        
+        content['post']['liked_by_user'] = db_sess.query(Like).filter(
+            Like.post_id == post_id,
+            Like.user_id == user_id
+        ).first() is not None
 
         if post.status == PostLiterals.PUBLIC:
             return JSONResponse(content=content, status_code=200)
