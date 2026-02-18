@@ -43,12 +43,16 @@ async def post_comment(
     
     if not Comment.validate_creation(data):
         return JSONResponse(content={'message': 'Invalid comment data'}, status_code=400)
+    
+    body: str = data.get('body').strip()
+    post_id: UUID = UUID(data.get('post_id'))
+    comment_id: UUID | None = UUID(data.get('comment_id')) if data.get('comment_id') else None
 
     with DBSessionManager() as db_sess:
         new_comment = Comment(
-            body=data.get('body'),
-            post_id=UUID(data.get('post_id')),
-            comment_id=UUID(data.get('comment_id')) if data.get('comment_id') else None,
+            body=body,
+            post_id=post_id,
+            comment_id=comment_id,
             creator_id=user_id,
             commented_at=datetime.now(timezone.utc)
         )
