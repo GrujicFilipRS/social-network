@@ -9,6 +9,7 @@ import { LikePost, UnlikePost } from '../functions/LikePost';
 import type { PostData } from '../interfaces/PostData';
 
 import Button from 'primevue/button';
+import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
@@ -32,8 +33,9 @@ if (!postId) {
 const toast = useToast();
 
 const postData = ref<PostData | null>(null);
-const likeLoading = ref(false);
-const postLiked = ref(postData.value?.liked_by_user ?? false);
+const likeLoading = ref<boolean>(false);
+const postLiked = ref<boolean>(postData.value?.liked_by_user ?? false);
+const commentInput = ref<string>('');
 
 const fetchPostData = async () => {
     const data = await GetPostData(postId!);
@@ -86,6 +88,19 @@ const pressLikeButton = async () => {
         }
     }
 }
+
+const postComment = async () => {
+    if (!commentInput.value.trim()) return;
+
+    commentInput.value = '';
+    toast.add({
+        severity: 'success',
+        summary: 'Comment posted successfully!',
+        life: 3000
+    });
+
+    await fetchPostData();
+};
 
 </script>
 
@@ -152,6 +167,26 @@ const pressLikeButton = async () => {
             </div>
 
             <p v-if='postData?.comments.length === 0'>No comments yet</p>
+            
+            <div class='comment-form'>
+                <h3>Write a comment</h3>
+
+                <Textarea
+                    class='w-100'
+                    v-model='commentInput'
+                    placeholder='Your comment here...'
+                    style='resize: none;'
+
+                />
+
+                <Button
+                    label='Post Comment'
+                    severity='secondary'
+                    icon='pi pi-send'
+                    :disabled='!commentInput.trim()'
+                    @click='postComment'
+                />
+            </div>
         </div>
     </div>
 </template>
