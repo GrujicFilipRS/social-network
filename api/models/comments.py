@@ -1,4 +1,6 @@
+import string
 from typing import Any
+import unicodedata
 from sqlalchemy import Column, UUID, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from db.db_session import SqlAlchemyBase
@@ -29,3 +31,64 @@ class Comment(SqlAlchemyBase):
         }
         
         return content
+    
+    @staticmethod
+    def validate_creation(data: dict[str, Any]) -> bool:
+        body = data.get('body')
+        post_id = data.get('post_id')
+        comment_id = data.get('comment_id')
+        
+        if not body or not isinstance(body, str):
+            return False
+        
+        if not post_id or not isinstance(post_id, str):
+            return False
+        
+        if comment_id and not isinstance(comment_id, str):
+            return False
+        
+        try:
+            UUID(post_id)
+            UUID(comment_id) if comment_id else None
+        except ValueError:
+            return False
+        
+        body = body.strip()
+
+        MIN_BODY_LENGTH = 1
+        MAX_BODY_LENGTH = 80
+
+        if len(body) < MIN_BODY_LENGTH or len(body) > MAX_BODY_LENGTH:
+            return False
+
+        MAX_BODY_LINES = 3
+        if body.count('\n') > MAX_BODY_LINES:
+            return False
+
+        if not all(c in string.printable for c in body):
+            return False
+
+        DANGEROUS_SUBSTRINGS = (
+            '<script',
+            '</script',
+            'javascript:',
+            'onerror=',
+            'onload=',
+            '<iframe',
+            '</iframe',
+        )
+
+        lower_body = body.lower()
+        if any(x in lower_body for x in DANGEROUS_SUBSTRINGS):
+            return False
+
+        if any(
+            unicodedata.category(c) in ('Cc', 'Cf') and c not in '\n\r\t'
+            for c in body
+        ):
+            return False
+        
+        if not body.replace('\n', '').strip():
+            return False
+        
+        return True

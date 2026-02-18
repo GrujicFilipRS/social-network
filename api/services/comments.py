@@ -39,9 +39,12 @@ async def post_comment(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    data = await request.json()
+    
+    if not Comment.validate_creation(data):
+        return JSONResponse(content={'message': 'Invalid comment data'}, status_code=400)
+
     with DBSessionManager() as db_sess:
-        data = await request.json()
-            
         new_comment = Comment(
             body=data.get('body'),
             post_id=UUID(data.get('post_id')),
