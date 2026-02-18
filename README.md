@@ -44,11 +44,10 @@ SECRET_KEY="your JWT secret key here" # REQUIRED
 CLOUDINARY_CLOUD_NAME="cloudinary.com" # REQUIRED
 CLOUDINARY_API_KEY="cloudinary.com" # REQUIRED
 CLOUDINARY_API_SECRET="cloudinary.com" # REQUIRED
-CLOUDINARY_PFP_FOLDER="fastapi_uploads_pfp" # NOT required
-FRONTEND_URL="http://localhost:5173" # NOT required
-JWT_EXPIRATION_HOURS="24" # NOT required
+CLOUDINARY_PFP_FOLDER="fastapi_uploads_pfp"
+FRONTEND_URL="http://localhost:5173"
+JWT_EXPIRATION_HOURS="24"
 DATABASE_URL="some postgres db conn string here" # If not provided defaults to creating a .sqlite file
-FLASK_ENV="development" # Either development or production
 ```
 
 But for the production version, you will need another `.env` file located in the `client/` directory, with only one variable, `VITE_API_URL`, corresponding to your server routing config
