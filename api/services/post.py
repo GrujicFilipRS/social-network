@@ -54,7 +54,7 @@ async def get_post(
             return JSONResponse(content=content, status_code=200)
         
         if user_id != post.user_id:
-            return JSONResponse(content={'message': 'You are not authorized to view this post'}, status_code=401)
+            return JSONResponse(content={'message': 'Post not found'}, status_code=404)
 
         return JSONResponse(content=content, status_code=200)
 
