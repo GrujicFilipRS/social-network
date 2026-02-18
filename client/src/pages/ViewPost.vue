@@ -106,6 +106,7 @@ const pressLikeButton = async () => {
             />
 
             <p>{{ postData?.created_at }}</p>
+            <p v-if='postData?.status === "PRIVATE"'>Private Post</p>
         </div>
     </div>
 
