@@ -49,11 +49,8 @@ async def get_post(
             Like.post_id == post_id,
             Like.user_id == user_id
         ).first() is not None
-
-        if post.status == PostLiterals.PUBLIC:
-            return JSONResponse(content=content, status_code=200)
         
-        if user_id != post.user_id:
+        if post.status == PostLiterals.PRIVATE and user_id != post.user_id:
             return JSONResponse(content={'message': 'Post not found'}, status_code=404)
 
         return JSONResponse(content=content, status_code=200)
