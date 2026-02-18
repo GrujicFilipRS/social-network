@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 import { verifyUser } from '../api';
 import { GetPostData } from '../functions/GetPostData';
 import { LikePost, UnlikePost } from '../functions/LikePost';
+import { CreateComment } from '../functions/CreateComment';
 
 import type { PostData } from '../interfaces/PostData';
 
@@ -36,6 +37,7 @@ const postData = ref<PostData | null>(null);
 const likeLoading = ref<boolean>(false);
 const postLiked = ref<boolean>(postData.value?.liked_by_user ?? false);
 const commentInput = ref<string>('');
+const commentedLoading = ref<boolean>(false);
 
 const fetchPostData = async () => {
     const data = await GetPostData(postId!);
@@ -90,16 +92,21 @@ const pressLikeButton = async () => {
 }
 
 const postComment = async () => {
+    if (!postId) return;
     if (!commentInput.value.trim()) return;
 
-    commentInput.value = '';
-    toast.add({
-        severity: 'success',
-        summary: 'Comment posted successfully!',
-        life: 3000
-    });
-
-    await fetchPostData();
+    CreateComment(
+        postId,
+        commentInput.value.trim(),
+        (message: string, severity: "success" | "error") => toast.add({
+            severity: severity,
+            summary: message,
+            life: 3000
+        }),
+        () => commentInput.value = '',
+        (loading: boolean) => commentedLoading.value = loading,
+        fetchPostData
+    );
 };
 
 </script>

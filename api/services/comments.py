@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from uuid import UUID
 from fastapi.responses import JSONResponse
 
@@ -45,7 +46,8 @@ async def post_comment(
             body=data.get('body'),
             post_id=UUID(data.get('post_id')),
             comment_id=UUID(data.get('comment_id')) if data.get('comment_id') else None,
-            creator_id=user_id
+            creator_id=user_id,
+            commented_at=datetime.now(timezone.utc)
         )
 
         db_sess.add(new_comment)

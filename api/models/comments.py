@@ -22,7 +22,7 @@ class Comment(SqlAlchemyBase):
         content: dict[str, Any] = {
             'id': str(self.id),
             'body': self.body,
-            'post_id': self.post_id,
+            'post_id': str(self.post_id),
             'comment_id': str(self.comment_id) if self.comment_id else None,
             'creator': self.creator.to_dict(),
             'commented_at': str(self.commented_at)
