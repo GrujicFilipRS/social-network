@@ -105,7 +105,7 @@ class Post(SqlAlchemyBase):
         if any(unicodedata.category(c) in ('Cc', 'Cf') for c in body + title):
             return False
 
-        images = data.getlist('images')
+        images = data.getlist('images') or []
         MAX_IMAGES = 10
         
         if len(images) > MAX_IMAGES:

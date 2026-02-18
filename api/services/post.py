@@ -73,7 +73,7 @@ async def create_post(
     title: str = data.get('title').strip()
     body: str = data.get('body').strip()
     status: str = data.get('status').strip().upper()
-    photos: list[UploadFile] = data.getlist('images')
+    photos: list[UploadFile] = data.getlist('images') or []
 
     with DBSessionManager() as db_sess:
         post = Post(
