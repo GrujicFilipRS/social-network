@@ -87,6 +87,14 @@ async def create_post(
         db_sess.add(post)
         db_sess.flush()
         
+        # User automatically likes their own post
+        user_like = Like(
+            user_id=user_id,
+            post_id=post.id
+        )
+        
+        db_sess.add(user_like)
+        
         # Create all individual photos
         for position, photo in enumerate(photos):
             image_src, public_id = await ImageController.create_image(photo)
