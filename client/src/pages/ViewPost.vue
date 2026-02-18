@@ -112,7 +112,7 @@ const pressLikeButton = async () => {
 
     <div class='post'>
         <h2 class='text-4xl font-bold'>{{ postData?.title }}</h2>
-        <p>{{ postData?.body }}</p>
+        <p style='white-space: pre-line;'>{{ postData?.body }}</p>
 
         <div class='image-list'>
             <img
@@ -148,7 +148,7 @@ const pressLikeButton = async () => {
                     <p>{{ comment.commented_at }}</p>
                 </div>
 
-                <p>{{ comment.body }}</p>
+                <p style='white-space: pre-line;'>{{ comment.body }}</p>
             </div>
 
             <p v-if='postData?.comments.length === 0'>No comments yet</p>

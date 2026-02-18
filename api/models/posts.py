@@ -102,7 +102,10 @@ class Post(SqlAlchemyBase):
         if any(x in lower_body for x in DANGEROUS_SUBSTRINGS):
             return False
         
-        if any(unicodedata.category(c) in ('Cc', 'Cf') for c in body + title):
+        if any(
+            unicodedata.category(c) in ('Cc', 'Cf') and c not in '\n\r\t'
+            for c in body + title
+        ):
             return False
 
         images = data.getlist('images') or []
