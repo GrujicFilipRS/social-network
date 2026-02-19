@@ -71,7 +71,7 @@ class Post(SqlAlchemyBase):
         body: str = body.strip()
         status: str = status.strip().upper()
         
-        MIN_TITLE_LENGTH, MAX_TITLE_LENGTH = 3, 15
+        MIN_TITLE_LENGTH, MAX_TITLE_LENGTH = 3, 45
         if len(title) < MIN_TITLE_LENGTH or len(title) > MAX_TITLE_LENGTH:
             return False
         
