@@ -7,6 +7,7 @@ import './style.css';
 import App from './App.vue';
 import router from './router';
 import { ToastService } from 'primevue';
+import ConfirmationService from 'primevue/confirmationservice';
 
 const app = createApp(App);
 
@@ -17,5 +18,6 @@ app.use(PrimeVue, {
     }
 });
 app.use(ToastService);
+app.use(ConfirmationService);
 app.directive('styleclass', StyleClass);
 app.mount('#app');
