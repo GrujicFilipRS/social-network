@@ -2,6 +2,8 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
+import Comment from '../components/Comment.vue';
+
 import { verifyUser } from '../api';
 import { GetPostData } from '../functions/GetPostData';
 import { LikePost, UnlikePost } from '../functions/LikePost';
@@ -16,10 +18,15 @@ import { useToast } from 'primevue/usetoast';
 
 const router = useRouter();
 
+const currentUserId = ref<string>('');
+
 verifyUser().then(async (res) => {
     if (res.statusCode !== 200) {
         window.location.href = '/join';
     }
+
+    const data = await res;
+    currentUserId.value = data.result.user.id;
 }).catch(() => {
     window.location.href = '/join';
 });
@@ -159,19 +166,17 @@ const postComment = async () => {
         <div class='comments'>
             <h3 class='text-2xl font-bold'>Comments</h3>
 
-            <div
+            <Comment
                 v-for='comment in postData?.comments ?? []'
                 :key='comment.id'
-                class='comment'
-            >
-                <div class='comment-header'>
-                    <img :src='comment.creator.pfp ?? "/default-pfp.png"' class='comment-pfp' />
-                    <p>{{ comment.creator.name ?? comment.creator.username }}</p>
-                    <p>{{ comment.commented_at }}</p>
-                </div>
-
-                <p style='white-space: pre-line;'>{{ comment.body }}</p>
-            </div>
+                :comment-data='comment'
+                :user-id='currentUserId'
+                :callback-fetch='fetchPostData'
+                :toast-add='
+                (message: string, severity: "success" | "error") => toast.add(
+                    {severity, summary: message, life: 3000}
+                )'
+            />
 
             <p v-if='postData?.comments.length === 0'>No comments yet</p>
             

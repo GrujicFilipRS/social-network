@@ -7,7 +7,7 @@ export const DeleteComment = (
 ) => {
     setLoading(true);
 
-    Fetch('/comments/remove_comment/', {
+    Fetch('comment/remove_comment/', {
         method: 'DELETE',
         body: JSON.stringify({ comment_id: commentId })
     })
