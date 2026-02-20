@@ -56,9 +56,16 @@ const deleteComment = async () => {
     
     <Button
         v-if='props.commentData.creator.id === props.userId'
-        label='Delete Comment'
+        icon='pi pi-pencil'
+        severity='secondary'
+        style='font-size: 0.7rem'
+    />
+    
+    <Button
+        v-if='props.commentData.creator.id === props.userId'
         icon='pi pi-trash'
         severity='danger'
+        style='font-size: 0.7rem'
         :loading='deleteLoading'
         @click='confirmDelete'
     />
