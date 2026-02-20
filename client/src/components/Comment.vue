@@ -4,6 +4,7 @@ import type { CommentsData } from '../interfaces/CommentsData';
 import { DeleteComment } from '../functions/DeleteComment';
 
 import Button from 'primevue/button';
+import Textarea from 'primevue/textarea';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { useConfirm } from 'primevue/useconfirm';
 
@@ -15,6 +16,8 @@ const props = defineProps<{
 }>();
 
 const deleteLoading = ref<boolean>(false);
+const beingEdited = ref<boolean>(false);
+const commentEditingText = ref<string>(props.commentData.body);
 
 const confirm = useConfirm();
 
@@ -52,13 +55,35 @@ const deleteComment = async () => {
         <p>{{ props.commentData.commented_at }}</p>
     </div>
 
-    <p style='white-space: pre-line;'>{{ props.commentData.body }}</p>
+    <p style='white-space: pre-line;' v-if='!beingEdited'>{{ props.commentData.body }}</p>
+
+    <div
+        v-if='beingEdited'
+        class='comment-edit'
+    >
+        <Textarea
+            v-model='commentEditingText'
+            style='resize: none'
+        />
+
+        <Button
+            icon='pi pi-check'
+        />
+
+        <Button
+            icon='pi pi-times'
+            severity='danger'
+            @click='() => { commentEditingText = props.commentData.body; beingEdited = false; }'
+        />
+    </div>
     
     <Button
         v-if='props.commentData.creator.id === props.userId'
+        :disabled='beingEdited'
         icon='pi pi-pencil'
         severity='secondary'
         style='font-size: 0.7rem'
+        @click='beingEdited = true'
     />
     
     <Button
