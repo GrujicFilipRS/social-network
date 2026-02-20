@@ -1,7 +1,9 @@
 <script setup lang='ts'>
 import { ref } from 'vue';
 import type { CommentsData } from '../interfaces/CommentsData';
+
 import { DeleteComment } from '../functions/DeleteComment';
+import { EditComment } from '../functions/EditComment';
 
 import Button from 'primevue/button';
 import Textarea from 'primevue/textarea';
@@ -16,6 +18,7 @@ const props = defineProps<{
 }>();
 
 const deleteLoading = ref<boolean>(false);
+const editLoading = ref<boolean>(false);
 const beingEdited = ref<boolean>(false);
 const commentEditingText = ref<string>(props.commentData.body);
 
@@ -34,6 +37,11 @@ const confirmDelete = () => {
     });
 };
 
+const closeEditForm = () => {
+    beingEdited.value = false;
+    commentEditingText.value = props.commentData.body;
+}
+
 const deleteComment = async () => {
     await DeleteComment(
         props.commentData.id,
@@ -41,10 +49,20 @@ const deleteComment = async () => {
         (loading: boolean) => deleteLoading.value = loading,
         props.callbackFetch
     );
-
-    props.callbackFetch();
 };
 
+const editComment = async () => {
+    EditComment(
+        props.commentData.id,
+        commentEditingText.value,
+        props.toastAdd,
+        (loading: boolean) => editLoading.value = loading,
+        props.callbackFetch,
+        closeEditForm
+    );
+
+    props.callbackFetch();
+}
 
 </script>
 
@@ -69,12 +87,14 @@ const deleteComment = async () => {
 
         <Button
             icon='pi pi-check'
+            :loading='editLoading'
+            @click='editComment'
         />
 
         <Button
             icon='pi pi-times'
             severity='danger'
-            @click='() => { commentEditingText = props.commentData.body; beingEdited = false; }'
+            @click='closeEditForm'
         />
     </div>
     

@@ -33,26 +33,12 @@ class Comment(SqlAlchemyBase):
         return content
     
     @staticmethod
-    def validate_creation(data: dict[str, Any]) -> bool:
+    def validate_body(data: Any) -> bool:
         body = data.get('body')
-        post_id = data.get('post_id')
-        comment_id = data.get('comment_id')
         
         if not body or not isinstance(body, str):
             return False
-        
-        if not post_id or not isinstance(post_id, str):
-            return False
-        
-        if comment_id and not isinstance(comment_id, str):
-            return False
-        
-        try:
-            UUID(post_id)
-            UUID(comment_id) if comment_id else None
-        except ValueError:
-            return False
-        
+
         body = body.strip()
 
         MIN_BODY_LENGTH = 1
@@ -89,6 +75,28 @@ class Comment(SqlAlchemyBase):
             return False
         
         if not body.replace('\n', '').strip():
+            return False
+        
+        return True
+    
+    @staticmethod
+    def validate_creation(data: dict[str, Any]) -> bool:
+        post_id = data.get('post_id')
+        comment_id = data.get('comment_id')
+        
+        if not Comment.validate_body(data):
+            return False
+        
+        if not post_id or not isinstance(post_id, str):
+            return False
+        
+        if comment_id and not isinstance(comment_id, str):
+            return False
+        
+        try:
+            UUID(post_id)
+            UUID(comment_id) if comment_id else None
+        except ValueError:
             return False
         
         return True

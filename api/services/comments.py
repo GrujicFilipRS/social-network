@@ -68,6 +68,38 @@ async def post_comment(
         return JSONResponse(content=content, status_code=201)
 
 
+@router.put('/edit_comment/')
+@require_auth
+async def edit_comment(
+    request: Request,
+    user_id: UUID | None = None
+) -> JSONResponse:
+    data = await request.json()
+    try:
+        comment_id = UUID(data.get('comment_id'))
+    except ValueError:
+        return JSONResponse(content={'message': 'Invalid comment_id'}, status_code=400)
+    
+    if not Comment.validate_body(data):
+        return JSONResponse(content={'message': 'Invalid comment data'}, status_code=400)
+    
+    body: str = data.get('body')
+    
+    with DBSessionManager() as db_sess:
+        comment: Comment | None = db_sess.get(Comment, comment_id)
+
+        if comment is None:
+            return JSONResponse(content={'message': 'Comment not found'}, status_code=404)
+
+        if comment.creator_id != user_id:
+            return JSONResponse(content={'message': 'You are not authorized to delete this comment'}, status_code=401)
+        
+        comment.body = body
+        
+        db_sess.commit()
+        
+    return JSONResponse(content={'message': 'Successfully edited comment'}, status_code=200)
+
 @router.delete('/remove_comment/')
 @require_auth
 async def delete_comment(
