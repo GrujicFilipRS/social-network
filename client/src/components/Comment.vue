@@ -98,21 +98,22 @@ const editComment = async () => {
         />
     </div>
     
-    <Button
-        v-if='props.commentData.creator.id === props.userId'
-        :disabled='beingEdited'
-        icon='pi pi-pencil'
-        severity='secondary'
-        style='font-size: 0.7rem'
-        @click='beingEdited = true'
-    />
+    <div v-if='props.commentData.creator.id === props.userId'>
+        <Button
+            :disabled='beingEdited'
+            icon='pi pi-pencil'
+            severity='secondary'
+            style='font-size: 0.7rem'
+            @click='beingEdited = true'
+        />
+        
+        <Button
+            icon='pi pi-trash'
+            severity='danger'
+            style='font-size: 0.7rem'
+            :loading='deleteLoading'
+            @click='confirmDelete'
+        />
+    </div>
     
-    <Button
-        v-if='props.commentData.creator.id === props.userId'
-        icon='pi pi-trash'
-        severity='danger'
-        style='font-size: 0.7rem'
-        :loading='deleteLoading'
-        @click='confirmDelete'
-    />
 </template>
