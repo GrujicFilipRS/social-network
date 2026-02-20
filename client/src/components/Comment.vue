@@ -38,7 +38,8 @@ const deleteComment = async () => {
     await DeleteComment(
         props.commentData.id,
         props.toastAdd,
-        (loading: boolean) => deleteLoading.value = loading
+        (loading: boolean) => deleteLoading.value = loading,
+        props.callbackFetch
     );
 
     props.callbackFetch();

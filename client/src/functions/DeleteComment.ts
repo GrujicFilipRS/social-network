@@ -3,7 +3,8 @@ import { Fetch } from '../api';
 export const DeleteComment = (
     commentId: string,
     toastAdd: (message: string, severity: 'success' | 'error') => void,
-    setLoading: (loading: boolean) => void
+    setLoading: (loading: boolean) => void,
+    callbackFetch: () => void
 ) => {
     setLoading(true);
 
@@ -24,5 +25,6 @@ export const DeleteComment = (
     })
     .finally(() => {
         setLoading(false);
+        callbackFetch();
     });
 }
