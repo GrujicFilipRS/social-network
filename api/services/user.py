@@ -308,3 +308,11 @@ def get_current_user_profile(
         }
         
         return JSONResponse(content=content, status_code=200)
+
+@router.post('/logout/')
+def logout() -> JSONResponse:
+    response = JSONResponse(content={'message': 'Successfully logged out'}, status_code=200)
+    
+    set_response_cookie(response, '')
+    
+    return response
