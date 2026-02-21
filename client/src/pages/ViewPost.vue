@@ -8,13 +8,16 @@ import { verifyUser } from '../api';
 import { GetPostData } from '../functions/GetPostData';
 import { LikePost, UnlikePost } from '../functions/LikePost';
 import { CreateComment } from '../functions/CreateComment';
+import { EditPost } from '../functions/EditPost';
 
 import type { PostData } from '../interfaces/PostData';
 
 import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
+import { useConfirm } from 'primevue/useconfirm';
 
 const router = useRouter();
 
@@ -39,6 +42,7 @@ if (!postId) {
 }
 
 const toast = useToast();
+const confirm = useConfirm();
 
 const postData = ref<PostData | null>(null);
 const likeLoading = ref<boolean>(false);
@@ -46,9 +50,55 @@ const postLiked = ref<boolean>(postData.value?.liked_by_user ?? false);
 const commentInput = ref<string>('');
 const commentedLoading = ref<boolean>(false);
 
+const editingPost = ref<boolean>(false);
+const editLoading = ref<boolean>(false);
+const editedTitle = ref<string>('');
+const editedBody = ref<string>('');
+const editedStatus = ref<'PUBLIC' | 'PRIVATE'>('PUBLIC');
+
+const resetEditingForm = () => {
+    editedTitle.value = postData.value!.title;
+    editedBody.value = postData.value!.body;
+    editedStatus.value = postData.value!.status;
+    editingPost.value = false;
+}
+
+const submitEdit = () => {
+    EditPost(
+        postData.value!.id,
+        editedTitle.value,
+        editedBody.value,
+        editedStatus.value,
+        (message: string, severity: string) => toast.add({
+            severity: severity,
+            summary: message,
+            life: 3000
+        }),
+        resetEditingForm,
+        (loading: boolean) => editLoading.value = loading,
+        fetchPostData
+    );
+}
+
+const confirmEdit = () => {
+    confirm.require({
+        message: 'Are you sure you want to edit this post?',
+        header: 'Confirm Edit',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Yes, Edit',
+        rejectLabel: 'No',
+        rejectProps: { severity: 'secondary' },
+        acceptClass: 'p-button-success',
+        acceptIcon: 'pi pi-check',
+        rejectIcon: 'pi pi-times',
+        accept: submitEdit
+    });
+}
+
 const fetchPostData = async () => {
     const data = await GetPostData(postId!);
     postData.value = data;
+    resetEditingForm();
 
     if (postData.value === null) {
         router.push('/feed');
@@ -120,6 +170,7 @@ const postComment = async () => {
 
 <template>
     <Toast />
+    <ConfirmPopup />
     <div class='user-header'>
         <div class='lside-user'>
             <img :src='postData?.user.pfp ?? "/default-pfp.png"' class='pfp' />
@@ -136,12 +187,58 @@ const postComment = async () => {
 
             <p>{{ postData?.created_at }}</p>
             <p v-if='postData?.status === "PRIVATE"'>Private Post</p>
+
+            <Button
+                v-if='currentUserId === postData?.user.id'
+                severity='secondary'
+                class='p-button-sm'
+                icon='pi pi-pencil'
+                label='Edit post'
+                :disabled='editingPost'
+                :loading='editLoading'
+                @click='editingPost = true'
+            />
         </div>
     </div>
 
     <div class='post'>
-        <h2 class='text-4xl font-bold'>{{ postData?.title }}</h2>
-        <p style='white-space: pre-line;'>{{ postData?.body }}</p>
+        <h2
+            v-if='!editingPost'
+            class='text-4xl font-bold'
+        >
+            {{ postData?.title }}
+        </h2>
+
+        <p
+            v-if='!editingPost'
+            style='white-space: pre-line;'
+        >
+            {{ postData?.body }}
+        </p>
+
+        <InputText
+            v-if='editingPost'
+            v-model='editedTitle'
+        />
+
+        <Textarea
+            v-if='editingPost'
+            v-model='editedBody'
+            style='resize: none'
+        />
+
+        <Button
+            v-if='editingPost'
+            icon='pi pi-check'
+            @click='confirmEdit'
+        />
+
+        <Button
+            v-if='editingPost'
+            icon='pi pi-times'
+            severity='danger'
+            @click='resetEditingForm'
+        />
 
         <div class='image-list'>
             <img

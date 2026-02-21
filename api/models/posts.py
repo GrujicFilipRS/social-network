@@ -125,3 +125,55 @@ class Post(SqlAlchemyBase):
             image.seek(0)
         
         return True
+    
+    @staticmethod
+    def verify_edit(data: Any) -> bool:
+        title: Any = data.get('title')
+        body: Any = data.get('body')
+        status: Any = data.get('status')
+
+        if not isinstance(title, str) or not isinstance(body, str) or not isinstance(status, str):
+            return False
+        
+        title: str = title.strip()
+        body: str = body.strip()
+        status: str = status.strip().upper()
+        
+        MIN_TITLE_LENGTH, MAX_TITLE_LENGTH = 3, 45
+        if len(title) < MIN_TITLE_LENGTH or len(title) > MAX_TITLE_LENGTH:
+            return False
+        
+        MAX_BODY_LENGTH = 280
+        if len(body) > MAX_BODY_LENGTH:
+            return False
+        
+        if status not in PostLiterals.LIST_LITS:
+            return False
+        
+        if (not all(c in string.printable for c in title) or
+            not all(c in string.printable for c in body)):
+            return False
+        
+        MAX_BODY_LINES = 10
+        if body.count('\n') > MAX_BODY_LINES:
+            return False
+        
+        DANGEROUS_SUBSTRINGS = (
+            '<script',
+            '</script',
+            'javascript:',
+            'onerror=',
+            'onload=',
+        )
+
+        lower_body = body.lower()
+        if any(x in lower_body for x in DANGEROUS_SUBSTRINGS):
+            return False
+        
+        if any(
+            unicodedata.category(c) in ('Cc', 'Cf') and c not in '\n\r\t'
+            for c in body + title
+        ):
+            return False
+        
+        return True
