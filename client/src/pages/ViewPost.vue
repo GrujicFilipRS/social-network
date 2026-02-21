@@ -15,6 +15,7 @@ import type { PostData } from '../interfaces/PostData';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
+import Select from 'primevue/select';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
@@ -225,6 +226,12 @@ const postComment = async () => {
             v-if='editingPost'
             v-model='editedBody'
             style='resize: none'
+        />
+
+        <Select
+            v-if='editingPost'
+            v-model='editedStatus'
+            :options='["PUBLIC", "PRIVATE"]'
         />
 
         <Button
