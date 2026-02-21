@@ -98,3 +98,15 @@ def optional_auth(func):
             return func(*args, **kwargs)
 
     return async_wrapper
+
+
+def set_response_cookie(response: JSONResponse, token: str):
+    response.set_cookie(
+        key=AUTH_COOKIE_NAME,
+        value=token,
+        httponly=True,
+        samesite='Lax',
+        path='/',
+        secure=Env.FLASK_ENV == 'production',
+        expires=Env.JWT_EXPIRATION_HOURS * 3600
+    )

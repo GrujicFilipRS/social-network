@@ -11,7 +11,7 @@ from models.follows import Follow
 from db.db_session import DBSessionManager
 
 from utils import jwt_tokens
-from utils.jwt_tokens import require_auth, AUTH_COOKIE_NAME
+from utils.jwt_tokens import require_auth, set_response_cookie
 
 from fastapi import APIRouter
 
@@ -111,15 +111,7 @@ async def register(data: RegistrationData) -> JSONResponse:
             status_code=200
         )
         
-        response.set_cookie(
-            key=AUTH_COOKIE_NAME,
-            value=token,
-            httponly=True,
-            samesite='Lax',
-            path='/',
-            secure=Env.FLASK_ENV == 'production',
-            expires=Env.JWT_EXPIRATION_HOURS * 3600
-        )
+        set_response_cookie(response, token)
 
         return response
 
@@ -149,15 +141,7 @@ async def login(data: LoginData) -> JSONResponse:
             status_code=200
         )
         
-        response.set_cookie(
-            key=AUTH_COOKIE_NAME,
-            value=token,
-            httponly=True,
-            samesite='Lax',
-            path='/',
-            secure=Env.FLASK_ENV == 'production',
-            expires=Env.JWT_EXPIRATION_HOURS * 3600
-        )
+        set_response_cookie(response, token)
 
         return response
 
