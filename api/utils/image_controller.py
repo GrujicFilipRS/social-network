@@ -15,12 +15,9 @@ class ImageController:
     
     @staticmethod
     def test_connection() -> None:
-        try:
-            result = cloudinary.api.config()
-            print('Cloudinary connection successful!')
-            print(f'Cloud name: {result.get('cloud_name')}')
-        except Exception as e:
-            print(f'Cloudinary connection unsuccessful: {e}')
+        result = cloudinary.api.config()
+        print('Cloudinary connection successful!')
+        print(f'Cloud name: {result.get('cloud_name')}')
     
     @staticmethod
     async def create_image(image: UploadFile) -> tuple[str, str]:
@@ -41,4 +38,4 @@ class ImageController:
         cloudinary.uploader.destroy(public_id)
     
     def __new__():
-        raise TypeError('CloudinaryController class is not instantiable')
+        raise TypeError('ImageController class is not instantiable')
