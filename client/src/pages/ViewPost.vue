@@ -18,6 +18,7 @@ import Textarea from 'primevue/textarea';
 import Select from 'primevue/select';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
+import ConfirmPopup from 'primevue/confirmpopup';
 import { useConfirm } from 'primevue/useconfirm';
 
 const router = useRouter();
