@@ -9,10 +9,11 @@ from os import getenv, environ
 load_dotenv()
 
 REQUIRED_ENV_VARS = (
+    'DATABASE_URL',
+    'SECRET_KEY',
     'CLOUDINARY_CLOUD_NAME',
     'CLOUDINARY_API_KEY',
     'CLOUDINARY_API_SECRET',
-    'SECRET_KEY',
 )
 
 raise_exc: bool = False
@@ -26,15 +27,6 @@ for var in REQUIRED_ENV_VARS:
 if raise_exc:
     raise Exception(f'Missing required environment variables: { ', '.join(missing_vars) }')
 
-def get_local_db_string(db_name: str) -> str:
-    base_dir = Path(__file__).resolve().parent.parent
-    db_dir = base_dir / 'db'
-    db_dir.mkdir(exist_ok=True)
-
-    db_file = db_dir / f'{db_name.strip()}.sqlite'
-
-    return f'sqlite:///{db_file.as_posix()}?check_same_thread=False'
-
 class Env:
     def __new__(cls):
         raise TypeError('Env is a static configuration class')
@@ -43,8 +35,8 @@ class Env:
     CLOUDINARY_API_KEY = getenv('CLOUDINARY_API_KEY')
     CLOUDINARY_API_SECRET = getenv('CLOUDINARY_API_SECRET')
     SECRET_KEY = getenv('SECRET_KEY')
+    DATABASE_URL = getenv('DATABASE_URL')
     FRONTEND_URL = getenv('FRONTEND_URL', 'http://localhost:5173')
     JWT_EXPIRATION_HOURS = float(getenv('JWT_EXPIRATION_HOURS', '24'))
-    DATABASE_URL = getenv('DATABASE_URL', get_local_db_string('network'))
     FLASK_ENV = getenv('FLASK_ENV', 'development')
     CLOUDINARY_PFP_FOLDER = getenv('CLOUDINARY_PFP_FOLDER', 'fastapi_uploads_pfp')

@@ -15,7 +15,7 @@ def global_init():
 
     connection_string = Env.DATABASE_URL
 
-    print(f'Connecting to remote DB at {connection_string}')
+    print(f'Connecting to remote DB')
 
     engine = create_engine(
         connection_string,

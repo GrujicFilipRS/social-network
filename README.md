@@ -1,7 +1,6 @@
 # Social Network Platform
 
-A full-stack social networking platform built with **Vue.js** on the frontend and **FastAPI** on the backend.  
-It supports user authentication, posts with image uploads, and scalable data storage using **PostgreSQL** (production) and **SQLite** (development), with **Cloudinary** handling media storage.
+A full-stack social networking platform built with **Vue.js** on the frontend and **FastAPI** on the backend.
 
 ---
 
@@ -17,8 +16,7 @@ It supports user authentication, posts with image uploads, and scalable data sto
 - SQLAlchemy
 
 ### Database
-- **PostgreSQL** (production)
-- **SQLite** (local development)
+- **PostgreSQL**
 
 ### Media Storage
 - **Cloudinary** (image hosting)
@@ -40,6 +38,7 @@ To start the project, you will need to have one or two `.env` files, depending o
 This is the full list of environment variables used in the project:
 
 ```dotenv
+DATABASE_URL="some postgres db conn string here" # REQUIRED
 SECRET_KEY="your JWT secret key here" # REQUIRED
 CLOUDINARY_CLOUD_NAME="cloudinary.com" # REQUIRED
 CLOUDINARY_API_KEY="cloudinary.com" # REQUIRED
@@ -47,7 +46,6 @@ CLOUDINARY_API_SECRET="cloudinary.com" # REQUIRED
 CLOUDINARY_PFP_FOLDER="fastapi_uploads_pfp"
 FRONTEND_URL="http://localhost:5173"
 JWT_EXPIRATION_HOURS="24"
-DATABASE_URL="some postgres db conn string here" # If not provided defaults to creating a .sqlite file
 ```
 
 But for the production version, you will need another `.env` file located in the `client/` directory, with only one variable, `VITE_API_URL`, corresponding to your server routing config
