@@ -1,0 +1,23 @@
+#header {
+    position: absolute;
+}
+
+#header .avatar {
+    position: fixed;
+    right: 10px;
+    top: 10px;
+}
+
+.header-btn {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.header-btn .p-button-icon {
+    position: absolute;
+    left: 1rem;
+}
+
+.header-drawer {
+    gap: 15px;
+}
