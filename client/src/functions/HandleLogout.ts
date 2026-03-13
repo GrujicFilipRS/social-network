@@ -5,7 +5,7 @@ export const HandleLogout = (
     router: Router,
     turnOffHeader: () => void
 ) => {
-    Fetch('user/logout/')
+    Fetch('user/logout/', { method: 'POST' })
     .then(() => {
         turnOffHeader();
         router.push('/join');
