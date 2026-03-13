@@ -3,6 +3,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { verifyUser } from '../api';
+import { HandleLogout } from '../functions/HandleLogout';
 import { eventBus } from '../events';
 
 import Drawer from 'primevue/drawer';
@@ -33,7 +34,13 @@ onUnmounted(() => {
 });
 
 const Logout = () => {
-    // TODO implement frontend logout functionality
+    HandleLogout(
+        router,
+        () => {
+            drawerVisible.value = false;
+            headerVisible.value = false;
+        }
+    );
 }
 
 </script>
