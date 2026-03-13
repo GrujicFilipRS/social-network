@@ -2,6 +2,7 @@ import type { Router } from 'vue-router';
 import type { Ref } from 'vue';
 
 import { Fetch } from '../api';
+import { eventBus } from '../events';
 
 export const handleLogin = async (
     username: string,
@@ -19,6 +20,7 @@ export const handleLogin = async (
     .then(async (res) => {
         if (res.status == 200) {
             router.push('/feed');
+            eventBus.emit('login');
             return;
         }
         

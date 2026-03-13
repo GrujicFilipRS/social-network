@@ -1,8 +1,9 @@
 <script lang='ts' setup>
-import { ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { verifyUser } from '../api';
+import { eventBus } from '../events';
 
 import Drawer from 'primevue/drawer';
 import Avatar from 'primevue/avatar';
@@ -22,6 +23,14 @@ const fetchPfp = async () => {
 }
 
 fetchPfp();
+
+onMounted(() => {
+    eventBus.on('login', fetchPfp);
+});
+
+onUnmounted(() => {
+    eventBus.off('login', fetchPfp);
+});
 
 const Logout = () => {
     // TODO implement frontend logout functionality
