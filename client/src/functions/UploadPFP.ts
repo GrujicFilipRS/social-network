@@ -1,5 +1,6 @@
 import type { ToastMessageOptions } from 'primevue/toast';
 import { FetchWithFileUpload } from '../api';
+import { eventBus } from '../events';
 
 export const UploadPFP = (
     image: File, toastAdd:
@@ -33,6 +34,8 @@ export const UploadPFP = (
             summary: 'Success',
             detail: 'Successfully uploaded new PFP'
         });
+
+        eventBus.emit('header-update');
     }).finally(() => {
         setLoading(false);
         refreshImage();

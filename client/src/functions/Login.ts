@@ -20,7 +20,7 @@ export const handleLogin = async (
     .then(async (res) => {
         if (res.status == 200) {
             router.push('/feed');
-            eventBus.emit('login');
+            eventBus.emit('header-update');
             return;
         }
         

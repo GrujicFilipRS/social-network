@@ -26,11 +26,11 @@ const fetchPfp = async () => {
 fetchPfp();
 
 onMounted(() => {
-    eventBus.on('login', fetchPfp);
+    eventBus.on('header-update', fetchPfp);
 });
 
 onUnmounted(() => {
-    eventBus.off('login', fetchPfp);
+    eventBus.off('header-update', fetchPfp);
 });
 
 const Logout = () => {
