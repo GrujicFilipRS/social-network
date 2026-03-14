@@ -14,6 +14,7 @@ import type { PostData } from '../interfaces/PostData';
 import Button from 'primevue/button';
 
 import FollowsWindow from '../components/FollowWindow.vue';
+import ProfilePostView from '../components/ProfilePostView.vue';
 
 const router = useRouter();
 
@@ -123,7 +124,7 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
         />
 
         <div class='post-list'>
-            {{ JSON.stringify(postData) }}
+            <ProfilePostView :postData='post' :key='post.id' v-for='post in postData' />
         </div>
     </div>
 
