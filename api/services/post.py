@@ -4,6 +4,7 @@ from fastapi import Request, UploadFile
 from datetime import datetime, timezone
 
 from models.posts import Post
+from models.users import User
 from models.likes import Like
 from models.photos import Photo
 from db.db_session import DBSessionManager
@@ -184,3 +185,27 @@ async def delete_post(
         db_sess.commit()
 
         return JSONResponse(content={'message': 'Successfully deleted post'}, status_code=200)
+
+
+@router.get('/get_profile_posts/')
+def get_profile_posts(username: str) -> JSONResponse:
+    with DBSessionManager() as db_sess:
+        user: User | None = db_sess.query(User).filter_by(username=username).first()
+        
+        if user is None:
+            return JSONResponse(content={'message': 'User not found'}, status_code=404)
+        
+        user_posts: list[Post] = (
+            db_sess.query(Post)
+            .filter(Post.user == user, Post.status != 'PRIVATE')
+            .order_by(Post.created_at.desc())
+            .limit(10)
+            .all()
+        )
+        
+        content = {
+            'message': 'Successfully fetched users profile posts',
+            'posts': list(map(lambda post: post.to_dict(), user_posts))
+        }
+        
+        return JSONResponse(content=content, status_code=200)

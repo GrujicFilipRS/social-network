@@ -5,9 +5,12 @@ import { verifyUser } from '../api';
 
 import { GetProfile } from '../functions/GetProfile';
 import { Follow, Unfollow } from '../functions/Follow';
+import { GetProfilePosts } from '../functions/GetProfilePosts';
 
 import type { ProfileData } from '../interfaces/ProfileData';
 import type { FollowWindowModeType } from '../interfaces/FollowWindowModeType';
+import type { PostData } from '../interfaces/PostData';
+
 import Button from 'primevue/button';
 
 import FollowsWindow from '../components/FollowWindow.vue';
@@ -26,6 +29,7 @@ const urlParams = new URLSearchParams(queryString);
 const username: string | null = urlParams.get('user');
 
 const fetchData = ref<{status: number, data: ProfileData}>(await GetProfile(username) as {status: number, data: ProfileData});
+const postData = ref<PostData[]>(await GetProfilePosts(username ?? verificationData.result['user']['username']));
 
 if (fetchData.value.status === 404) {
     router.push('/feed');
@@ -108,11 +112,6 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
         </div>
     </div>
 
-    <FollowsWindow
-        ref='followWindowRef'
-        :userId='data.user_id'
-    />
-
     <div class='w-[60%] mt-6'>
         <Button
             v-if='userId == data.user_id'
@@ -122,7 +121,16 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
             @click='() => router.push("/create_post")'
             icon='pi pi-plus'
         />
+
+        <div class='post-list'>
+            {{ JSON.stringify(postData) }}
+        </div>
     </div>
+
+    <FollowsWindow
+        ref='followWindowRef'
+        :userId='data.user_id'
+    />
 </template>
 
 <style>
