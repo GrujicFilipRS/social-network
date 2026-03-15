@@ -32,7 +32,7 @@ const shortenString = (
         <div class='top'>
             <div class='ls-top'>
                 <h3>{{ shortenString(postData.title, 25) }}</h3>
-                <p style='white-space: pre-line;'>{{ shortenString(postData.body, 200, 2) }}</p>
+                <p style='white-space: pre-line;'>{{ shortenString(postData.body, 200, 4) }}</p>
             </div>
 
             <div class='rs-top' v-if='postData.photos.length > 0'>
