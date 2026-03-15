@@ -10,7 +10,7 @@ class Photo(SqlAlchemyBase):
     __tablename__ = 'photos'
 
     id = Column(UUID, primary_key=True, default=uuid4)
-    post_id = Column(UUID, ForeignKey('posts.id'), nullable=False)
+    post_id = Column(UUID, ForeignKey('posts.id', ondelete='CASCADE'), nullable=False)
     post_position = Column(Integer, nullable=False)
     image_src = Column(String, nullable=False)
     image_id = Column(String, nullable=False)

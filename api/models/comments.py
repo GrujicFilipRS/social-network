@@ -11,7 +11,7 @@ class Comment(SqlAlchemyBase):
 
     id = Column(UUID, primary_key=True, default=uuid4)
     body = Column(Text, nullable=False)
-    post_id = Column(UUID, ForeignKey('posts.id'), nullable=False)
+    post_id = Column(UUID, ForeignKey('posts.id', ondelete='CASCADE'), nullable=False)
     comment_id = Column(UUID, ForeignKey('comments.id'), nullable=True)
     creator_id = Column(UUID, ForeignKey('users.id'), nullable=False)
     commented_at = Column(DateTime, nullable=True)

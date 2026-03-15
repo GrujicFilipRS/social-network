@@ -8,7 +8,7 @@ class Like(SqlAlchemyBase):
 
     id = Column(UUID, primary_key=True, default=uuid4)
     user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
-    post_id = Column(UUID, ForeignKey('posts.id'), nullable=False)
+    post_id = Column(UUID, ForeignKey('posts.id', ondelete='CASCADE'), nullable=False)
     liked_at = Column(DateTime, nullable=True)
 
     user = relationship('User', foreign_keys=[user_id], back_populates='likes')

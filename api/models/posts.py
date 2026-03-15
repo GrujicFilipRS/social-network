@@ -22,9 +22,9 @@ class Post(SqlAlchemyBase):
     user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
 
     user = relationship('User', back_populates='posts')
-    likes = relationship('Like', back_populates='post')
-    comments = relationship('Comment', back_populates='post')
-    photos = relationship('Photo', back_populates='post')
+    likes = relationship('Like', back_populates='post', cascade='all, delete-orphan')
+    comments = relationship('Comment', back_populates='post', cascade='all, delete-orphan')
+    photos = relationship('Photo', back_populates='post', cascade='all, delete-orphan')
 
     def to_dict(
         self,

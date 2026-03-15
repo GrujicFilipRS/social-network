@@ -9,6 +9,7 @@ import { GetPostData } from '../functions/GetPostData';
 import { LikePost, UnlikePost } from '../functions/LikePost';
 import { CreateComment } from '../functions/CreateComment';
 import { EditPost } from '../functions/EditPost';
+import { DeletePost } from '../functions/DeletePost';
 
 import type { PostData } from '../interfaces/PostData';
 
@@ -57,6 +58,7 @@ const editLoading = ref<boolean>(false);
 const editedTitle = ref<string>('');
 const editedBody = ref<string>('');
 const editedStatus = ref<'PUBLIC' | 'PRIVATE'>('PUBLIC');
+const deleteLoading = ref<boolean>(false);
 
 const resetEditingForm = () => {
     editedTitle.value = postData.value!.title;
@@ -111,6 +113,35 @@ const fetchPostData = async () => {
 };
 
 fetchPostData();
+
+const deletePost = () => {
+    DeletePost(
+        postId!,
+        (message: string) => toast.add({
+            summary: 'Error while deleting post',
+            detail: message,
+            life: 3000,
+            severity: 'error'
+        }),
+        router,
+        (val: boolean) => deleteLoading.value = val
+    )
+}
+
+const showPostDeleteConfirmPopup = () => {
+    confirm.require({
+        message: 'Are you sure you want to delete this post?',
+        header: 'Confirm Delete',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Yes, Delete',
+        rejectLabel: 'No',
+        rejectProps: { severity: 'secondary' },
+        acceptClass: 'p-button-danger',
+        acceptIcon: 'pi pi-trash',
+        rejectIcon: 'pi pi-times',
+        accept: deletePost
+    });
+}
 
 const pressLikeButton = async () => {
     if (!postData.value) return;
@@ -199,6 +230,16 @@ const postComment = async () => {
                 :disabled='editingPost'
                 :loading='editLoading'
                 @click='editingPost = true'
+            />
+
+            <Button
+                v-if='currentUserId === postData?.user.id'
+                severity='danger'
+                class='p-button-sm'
+                icon='pi pi-trash'
+                label='Delete post'
+                @click='showPostDeleteConfirmPopup'
+                :loading='deleteLoading'
             />
         </div>
     </div>
