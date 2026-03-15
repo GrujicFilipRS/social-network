@@ -124,7 +124,18 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
         />
 
         <div class='post-list'>
-            <ProfilePostView :postData='post' :key='post.id' v-for='post in postData' />
+            <ProfilePostView
+                :postData='post'
+                :key='post.id'
+                v-for='post in postData.sort((a: PostData, b: PostData) => {
+                    const parseDate = (d: string) => {
+                        const [day, month, year] = d.split(". ").map(v => v.replace(".", ""));
+                        return new Date(Number(year), Number(month) - 1, Number(day));
+                    };
+
+                    return parseDate(b.created_at).getTime() - parseDate(a.created_at).getTime();
+                })''
+            />
         </div>
     </div>
 
