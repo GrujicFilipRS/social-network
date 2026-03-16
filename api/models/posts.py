@@ -1,4 +1,5 @@
-from fastapi import UploadFile
+from fastapi import UploadFile as FastAPIUploadFile
+from starlette.datastructures import UploadFile
 from fastapi.datastructures import FormData
 from sqlalchemy import Column, ForeignKey, UUID, String, DateTime, Text
 from sqlalchemy.orm import relationship
@@ -115,14 +116,14 @@ class Post(SqlAlchemyBase):
             return False
         
         for image in images:
-            if not isinstance(image, UploadFile):
+            if not isinstance(image, (UploadFile, FastAPIUploadFile)):
                 return False
             
             if not await Photo.verify_valid_photo(image):
                 return False
             
             # Reset image byte pointer
-            image.seek(0)
+            await image.seek(0)
         
         return True
     

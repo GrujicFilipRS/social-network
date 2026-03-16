@@ -1,6 +1,7 @@
 from uuid import UUID
+from starlette.datastructures import UploadFile
 from fastapi.responses import JSONResponse
-from fastapi import Request, UploadFile
+from fastapi import Request, UploadFile as FastAPIUploadFile
 from datetime import datetime, timezone
 
 from models.posts import Post
@@ -71,7 +72,10 @@ async def create_post(
     title: str = data.get('title').strip()
     body: str = data.get('body').strip()
     status: str = data.get('status').strip().upper()
-    photos: list[UploadFile] = data.getlist('images') or []
+    photos: list[UploadFile] = [
+        photo for photo in data.getlist('images') or []
+        if isinstance(photo, (UploadFile, FastAPIUploadFile))
+    ]
 
     with DBSessionManager() as db_sess:
         post = Post(

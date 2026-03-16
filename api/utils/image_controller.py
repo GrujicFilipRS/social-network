@@ -1,6 +1,9 @@
 import cloudinary, io
 import cloudinary.api, cloudinary.uploader
-from fastapi import UploadFile
+from fastapi import UploadFile as FastAPIUploadFile
+from starlette.datastructures import UploadFile
+from uuid import uuid4
+
 from env import Env
 
 class ImageController:
@@ -20,14 +23,15 @@ class ImageController:
         print(f'Cloud name: {result.get('cloud_name')}')
     
     @staticmethod
-    async def create_image(image: UploadFile) -> tuple[str, str]:
+    async def create_image(image: UploadFile | FastAPIUploadFile) -> tuple[str, str]:
         file_bytes = await image.read()
+        await image.seek(0)
 
         result = cloudinary.uploader.upload(
             io.BytesIO(file_bytes),
             folder=Env.CLOUDINARY_PFP_FOLDER,
             resource_type='image',
-            public_id=image.filename.split('.')[0],
+            public_id=str(uuid4()),
             overwrite=True
         )
 

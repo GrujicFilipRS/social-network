@@ -33,13 +33,14 @@ class Photo(SqlAlchemyBase):
     @staticmethod
     async def verify_valid_photo(image: UploadFile) -> bool:
         MAX_SIZE = 15 * 1024 * 1024  # 15MB
-        ALLOWED_FORMATS = {'JPEG', 'PNG', 'WEBP'}
+        ALLOWED_FORMATS = {'JPEG', 'PNG', 'WEBP', 'JPG'}
 
         if not image.content_type or not image.content_type.startswith('image/'):
             return False
 
         try:
             file_bytes = await image.read()
+            await image.seek(0)
         except Exception:
             return False
 
