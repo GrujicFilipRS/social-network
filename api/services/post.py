@@ -192,7 +192,13 @@ async def delete_post(
 
 
 @router.get('/get_profile_posts/')
-def get_profile_posts(username: str) -> JSONResponse:
+@require_auth
+def get_profile_posts(
+    request: Request,
+    user_id: UUID | None = None
+) -> JSONResponse:
+    username = request.query_params.get('username')
+    
     with DBSessionManager() as db_sess:
         user: User | None = db_sess.query(User).filter_by(username=username).first()
         
@@ -207,9 +213,16 @@ def get_profile_posts(username: str) -> JSONResponse:
             .all()
         )
         
+        posts = list(map(lambda post: post.to_dict(req_likes=True), user_posts))
+        for i, post in enumerate(posts):
+            posts[i]['liked_by_user'] = db_sess.query(Like).filter(
+                Like.post_id == post['id'],
+                Like.user_id == user_id
+            ).first() is not None
+        
         content = {
             'message': 'Successfully fetched users profile posts',
-            'posts': list(map(lambda post: post.to_dict(), user_posts))
+            'posts': posts
         }
         
         return JSONResponse(content=content, status_code=200)

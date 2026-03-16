@@ -4,7 +4,8 @@ export const LikePost = async (
     postId: string,
     toastAdd: (message: string) => void,
     setLiked: (liked: boolean) => void,
-    setLoading: (loading: boolean) => void
+    setLoading: (loading: boolean) => void,
+    incrementLikes?: () => void
 ): Promise<boolean> => {
     setLoading(true);
 
@@ -20,6 +21,7 @@ export const LikePost = async (
         }
 
         setLiked(true);
+        if (incrementLikes) incrementLikes()
         return true;
     })
     .finally(() => setLoading(false));
@@ -29,7 +31,8 @@ export const UnlikePost = async (
     postId: string,
     toastAdd: (message: string) => void,
     setLiked: (liked: boolean) => void,
-    setLoading: (loading: boolean) => void
+    setLoading: (loading: boolean) => void,
+    decrementLikes?: () => void
 ): Promise<boolean> => {
     setLoading(true);
 
@@ -44,7 +47,8 @@ export const UnlikePost = async (
             return false;
         }
 
-        setLiked(true);
+        setLiked(false);
+        if (decrementLikes) decrementLikes();
         return true;
     })
     .finally(() => setLoading(false));

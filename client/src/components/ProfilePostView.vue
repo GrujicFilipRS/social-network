@@ -1,5 +1,11 @@
 <script setup lang='ts'>
+import { ref } from 'vue';
+
 import type { PostData } from '../interfaces/PostData';
+
+import { LikePost, UnlikePost } from '../functions/LikePost';
+
+import Button from 'primevue/button';
 
 const { postData } = defineProps<{postData: PostData}>();
 
@@ -25,6 +31,27 @@ const shortenString = (
     return result;
 };
 
+const likeButtonLoading = ref<boolean>(false);
+const clickLikeButton = () => {
+    if (postData.liked_by_user) {
+        UnlikePost(
+            postData.id,
+            () => {}, // No toast needed here
+            (val: boolean) => postData.liked_by_user = val,
+            (val: boolean) => likeButtonLoading.value = val,
+            () => postData.likes -= 1
+        );
+    } else {
+        LikePost(
+            postData.id,
+            () => {},
+            (val: boolean) => postData.liked_by_user = val,
+            (val: boolean) => likeButtonLoading.value = val,
+            () => postData.likes += 1
+        );
+    }
+}
+
 </script>
 
 <template>
@@ -36,18 +63,24 @@ const shortenString = (
             </div>
 
             <div class='rs-top' v-if='postData.photos.length > 0'>
-                <!-- <img :src='postData.photos[0]!.image_src' /> -->
                 <div
                     class='img-wrapper'
                     :style='{
                         backgroundImage: `url(${postData.photos[0]!.image_src})`
                     }'
-                ></div>
+                />
             </div>
         </div>
 
-        <div class='bottom'>
-
+        <div class='bottom mt-1'>
+            <Button
+                severity='secondary'
+                class='p-button-sm'
+                :icon='postData.liked_by_user ? `pi pi-thumbs-up-fill` : `pi pi-thumbs-up`'
+                :label='String(postData.likes)'
+                :loading='likeButtonLoading'
+                @click='clickLikeButton'
+            />
         </div>
     </div>
 </template>
