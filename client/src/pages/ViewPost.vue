@@ -100,7 +100,7 @@ const confirmEdit = () => {
 }
 
 const fetchPostData = async () => {
-    const data = await GetPostData(postId!);
+    const data = await GetPostData(postId!, router);
     postData.value = data;
     resetEditingForm();
 
