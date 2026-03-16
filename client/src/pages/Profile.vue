@@ -129,8 +129,17 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
                 :key='post.id'
                 v-for='post in postData.sort((a: PostData, b: PostData) => {
                     const parseDate = (d: string) => {
-                        const [day, month, year] = d.split(". ").map(v => v.replace(".", ""));
-                        return new Date(Number(year), Number(month) - 1, Number(day));
+                        const [datePart, timePart] = d.split(" ");
+                        const [day, month, year] = datePart!.split(".").filter(Boolean);
+                        const [hour, minute] = timePart!.split(":");
+
+                        return new Date(
+                            Number(year),
+                            Number(month) - 1,
+                            Number(day),
+                            Number(hour),
+                            Number(minute)
+                        );
                     };
 
                     return parseDate(b.created_at).getTime() - parseDate(a.created_at).getTime();
