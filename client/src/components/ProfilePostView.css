@@ -1,0 +1,27 @@
+.post {
+    display: flex;
+    flex-direction: column;
+}
+
+.post .top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.post h3 {
+    font-size: 28px;
+    font-weight: 700;
+    padding-top: 25px;
+}
+
+.post .img-wrapper {
+    width: 350px;
+    height: 200px;
+    background-position: center;
+    background-size: cover;
+}
+
+.post .ls-top {
+    display: flex;
+    flex-direction: column;
+}

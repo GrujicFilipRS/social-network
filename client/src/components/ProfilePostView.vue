@@ -40,11 +40,7 @@ const shortenString = (
                 <div
                     class='img-wrapper'
                     :style='{
-                        backgroundImage: `url(${postData.photos[0]!.image_src})`,
-                        width: `400px`,
-                        height: `250px`,
-                        backgroundPosition: `center`,
-                        backgroundSize: `cover`
+                        backgroundImage: `url(${postData.photos[0]!.image_src})`
                     }'
                 ></div>
             </div>
