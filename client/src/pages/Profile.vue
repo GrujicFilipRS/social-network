@@ -125,6 +125,7 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
 
         <div class='post-list'>
             <ProfilePostView
+                :router='router'
                 :postData='post'
                 :key='post.id'
                 v-for='post in postData.sort((a: PostData, b: PostData) => {

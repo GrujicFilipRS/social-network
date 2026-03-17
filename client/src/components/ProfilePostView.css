@@ -6,6 +6,7 @@
 .post .top {
     display: flex;
     justify-content: space-between;
+    cursor: pointer;
 }
 
 .post h3 {

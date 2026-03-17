@@ -1,5 +1,7 @@
 <script setup lang='ts'>
 import { ref } from 'vue';
+import type { Router } from 'vue-router';
+
 
 import type { PostData } from '../interfaces/PostData';
 
@@ -7,7 +9,7 @@ import { LikePost, UnlikePost } from '../functions/LikePost';
 
 import Button from 'primevue/button';
 
-const { postData } = defineProps<{postData: PostData}>();
+const { postData, router } = defineProps<{postData: PostData, router: Router}>();
 
 const shortenString = (
     input: string,
@@ -55,8 +57,8 @@ const clickLikeButton = () => {
 </script>
 
 <template>
-    <div class='post mb-4'>
-        <div class='top'>
+    <div class='post mb-4 p-2'>
+        <div class='top' @click='() => router.push(`/post?post_id=${postData.id}`)'>
             <div class='ls-top'>
                 <h3>{{ shortenString(postData.title, 25) }}</h3>
                 <p style='white-space: pre-line;'>{{ shortenString(postData.body, 200, 4) }}</p>
