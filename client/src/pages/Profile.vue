@@ -124,6 +124,8 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
         />
 
         <div class='post-list'>
+            <h1 class='mt-16 text-4xl font-bold'>Newest posts</h1>
+
             <ProfilePostView
                 :router='router'
                 :postData='post'
