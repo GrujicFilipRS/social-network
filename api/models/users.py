@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
-import re, regex
+import re
+import regex
 from sqlalchemy import Column, UUID, String, DateTime
 from sqlalchemy.orm import relationship
 from db.db_session import SqlAlchemyBase
@@ -96,7 +97,8 @@ class User(SqlAlchemyBase):
 
     @staticmethod
     def validate_name(name: str | None) -> bool:
-        if name == '' or name is None: return True
+        if name == '' or name is None:
+            return True
         
         name_regex = regex.compile(r'^[\p{L}][\p{L}\p{M}\'\-.\s]*$')
         if not bool(name_regex.match(name)):

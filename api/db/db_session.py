@@ -15,7 +15,7 @@ def global_init():
 
     connection_string = Env.DATABASE_URL
 
-    print(f'Connecting to remote DB')
+    print('Connecting to remote DB')
 
     engine = create_engine(
         connection_string,
@@ -25,8 +25,6 @@ def global_init():
     )
     
     __factory = orm.sessionmaker(bind=engine, autoflush=False, autocommit=False)
-
-    from models import __all_models
 
     SqlAlchemyBase.metadata.create_all(engine)
 

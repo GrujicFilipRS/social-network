@@ -6,7 +6,6 @@ import traceback
 
 from env import Env
 from db import db_session
-from models.__all_models import *
 
 from router import configure_routing
 from utils.image_controller import ImageController
@@ -24,11 +23,11 @@ app.add_middleware(
 )
 
 @app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
+async def global_exception_handler(req: Request, exc: Exception):
     traceback.print_exc()
     return JSONResponse(
-        status_code=400,
-        content={'message': str(exc)}
+        status_code=500,
+        content={'message': 'Internal server error'}
     )
 
 configure_routing(app)

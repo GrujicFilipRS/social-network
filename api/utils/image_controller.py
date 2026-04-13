@@ -1,5 +1,7 @@
-import cloudinary, io
-import cloudinary.api, cloudinary.uploader
+import cloudinary
+import cloudinary.api
+import cloudinary.uploader
+import io
 from fastapi import UploadFile as FastAPIUploadFile
 from starlette.datastructures import UploadFile
 from uuid import uuid4
