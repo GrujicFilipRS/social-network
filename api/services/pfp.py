@@ -50,7 +50,7 @@ async def create_user_pfp(
 
         previous_pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
 
-        if not previous_pfp is None:
+        if previous_pfp is not None:
             ImageController.destroy_image(previous_pfp.image_id)
             db_sess.delete(previous_pfp)
             db_sess.commit()
