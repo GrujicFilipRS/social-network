@@ -7,7 +7,8 @@ import { GetUserFollows } from '../functions/GetUserFollows';
 import type { FollowWindowModeType as modeType } from '../interfaces/FollowWindowModeType' ;
 import type { FollowsData } from '../interfaces/FollowData';
 
-import FollowBox from './FollowBox.vue';
+import Dialog from 'primevue/dialog';
+import Avatar from 'primevue/avatar';
 
 const props = defineProps<{
     userId?: string,
@@ -34,10 +35,6 @@ const setWindowMode = (modeToShow: modeType) => {
     }
 };
 
-const closeWindow = () => {
-    showRef.value = false;
-};
-
 const userFollowers = ref<FollowsData | null>(null);
 const userFollows = ref<FollowsData | null>(null);
 onMounted(async () => {
@@ -50,57 +47,45 @@ defineExpose({ showWindow });
 </script>
 
 <template>
-    <div
-        v-show='showRef'
+    <Dialog
+        v-model:visible='showRef'
+        modal
         class='follows-window-overlay'
     >
-        <div class='follows-window'>
-            <div class='follows-header'>
-                <div class='lside-follows-header'>
-                    <p
-                        :class='followsTextClass'
-                        @click='setWindowMode("FOLLOWING")'
-                    >
-                        Follows
-                    </p>
+        <div class='follows-window-header'>
+            <span
+                :class='followsTextClass'
+                @click='setWindowMode("FOLLOWING")'
+            >Following</span>
 
-                    <p
-                        :class='followersTextClass'
-                        @click='setWindowMode("FOLLOWERS")'
-                    >
-                        Followers
-                    </p>
-                </div>
+            <span
+                :class='followersTextClass'
+                @click='setWindowMode("FOLLOWERS")'
+            >Followers</span>
 
-                <button
-                    class='close-follows-btn'
-                    @click='closeWindow'
-                >✖</button>
-            </div>
-
+        </div>
+        
+        <div class='user-list'>
             <div
-                class='follows-list'
-                v-show='mode == "FOLLOWING"'
+                v-for='user in mode == "FOLLOWING" ? userFollows!.users : userFollowers!.users'
+                :key='user.id'
+                class='user-list-item'
             >
-                <FollowBox
-                    v-for='(user, index) in userFollows?.users'
-                    :key='user.id || index'
-                    :user='user'
+                <Avatar
+                    :image='user.pfp ?? "/default-pfp.png"'
+                    shape='circle'
                 />
-            </div>
 
-            <div
-                class='follows-list'
-                v-show='mode == "FOLLOWERS"'
-            >
-                <FollowBox
-                    v-for='(user, index) in userFollowers?.users'
-                    :key='user.id || index'
-                    :user='user'
-                />
+                <a class='username' :href='`/profile?user=${user.username}`'>{{ user.username }}</a>
             </div>
         </div>
-    </div>
+
+        <p
+            v-if='mode == "FOLLOWING" ?
+            userFollows!.users.length === 0 :
+            userFollowers!.users.length === 0'
+        >No users found</p>
+    </Dialog>
 </template>
 
 <style>
