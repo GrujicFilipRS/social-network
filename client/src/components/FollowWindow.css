@@ -2,6 +2,8 @@
     width: 500px;
     display: flex;
     flex-direction: column;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .user-list-item {
@@ -9,4 +11,17 @@
     align-items: center;
     gap: 10px;
     padding: 10px;
+}
+
+.follows-window-header {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.follows-window-header span {
+    cursor: pointer;
+    font-size: 1.2em;
 }
