@@ -5,7 +5,6 @@ import { verifyUser } from '../api';
 
 import { GetProfile } from '../functions/GetProfile';
 import { Follow, Unfollow } from '../functions/Follow';
-import { GetProfilePosts } from '../functions/GetProfilePosts';
 
 import type { ProfileData } from '../interfaces/ProfileData';
 import type { FollowWindowModeType } from '../interfaces/FollowWindowModeType';
@@ -30,7 +29,7 @@ const urlParams = new URLSearchParams(queryString);
 const username: string | null = urlParams.get('user');
 
 const fetchData = ref<{status: number, data: ProfileData}>(await GetProfile(username) as {status: number, data: ProfileData});
-const postData = ref<PostData[]>(await GetProfilePosts(username ?? verificationData.result['user']['username']));
+const postData = ref<PostData[]>(fetchData.value.data.posts!);
 
 if (fetchData.value.status === 404) {
     router.push('/feed');

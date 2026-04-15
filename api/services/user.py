@@ -273,14 +273,16 @@ async def get_user_profile(
             .filter_by(follower_id=user_id, followed_id=user.id)\
             .first() is not None
             
-        user_posts: list[Post] = (
+        user_posts_querry = (
             db_sess.query(Post)
             .filter(Post.user == user)
-            .filter(Post.status == 'PUBLIC' or Post.user_id == user_id)
             .order_by(Post.created_at.desc())
-            .limit(10)
-            .all()
         )
+        
+        if user.id != user_id:
+            user_posts_querry = user_posts_querry.filter(Post.status != 'PRIVATE')
+        
+        user_posts: list[Post] = user_posts_querry.all()
 
         content: dict = {
             'message': 'User profile found',
