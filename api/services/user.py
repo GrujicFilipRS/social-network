@@ -5,9 +5,7 @@ from pydantic import BaseModel
 from datetime import datetime, timezone
 from typing import Any
 
-from models.users import User, UserOptions
-from models.follows import Follow
-from models.posts import Post
+from models import Like, User, UserOptions, Follow, Post
 from db.db_session import DBSessionManager
 
 from utils import jwt_tokens
@@ -291,7 +289,11 @@ async def get_user_profile(
             'user_name': user.name,
             'num_followers': len(user.followers),
             'num_followed': len(user.follows),
-            'posts': [post.to_dict() for post in user_posts],
+            'posts': [{
+                **post.to_dict(req_likes=True),
+                'liked_by_user': db_sess.query(Like).filter_by(user_id=user_id, post_id=post.id).first()
+                is not None
+            } for post in user_posts],
             'pfp_src': user.pfp.image_src if user.pfp else None,
             'user_followed': user_followed
         }
@@ -324,7 +326,11 @@ def get_current_user_profile(
             'user_name': user.name,
             'num_followers': len(user.followers),
             'num_followed': len(user.follows),
-            'posts': [ post.to_dict() for post in user_posts ],
+            'posts': [{
+                **post.to_dict(req_likes=True),
+                'liked_by_user': db_sess.query(Like).filter_by(user_id=user_id, post_id=post.id).first()
+                is not None
+            } for post in user_posts],
             'pfp_src': user.pfp.image_src if user.pfp else None
         }
         
