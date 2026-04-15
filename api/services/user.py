@@ -5,9 +5,9 @@ from pydantic import BaseModel
 from datetime import datetime, timezone
 from typing import Any
 
-from env import Env
 from models.users import User, UserOptions
 from models.follows import Follow
+from models.posts import Post
 from db.db_session import DBSessionManager
 
 from utils import jwt_tokens
@@ -269,7 +269,18 @@ async def get_user_profile(
         if not user:
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
 
-        user_followed: bool = not db_sess.query(Follow).filter_by(follower_id=user_id, followed_id=user.id).first() is None
+        user_followed: bool = db_sess.query(Follow)\
+            .filter_by(follower_id=user_id, followed_id=user.id)\
+            .first() is not None
+            
+        user_posts: list[Post] = (
+            db_sess.query(Post)
+            .filter(Post.user == user)
+            .filter(Post.status == 'PUBLIC' or Post.user_id == user_id)
+            .order_by(Post.created_at.desc())
+            .limit(10)
+            .all()
+        )
 
         content: dict = {
             'message': 'User profile found',
@@ -278,7 +289,7 @@ async def get_user_profile(
             'user_name': user.name,
             'num_followers': len(user.followers),
             'num_followed': len(user.follows),
-            'posts': [ post.to_dict() for post in user.posts ],
+            'posts': [post.to_dict() for post in user_posts],
             'pfp_src': user.pfp.image_src if user.pfp else None,
             'user_followed': user_followed
         }
@@ -295,6 +306,14 @@ def get_current_user_profile(
         user: User | None = db_sess.get(User, user_id)
         if not user:
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
+    
+        user_posts: list[Post] = (
+            db_sess.query(Post)
+            .filter(Post.user == user)
+            .order_by(Post.created_at.desc())
+            .limit(10)
+            .all()
+        )
         
         content: dict = {
             'message': 'User profile found',
@@ -303,7 +322,7 @@ def get_current_user_profile(
             'user_name': user.name,
             'num_followers': len(user.followers),
             'num_followed': len(user.follows),
-            'posts': [ post.to_dict() for post in user.posts ],
+            'posts': [ post.to_dict() for post in user_posts ],
             'pfp_src': user.pfp.image_src if user.pfp else None
         }
         
