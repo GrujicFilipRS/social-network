@@ -4,10 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi import Request, UploadFile as FastAPIUploadFile
 from datetime import datetime, timezone
 
-from models.posts import Post
-from models.users import User
-from models.likes import Like
-from models.photos import Photo
+from models import Post, Like, Photo
 from db.db_session import DBSessionManager
 
 from utils.jwt_tokens import optional_auth, require_auth
@@ -189,40 +186,3 @@ async def delete_post(
         db_sess.commit()
 
         return JSONResponse(content={'message': 'Successfully deleted post'}, status_code=200)
-
-
-@router.get('/get_profile_posts/')
-@require_auth
-def get_profile_posts(
-    request: Request,
-    user_id: UUID | None = None
-) -> JSONResponse:
-    username = request.query_params.get('username')
-    
-    with DBSessionManager() as db_sess:
-        user: User | None = db_sess.query(User).filter_by(username=username).first()
-        
-        if user is None:
-            return JSONResponse(content={'message': 'User not found'}, status_code=404)
-        
-        user_posts: list[Post] = (
-            db_sess.query(Post)
-            .filter(Post.user == user, Post.status != 'PRIVATE')
-            .order_by(Post.created_at.desc())
-            .limit(10)
-            .all()
-        )
-        
-        posts = list(map(lambda post: post.to_dict(req_likes=True), user_posts))
-        for i, post in enumerate(posts):
-            posts[i]['liked_by_user'] = db_sess.query(Like).filter(
-                Like.post_id == post['id'],
-                Like.user_id == user_id
-            ).first() is not None
-        
-        content = {
-            'message': 'Successfully fetched users profile posts',
-            'posts': posts
-        }
-        
-        return JSONResponse(content=content, status_code=200)
