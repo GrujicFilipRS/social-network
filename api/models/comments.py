@@ -51,7 +51,7 @@ class Comment(SqlAlchemyBase):
         if body.count('\n') > MAX_BODY_LINES:
             return False
 
-        if not all(c in string.printable for c in body):
+        if not all(c.isprintable() or c in '\n\r\t' for c in body):
             return False
 
         DANGEROUS_SUBSTRINGS = (
