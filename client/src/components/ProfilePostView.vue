@@ -41,7 +41,7 @@ const clickLikeButton = () => {
             () => {}, // No toast needed here
             (val: boolean) => postData.liked_by_user = val,
             (val: boolean) => likeButtonLoading.value = val,
-            () => postData.likes -= 1
+            () => postData.likes! -= 1
         );
     } else {
         LikePost(
@@ -49,7 +49,7 @@ const clickLikeButton = () => {
             () => {},
             (val: boolean) => postData.liked_by_user = val,
             (val: boolean) => likeButtonLoading.value = val,
-            () => postData.likes += 1
+            () => postData.likes! += 1
         );
     }
 }
@@ -64,11 +64,11 @@ const clickLikeButton = () => {
                 <p style='white-space: pre-line;'>{{ shortenString(postData.body, 200, 4) }}</p>
             </div>
 
-            <div class='rs-top' v-if='postData.photos.length > 0'>
+            <div class='rs-top' v-if='postData.photos!.length > 0'>
                 <div
                     class='img-wrapper'
                     :style='{
-                        backgroundImage: `url(${postData.photos[0]!.image_src})`
+                        backgroundImage: `url(${postData.photos![0]!.image_src})`
                     }'
                 />
             </div>

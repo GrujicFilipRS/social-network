@@ -109,7 +109,7 @@ const fetchPostData = async () => {
         return;
     }
 
-    postLiked.value = postData.value!.liked_by_user;
+    postLiked.value = postData.value!.liked_by_user!;
 };
 
 fetchPostData();
@@ -160,7 +160,7 @@ const pressLikeButton = async () => {
 
         if (result) {
             postData.value.liked_by_user = true;
-            postData.value.likes += 1;
+            postData.value.likes! += 1;
         }
     } else {
         const result: boolean = await UnlikePost(
@@ -176,7 +176,7 @@ const pressLikeButton = async () => {
 
         if (result) {
             postData.value.liked_by_user = false;
-            postData.value.likes -= 1;
+            postData.value.likes! -= 1;
         }
     }
 }
@@ -324,7 +324,7 @@ const postComment = async () => {
                 )'
             />
 
-            <p v-if='postData?.comments.length === 0'>No comments yet</p>
+            <p v-if='postData?.comments!.length === 0'>No comments yet</p>
             
             <div class='comment-form'>
                 <h3>Write a comment</h3>

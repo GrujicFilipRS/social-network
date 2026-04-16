@@ -83,8 +83,8 @@ class Post(SqlAlchemyBase):
         if status not in PostLiterals.LIST_LITS:
             return False
         
-        if (not all(c in string.printable for c in title) or
-            not all(c in string.printable for c in body)):
+        if (not all(c.isprintable() or c in '\n\r\t' for c in title) or
+            not all(c.isprintable() or c in '\n\r\t' for c in body)):
             return False
         
         MAX_BODY_LINES = 10
@@ -151,8 +151,8 @@ class Post(SqlAlchemyBase):
         if status not in PostLiterals.LIST_LITS:
             return False
         
-        if (not all(c in string.printable for c in title) or
-            not all(c in string.printable for c in body)):
+        if (not all(c.isprintable() or c in '\n\r\t' for c in title) or
+            not all(c.isprintable() or c in '\n\r\t' for c in body)):
             return False
         
         MAX_BODY_LINES = 10
