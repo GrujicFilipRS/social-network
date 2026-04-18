@@ -1,5 +1,6 @@
 <script lang='ts' setup>
-import { onMounted, ref } from 'vue';
+import { ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { GetUserFollowers } from '../functions/GetUserFollowers';
 import { GetUserFollows } from '../functions/GetUserFollows';
@@ -14,7 +15,15 @@ const props = defineProps<{
     userId?: string,
 }>();
 
+const router = useRouter();
+
 const showRef = ref<boolean>(false);
+
+const redirectToUser = (username: string) => {
+    router.push(`/profile?user=${username}`);
+    showRef.value = false;
+}
+
 const mode = ref<modeType>('FOLLOWING');
 const followsTextClass = ref<'mode-active' | ''>('mode-active');
 const followersTextClass = ref<'mode-active' | ''>('');
@@ -37,10 +46,15 @@ const setWindowMode = (modeToShow: modeType) => {
 
 const userFollowers = ref<FollowsData | null>(null);
 const userFollows = ref<FollowsData | null>(null);
-onMounted(async () => {
-    userFollowers.value = await GetUserFollowers(props.userId!) as FollowsData;
-    userFollows.value = await GetUserFollows(props.userId!) as FollowsData;
-});
+
+watch(
+    () => props.userId,
+    async () => {
+        if (!props.userId) return;
+        userFollowers.value = await GetUserFollowers(props.userId!) as FollowsData;
+        userFollows.value = await GetUserFollows(props.userId!) as FollowsData;
+    }
+);
 
 defineExpose({ showWindow });
 
@@ -67,23 +81,26 @@ defineExpose({ showWindow });
         
         <div class='user-list'>
             <div
-                v-for='user in mode == "FOLLOWING" ? userFollows!.users : userFollowers!.users'
+                v-for='user in mode == "FOLLOWING" ? userFollows?.users : userFollowers?.users'
                 :key='user.id'
                 class='user-list-item'
+                @click='redirectToUser(user.username)'
             >
                 <Avatar
                     :image='user.pfp ?? "/default-pfp.png"'
                     shape='circle'
                 />
 
-                <a class='username' :href='`/profile?user=${user.username}`'>{{ user.username }}</a>
+                <p class='username'>
+                    {{ user.username }}
+                </p>
             </div>
         </div>
 
         <p
             v-if='mode == "FOLLOWING" ?
-            userFollows!.users.length === 0 :
-            userFollowers!.users.length === 0'
+            userFollows?.users.length === 0 :
+            userFollowers?.users.length === 0'
         >No users found</p>
     </Dialog>
 </template>

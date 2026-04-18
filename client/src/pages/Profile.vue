@@ -1,9 +1,9 @@
 <script setup lang='ts'>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { verifyUser } from '../api';
 
-import { GetProfile } from '../functions/GetProfile';
+import { GetProfile, GetSelfProfile } from '../functions/GetProfile';
 import { Follow, Unfollow } from '../functions/Follow';
 
 import type { ProfileData } from '../interfaces/ProfileData';
@@ -15,6 +15,7 @@ import Button from 'primevue/button';
 import FollowsWindow from '../components/FollowWindow.vue';
 import ProfilePostView from '../components/ProfilePostView.vue';
 
+const route = useRoute();
 const router = useRouter();
 
 const verificationData = await verifyUser();
@@ -24,29 +25,54 @@ if (verificationData.statusCode !== 200) {
 
 const userId: string = verificationData.result['user']['id'];
 
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-const username: string | null = urlParams.get('user');
+const fetchData = ref<{status: number, data?: ProfileData}>({
+    status: 0,
+    data: undefined
+});
+const postData = ref<PostData[]>([]);
+const profileData = ref<ProfileData>();
 
-const fetchData = ref<{status: number, data: ProfileData}>(await GetProfile(username) as {status: number, data: ProfileData});
-const postData = ref<PostData[]>(fetchData.value.data.posts!);
+const firstRow = ref<string>('');
+const secondRow = ref<string>('');
 
-if (fetchData.value.status === 404) {
-    router.push('/feed');
+const followingUser = ref<boolean>();
+
+const loadProfile = async () => {
+    const {status, data} = route.query.user === undefined ?
+    await GetSelfProfile() : await GetProfile(route.query.user as string);
+
+    fetchData.value = {status, data};
+
+    if (fetchData.value.status === 404) {
+        router.push('/feed');
+        return;
+    }
+
+    fetchData.value = {status, data};
+    postData.value = fetchData.value.data!.posts!;
+    profileData.value = fetchData.value.data!;
+
+    followingUser.value = profileData.value!.user_followed;
+
+    firstRow.value = profileData.value.user_name ? profileData.value.user_name : profileData.value.username;
+    secondRow.value = profileData.value.user_name ? profileData.value.username : '';
 }
 
-const data = ref<ProfileData>(fetchData.value.data);
+loadProfile();
 
-const firstRow: string = data.value.user_name ? data.value.user_name : data.value.username;
-const secondRow: string | null = data.value.user_name ? data.value.username : null;
-
-const followingUser = ref<boolean>(data.value.user_followed);
 const followWindowRef = ref<InstanceType<typeof FollowsWindow>>();
 
-const handleFollow = async () => { Follow(data.value.user_id, followingUser); };
-const handleUnfollow = async () => { Unfollow(data.value.user_id, followingUser); };
+const handleFollow = async () => { Follow(profileData.value!.user_id, (val) => followingUser.value = val); };
+const handleUnfollow = async () => { Unfollow(profileData.value!.user_id, (val) => followingUser.value = val); };
 const handleEdit = async () => { router.push('/edit_profile'); };
 const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.showWindow(mode); };
+
+watch(
+    () => route.query.user,
+    () => {
+        loadProfile();
+    }
+);
 
 </script>
 
@@ -54,7 +80,7 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
     <div class='profile-info'>
         <div class='lside-info'>
             <div class='pfp'>
-                <img :src='data.pfp_src ?? "/default-pfp.png"' />
+                <img :src='profileData?.pfp_src ?? "/default-pfp.png"' />
             </div>
 
             <div class='names'>
@@ -72,7 +98,7 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
                         title='See follows'
                         @click='() => {showFollows("FOLLOWING")}'
                     >
-                        {{ data.num_followed }}
+                        {{ profileData?.num_followed }}
                     </span>
                 </p>
 
@@ -83,27 +109,27 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
                         title='See followers'
                         @click='() => {showFollows("FOLLOWERS")}'
                     >
-                        {{ data.num_followers }}
+                        {{ profileData?.num_followers }}
                     </span>
                 </p>
             </div>
 
             <Button
-                v-show='userId !== data.user_id && !followingUser'
+                v-show='userId !== profileData?.user_id && !followingUser'
                 @click='handleFollow'
                 label='FOLLOW'
                 class='follow-button'
             />
 
             <Button
-                v-show='userId !== data.user_id && followingUser'
+                v-show='userId !== profileData?.user_id && followingUser'
                 @click='handleUnfollow'
                 label='Unfollow'
                 severity='secondary'
             />
 
             <Button
-                v-show='userId == data.user_id'
+                v-show='userId == profileData?.user_id'
                 @click='handleEdit'
                 label='Edit profile'
                 severity='secondary'
@@ -114,7 +140,7 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
 
     <div class='w-[60%] mt-6'>
         <Button
-            v-if='userId == data.user_id'
+            v-if='userId == profileData?.user_id'
             label='Create new post'
             severity='secondary'
             class='self-start'
@@ -129,30 +155,14 @@ const showFollows = (mode: FollowWindowModeType) => { followWindowRef.value!.sho
                 :router='router'
                 :postData='post'
                 :key='post.id'
-                v-for='post in postData.sort((a: PostData, b: PostData) => {
-                    const parseDate = (d: string) => {
-                        const [datePart, timePart] = d.split(" ");
-                        const [day, month, year] = datePart!.split(".").filter(Boolean);
-                        const [hour, minute] = timePart!.split(":");
-
-                        return new Date(
-                            Number(year),
-                            Number(month) - 1,
-                            Number(day),
-                            Number(hour),
-                            Number(minute)
-                        );
-                    };
-
-                    return parseDate(b.created_at).getTime() - parseDate(a.created_at).getTime();
-                })''
+                v-for='post in postData'
             />
         </div>
     </div>
 
     <FollowsWindow
         ref='followWindowRef'
-        :userId='data.user_id'
+        :userId='profileData?.user_id'
     />
 </template>
 
