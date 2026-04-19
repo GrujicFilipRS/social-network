@@ -19,7 +19,7 @@ const pfpSource = ref<string>('/default-pfp.png');
 const fetchPfp = async () => {
     verifyUser().then(res => {
         if (res.statusCode !== 401) headerVisible.value = true;
-        if (res.result.user.pfp) pfpSource.value = res.result.user.pfp;
+        pfpSource.value = res.result.user.pfp ?? '/default-pfp.png';
     });
 }
 
