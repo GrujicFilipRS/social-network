@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from models.comments import Comment
 from models.posts import Post
 from db.db_session import DBSessionManager
+from utils import NotificationController
 
 from utils.jwt_tokens import optional_auth, require_auth
 from utils.literals import PostLiterals
@@ -49,16 +50,28 @@ async def post_comment(
     comment_id: UUID | None = UUID(data.get('comment_id')) if data.get('comment_id') else None
 
     with DBSessionManager() as db_sess:
+        post: Post | None = db_sess.get(Post, post_id)
+        if post is None:
+            return JSONResponse(content={'message': 'No post found'}, status_code=404)
+        
         new_comment = Comment(
             body=body,
-            post_id=post_id,
+            post_id=post.id,
             comment_id=comment_id,
             creator_id=user_id,
             commented_at=datetime.now(timezone.utc)
         )
 
         db_sess.add(new_comment)
-        db_sess.commit()
+        db_sess.flush()
+        
+        NotificationController.create_notification(
+            session=db_sess,
+            receiver_id=post.user_id,
+            sender_id=user_id,
+            object_type='comment',
+            object_id=new_comment.id
+        )
 
         content: dict = {
             'message': 'Comment posted',
