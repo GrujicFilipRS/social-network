@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from models import Notification
 from sqlalchemy.orm import Session
 
@@ -11,10 +13,10 @@ class NotificationController:
     @staticmethod
     def create_notification(
         session: Session,
-        receiver_id: str,
-        sender_id: str,
+        receiver_id: UUID,
+        sender_id: UUID,
         object_type: str,
-        object_id: str
+        object_id: UUID
     ) -> Notification:
         # Create notification in the database
         notification = Notification(

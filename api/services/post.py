@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi import Request, UploadFile as FastAPIUploadFile
 from datetime import datetime, timezone
 
+from utils import NotificationController
 from models import Post, Like, Photo
 from db.db_session import DBSessionManager
 
@@ -107,7 +108,16 @@ async def create_post(
             
             db_sess.add(photo_obj)
         
-        db_sess.commit()
+        db_sess.flush()
+        
+        for follower in post.user.followers:
+            NotificationController.create_notification(
+                session=db_sess,
+                receiver_id=follower.follower_id,
+                sender_id=user_id,
+                object_type='post',
+                object_id=post.id
+            )
 
         content: dict = {
             'message': 'Successfully created post',

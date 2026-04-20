@@ -6,7 +6,10 @@ from datetime import datetime, timezone
 from models.likes import Like
 from models.users import User
 from models.posts import Post
+
 from db.db_session import DBSessionManager
+
+from utils import NotificationController
 
 from utils.jwt_tokens import optional_auth, require_auth
 from utils.literals import PostLiterals
@@ -75,7 +78,15 @@ async def like_post(
         like.liked_at = datetime.now(timezone.utc)
 
         db_sess.add(like)
-        db_sess.commit()
+        db_sess.flush()
+        
+        NotificationController.create_notification(
+            session=db_sess,
+            receiver_id=post.user_id,
+            sender_id=user_id,
+            object_type='like',
+            object_id=like.id
+        )
 
         return JSONResponse(content={'message': 'Successfully liked post'}, status_code=201)
     
