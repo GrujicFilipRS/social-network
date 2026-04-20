@@ -1,5 +1,6 @@
 from uuid import uuid4
 from sqlalchemy import UUID, Column, DateTime, Text
+from sqlalchemy.orm import Session
 from db.db_session import SqlAlchemyBase
 from models import Like, Comment, Post, Follow
 
@@ -14,7 +15,7 @@ class Notification(SqlAlchemyBase):
     object_id = Column(UUID, nullable=False)
     receiver_at = Column(DateTime, nullable=True)
 
-    def get_object(self, session):
+    def get_object(self, session: Session):
         if self.object_type == 'like':
             return session.get(Like, self.object_id)
         
