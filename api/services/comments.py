@@ -6,7 +6,7 @@ from models import Comment, Post
 from db import DBSessionManager
 from utils import NotificationController
 
-from utils.jwt_tokens import optional_auth, require_auth
+from utils import JWT
 from utils.literals import PostLiterals
 
 from fastapi import APIRouter, Request
@@ -34,7 +34,7 @@ def get_comment(comment_id: UUID | str) -> JSONResponse:
 
 
 @router.post('/post_comment/')
-@require_auth
+@JWT.require_auth
 async def post_comment(
     request: Request,
     user_id: UUID | None = None
@@ -81,7 +81,7 @@ async def post_comment(
 
 
 @router.put('/edit_comment/')
-@require_auth
+@JWT.require_auth
 async def edit_comment(
     request: Request,
     user_id: UUID | None = None
@@ -113,7 +113,7 @@ async def edit_comment(
     return JSONResponse(content={'message': 'Successfully edited comment'}, status_code=200)
 
 @router.delete('/remove_comment/')
-@require_auth
+@JWT.require_auth
 async def delete_comment(
     request: Request,
     user_id: UUID | None = None
@@ -140,7 +140,7 @@ async def delete_comment(
 
 
 @router.get('/get_post_comments/')
-@optional_auth
+@JWT.optional_auth
 def get_post_comments(
     request: Request,
     user_id: UUID | None = None

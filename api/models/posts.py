@@ -7,7 +7,6 @@ from db import SqlAlchemyBase
 from uuid import uuid4
 from typing import Any
 import unicodedata
-from models import Photo
 
 from utils.literals import PostLiterals
 
@@ -113,6 +112,8 @@ class Post(SqlAlchemyBase):
         
         if len(images) > MAX_IMAGES:
             return False
+        
+        from models import Photo
         
         for image in images:
             if not isinstance(image, (UploadFile, FastAPIUploadFile)):

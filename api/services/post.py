@@ -8,18 +8,18 @@ from utils import NotificationController
 from models import Post, Like, Photo
 from db import DBSessionManager
 
-from utils.jwt_tokens import optional_auth, require_auth
+from utils import JWT
 from utils.literals import PostLiterals
 
 from fastapi import APIRouter
 
-from utils.image_controller import ImageController
+from utils import ImageController
 
 router = APIRouter()
 
 
 @router.get('/get_post/')
-@optional_auth
+@JWT.optional_auth
 async def get_post(
     request: Request,
     user_id: UUID | None = None
@@ -57,7 +57,7 @@ async def get_post(
 
 
 @router.post('/create_post/')
-@require_auth
+@JWT.require_auth
 async def create_post(
     request: Request,
     user_id: UUID | None = None
@@ -128,7 +128,7 @@ async def create_post(
 
 
 @router.put('/edit_post/')
-@require_auth
+@JWT.require_auth
 async def edit_post(
     request: Request,
     user_id: UUID | None = None
@@ -172,7 +172,7 @@ async def edit_post(
 
 
 @router.delete('/delete_post/')
-@require_auth
+@JWT.require_auth
 async def delete_post(
     request: Request,
     user_id: UUID | None = None

@@ -4,11 +4,11 @@ from fastapi.responses import JSONResponse
 
 from fastapi import APIRouter
 
-from utils.image_controller import ImageController
+from utils import ImageController
 from models import PFP
 from db import DBSessionManager
 
-from utils.jwt_tokens import require_auth
+from utils import JWT
 
 router = APIRouter()
 
@@ -34,7 +34,7 @@ def get_user_pfp(user_id: str | UUID) -> JSONResponse:
         return JSONResponse(content=content, status_code=200)
 
 @router.post('/create_user_pfp/')
-@require_auth
+@JWT.require_auth
 async def create_user_pfp(
     request: Request,
     user_id: UUID | None = None
@@ -67,7 +67,7 @@ async def create_user_pfp(
         return JSONResponse(content=content, status_code=201)
 
 @router.delete('/delete_pfp/')
-@require_auth
+@JWT.require_auth
 async def delete_pfp(
     request: Request,
     user_id: UUID | None = None

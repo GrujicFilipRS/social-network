@@ -7,7 +7,7 @@ import traceback
 from env import Env
 from db import db_session
 
-from utils.image_controller import ImageController
+from utils import ImageController
 from services import router
 
 db_session.global_init()

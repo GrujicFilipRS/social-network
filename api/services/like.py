@@ -9,7 +9,7 @@ from db import DBSessionManager
 
 from utils import NotificationController
 
-from utils.jwt_tokens import optional_auth, require_auth
+from utils import JWT
 from utils.literals import PostLiterals
 
 from fastapi import APIRouter
@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 @router.get('/get_like/')
-@optional_auth
+@JWT.optional_auth
 def get_like(
     request: Request,
     user_id: UUID | None = None
@@ -47,7 +47,7 @@ def get_like(
 
 
 @router.post('/like_post/')
-@require_auth
+@JWT.require_auth
 async def like_post(
     request: Request,
     user_id: UUID | None = None
@@ -90,7 +90,7 @@ async def like_post(
     
 
 @router.delete('/unlike_post/')
-@require_auth
+@JWT.require_auth
 async def unlike_post(
     request: Request,
     user_id: UUID | None = None

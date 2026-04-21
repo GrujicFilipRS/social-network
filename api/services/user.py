@@ -8,8 +8,7 @@ from typing import Any
 from models import Like, User, UserOptions, Follow, Post
 from db import DBSessionManager
 
-from utils import jwt_tokens
-from utils.jwt_tokens import require_auth, set_response_cookie
+from utils import JWT
 
 from fastapi import APIRouter
 
@@ -43,7 +42,7 @@ async def get_user(
 
 
 @router.get('/get_current_user/')
-@require_auth
+@JWT.require_auth
 def get_current_user(
     request: Request,
     user_id: UUID | None = None,
@@ -99,7 +98,7 @@ async def register(data: RegistrationData) -> JSONResponse:
         db_sess.add(user)
         db_sess.commit()
         
-        token = jwt_tokens.encode_token(user.id)
+        token = JWT.encode_token(user.id)
 
         response = JSONResponse(
             content={
@@ -109,7 +108,7 @@ async def register(data: RegistrationData) -> JSONResponse:
             status_code=200
         )
         
-        set_response_cookie(response, token)
+        JWT.set_response_cookie(response, token)
 
         return response
 
@@ -129,7 +128,7 @@ async def login(data: LoginData) -> JSONResponse:
         if not (user and user.check_password(password)):
             return JSONResponse(content={'message': 'Incorrect credentials'}, status_code=400)
         
-        token = jwt_tokens.encode_token(user.id)
+        token = JWT.encode_token(user.id)
 
         response = JSONResponse(
             content={
@@ -139,13 +138,13 @@ async def login(data: LoginData) -> JSONResponse:
             status_code=200
         )
         
-        set_response_cookie(response, token)
+        JWT.set_response_cookie(response, token)
 
         return response
 
 
 @router.put('/set_name/')
-@require_auth
+@JWT.require_auth
 async def set_user_name(
     request: Request,
     user_id: UUID | None = None
@@ -173,7 +172,7 @@ async def set_user_name(
 
 
 @router.put('/change_username/')
-@require_auth
+@JWT.require_auth
 async def change_username(
     request: Request,
     user_id: UUID | None = None
@@ -217,7 +216,7 @@ async def change_username(
 
 
 @router.put('/change_password/')
-@require_auth
+@JWT.require_auth
 async def change_password(
     request: Request,
     user_id: UUID | None = None
@@ -253,7 +252,7 @@ async def change_password(
 
 
 @router.get('/get_user_profile/')
-@require_auth
+@JWT.require_auth
 async def get_user_profile(
     request: Request,
     user_id: UUID | None = None
@@ -301,7 +300,7 @@ async def get_user_profile(
         return JSONResponse(content=content, status_code=200)
 
 @router.get('/get_current_user_profile/')
-@require_auth
+@JWT.require_auth
 def get_current_user_profile(
     request: Request,
     user_id: UUID | None = None
@@ -340,6 +339,6 @@ def get_current_user_profile(
 def logout() -> JSONResponse:
     response = JSONResponse(content={'message': 'Successfully logged out'}, status_code=200)
     
-    set_response_cookie(response, '')
+    JWT.set_response_cookie(response, '')
     
     return response

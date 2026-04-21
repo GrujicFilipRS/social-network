@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from models import Follow, User
 from db import DBSessionManager
 
-from utils.jwt_tokens import require_auth
+from utils import JWT
 
 from fastapi import APIRouter
 
@@ -30,7 +30,7 @@ def get_follow(follow_id: int, req_names: bool = False) -> JSONResponse:
 
 
 @router.post('/follow_user/')
-@require_auth
+@JWT.require_auth
 async def follow_user(
     request: Request,
     user_id: UUID | None = None
@@ -58,7 +58,7 @@ async def follow_user(
 
 
 @router.delete('/unfollow_user/')
-@require_auth
+@JWT.require_auth
 async def unfollow_user(
     request: Request,
     user_id: UUID | None = None
