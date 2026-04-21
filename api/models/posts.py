@@ -3,11 +3,11 @@ from starlette.datastructures import UploadFile
 from fastapi.datastructures import FormData
 from sqlalchemy import Column, ForeignKey, UUID, String, DateTime, Text
 from sqlalchemy.orm import relationship
-from db.db_session import SqlAlchemyBase
+from db import SqlAlchemyBase
 from uuid import uuid4
 from typing import Any
 import unicodedata
-from models.photos import Photo
+from models import Photo
 
 from utils.literals import PostLiterals
 

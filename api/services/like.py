@@ -3,11 +3,9 @@ from fastapi.responses import JSONResponse
 from fastapi import Request
 from datetime import datetime, timezone
 
-from models.likes import Like
-from models.users import User
-from models.posts import Post
+from models import Like, User, Post
 
-from db.db_session import DBSessionManager
+from db import DBSessionManager
 
 from utils import NotificationController
 

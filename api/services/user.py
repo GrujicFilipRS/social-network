@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from models import Like, User, UserOptions, Follow, Post
-from db.db_session import DBSessionManager
+from db import DBSessionManager
 
 from utils import jwt_tokens
 from utils.jwt_tokens import require_auth, set_response_cookie

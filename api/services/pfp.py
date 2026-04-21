@@ -5,8 +5,8 @@ from fastapi.responses import JSONResponse
 from fastapi import APIRouter
 
 from utils.image_controller import ImageController
-from models.pfps import PFP
-from db.db_session import DBSessionManager
+from models import PFP
+from db import DBSessionManager
 
 from utils.jwt_tokens import require_auth
 

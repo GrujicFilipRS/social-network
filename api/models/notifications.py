@@ -1,7 +1,7 @@
 from uuid import uuid4
 from sqlalchemy import UUID, Column, DateTime, Text
 from sqlalchemy.orm import Session
-from db.db_session import SqlAlchemyBase
+from db import SqlAlchemyBase
 from models import Like, Comment, Post, Follow
 
 

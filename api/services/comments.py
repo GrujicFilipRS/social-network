@@ -2,9 +2,8 @@ from datetime import datetime, timezone
 from uuid import UUID
 from fastapi.responses import JSONResponse
 
-from models.comments import Comment
-from models.posts import Post
-from db.db_session import DBSessionManager
+from models import Comment, Post
+from db import DBSessionManager
 from utils import NotificationController
 
 from utils.jwt_tokens import optional_auth, require_auth

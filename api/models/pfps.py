@@ -2,7 +2,7 @@ from typing import Any
 from fastapi import UploadFile
 from sqlalchemy import Column, ForeignKey, UUID, String
 from sqlalchemy.orm import relationship
-from db.db_session import SqlAlchemyBase
+from db import SqlAlchemyBase
 from uuid import uuid4
 from PIL import Image
 from io import BytesIO

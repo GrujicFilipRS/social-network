@@ -3,7 +3,7 @@ import re
 import regex
 from sqlalchemy import Column, UUID, String, DateTime
 from sqlalchemy.orm import relationship
-from db.db_session import SqlAlchemyBase
+from db import SqlAlchemyBase
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from uuid import uuid4

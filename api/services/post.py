@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 from utils import NotificationController
 from models import Post, Like, Photo
-from db.db_session import DBSessionManager
+from db import DBSessionManager
 
 from utils.jwt_tokens import optional_auth, require_auth
 from utils.literals import PostLiterals

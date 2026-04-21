@@ -2,7 +2,7 @@ from typing import Any
 import unicodedata
 from sqlalchemy import Column, UUID, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
-from db.db_session import SqlAlchemyBase
+from db import SqlAlchemyBase
 from uuid import uuid4
 
 class Comment(SqlAlchemyBase):

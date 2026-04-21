@@ -3,9 +3,8 @@ from fastapi.responses import JSONResponse
 from fastapi import Request
 from datetime import datetime, timezone
 
-from models.follows import Follow
-from models.users import User
-from db.db_session import DBSessionManager
+from models import Follow, User
+from db import DBSessionManager
 
 from utils.jwt_tokens import require_auth
 
