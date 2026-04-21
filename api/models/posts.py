@@ -8,7 +8,6 @@ from uuid import uuid4
 from typing import Any
 import unicodedata
 
-from utils import PostLiterals
 
 class Post(SqlAlchemyBase):
     __tablename__ = 'posts'
@@ -77,6 +76,8 @@ class Post(SqlAlchemyBase):
         MAX_BODY_LENGTH = 280
         if len(body) > MAX_BODY_LENGTH:
             return False
+        
+        from utils import PostLiterals
         
         if status not in PostLiterals.LIST_LITS:
             return False
@@ -147,6 +148,8 @@ class Post(SqlAlchemyBase):
         MAX_BODY_LENGTH = 280
         if len(body) > MAX_BODY_LENGTH:
             return False
+        
+        from utils import PostLiterals
         
         if status not in PostLiterals.LIST_LITS:
             return False
