@@ -8,8 +8,7 @@ from utils import NotificationController
 from models import Post, Like, Photo
 from db import DBSessionManager
 
-from utils import JWT
-from utils.literals import PostLiterals
+from utils import JWT, PostLiterals
 
 from fastapi import APIRouter
 

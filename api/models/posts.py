@@ -8,7 +8,7 @@ from uuid import uuid4
 from typing import Any
 import unicodedata
 
-from utils.literals import PostLiterals
+from utils import PostLiterals
 
 class Post(SqlAlchemyBase):
     __tablename__ = 'posts'

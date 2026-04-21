@@ -6,8 +6,7 @@ from models import Comment, Post
 from db import DBSessionManager
 from utils import NotificationController
 
-from utils import JWT
-from utils.literals import PostLiterals
+from utils import JWT, PostLiterals
 
 from fastapi import APIRouter, Request
 
