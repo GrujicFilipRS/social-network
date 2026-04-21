@@ -7,8 +7,8 @@ import traceback
 from env import Env
 from db import db_session
 
-from router import configure_routing
 from utils.image_controller import ImageController
+from services import router
 
 db_session.global_init()
 
@@ -30,7 +30,7 @@ async def global_exception_handler(req: Request, exc: Exception):
         content={'message': 'Internal server error'}
     )
 
-configure_routing(app)
+app.include_router(router)
 
 ImageController.setup_connection()
 ImageController.test_connection()
