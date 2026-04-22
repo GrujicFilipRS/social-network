@@ -10,8 +10,6 @@ async def websocket(
     websocket: WebSocket,
     user_id: UUID | None = None
 ):
-    await websocket.accept()
-    
     try:
         while True:
             data = await websocket.receive_text()
