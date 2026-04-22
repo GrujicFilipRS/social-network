@@ -129,7 +129,7 @@ class JWT:
                     '@required_auth_websocket requires `websocket` parameter to be of type WebSocket'
                 )
 
-            websocket.accept()
+            await websocket.accept()
 
             token = JWT.get_cookie_from_websocket(websocket)
             if not token:
