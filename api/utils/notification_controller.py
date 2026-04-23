@@ -1,7 +1,8 @@
 from uuid import UUID
+from sqlalchemy.orm import Session
 
 from models import Notification
-from sqlalchemy.orm import Session
+from .connection_controller import ConnectionController
 
 
 class NotificationController:
@@ -11,14 +12,13 @@ class NotificationController:
     '''
     
     @staticmethod
-    def create_notification(
+    async def create_notification(
         session: Session,
         receiver_id: UUID,
         sender_id: UUID,
         object_type: str,
         object_id: UUID
     ) -> Notification:
-        # Create notification in the database
         notification = Notification(
             receiver_id=receiver_id,
             sender_id=sender_id,
@@ -28,6 +28,9 @@ class NotificationController:
         session.add(notification)
         session.commit()
         
-        # TODO Send notification to notification microservice
+        await ConnectionController.send_to_user_if_connected(
+            receiver_id,
+            f'New notification from {sender_id} regarding {object_type} {object_id}'
+        )
         
         return notification
