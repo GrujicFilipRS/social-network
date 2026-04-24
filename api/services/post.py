@@ -110,7 +110,7 @@ async def create_post(
         db_sess.flush()
         
         for follower in post.user.followers:
-            NotificationController.create_notification(
+            await NotificationController.create_notification(
                 session=db_sess,
                 receiver_id=follower.follower_id,
                 sender_id=user_id,

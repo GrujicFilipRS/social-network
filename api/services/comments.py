@@ -63,7 +63,7 @@ async def post_comment(
         db_sess.add(new_comment)
         db_sess.flush()
         
-        NotificationController.create_notification(
+        await NotificationController.create_notification(
             session=db_sess,
             receiver_id=post.user_id,
             sender_id=user_id,

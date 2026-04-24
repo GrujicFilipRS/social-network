@@ -77,7 +77,7 @@ async def like_post(
         db_sess.add(like)
         db_sess.flush()
         
-        NotificationController.create_notification(
+        await NotificationController.create_notification(
             session=db_sess,
             receiver_id=post.user_id,
             sender_id=user_id,
