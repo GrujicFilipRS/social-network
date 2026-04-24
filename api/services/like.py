@@ -6,10 +6,7 @@ from datetime import datetime, timezone
 from models import Like, User, Post
 
 from db import DBSessionManager
-
-from utils import NotificationController
-
-from utils import JWT, PostLiterals
+from utils import NotificationController, JWT, PostLiterals
 
 from fastapi import APIRouter
 

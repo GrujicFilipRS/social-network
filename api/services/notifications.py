@@ -15,7 +15,8 @@ async def websocket(
     await websocket.send_text(f'Connected as {user_id}') # Debugging
     
     try:
-        message = await websocket.receive_text()
-        await websocket.send_text(f'Echo: {message}')
+        while True:
+            message = await websocket.receive_text()
+            await websocket.send_text(f'Echo: {message}')
     except WebSocketDisconnect:
         controller.disconnect(user_id)
