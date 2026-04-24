@@ -3,16 +3,21 @@ from uuid import UUID
 
 
 class ConnectionController:
-    def __init__(self):
-        self.active_connections: dict[UUID, WebSocket] = {}
+    active_connections: dict[UUID, WebSocket] = {}
 
-    def connect(self, user_id: UUID, websocket: WebSocket):
-        self.active_connections[user_id] = websocket
+    @staticmethod
+    def connect(user_id: UUID, websocket: WebSocket):
+        ConnectionController.active_connections[user_id] = websocket
 
-    def disconnect(self, user_id: UUID):
-        self.active_connections.pop(user_id, None)
+    @staticmethod
+    def disconnect(user_id: UUID):
+        ConnectionController.active_connections.pop(user_id, None)
 
-    async def send_to_user_if_connected(self, user_id: UUID, message: str):
-        websocket = self.active_connections.get(user_id)
+    @staticmethod
+    async def send_to_user_if_connected(user_id: UUID, message: str):
+        websocket = ConnectionController.active_connections.get(user_id)
         if websocket:
             await websocket.send_text(message)
+    
+    def __new__(cls):
+        return ValueError('ConnectionController is a static class and cannot be instantiated')

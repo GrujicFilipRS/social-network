@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from models import Notification
 from .connection_controller import ConnectionController
 
-
 class NotificationController:
     '''
     Controller class for handling creation of notifications
