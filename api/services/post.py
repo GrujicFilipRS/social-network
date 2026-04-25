@@ -8,11 +8,9 @@ from utils import NotificationController
 from models import Post, Like, Photo
 from db import DBSessionManager
 
-from utils import JWT, PostLiterals
+from utils import JWT, PostLiterals, ImageController
 
 from fastapi import APIRouter
-
-from utils import ImageController
 
 router = APIRouter()
 

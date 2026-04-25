@@ -12,11 +12,9 @@ async def websocket(
     user_id: UUID | None = None
 ):
     ConnectionController.connect(user_id, websocket)
-    await websocket.send_text(f'Connected as {user_id}') # Debugging
     
     try:
         while True:
-            message = await websocket.receive_text()
-            await websocket.send_text(f'Echo: {message}')
+            await websocket.receive_text() # Keep the connection alive
     except WebSocketDisconnect:
         ConnectionController.disconnect(user_id)

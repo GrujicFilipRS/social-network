@@ -4,11 +4,9 @@ from fastapi.responses import JSONResponse
 
 from fastapi import APIRouter
 
-from utils import ImageController
+from utils import ImageController, JWT
 from models import PFP
 from db import DBSessionManager
-
-from utils import JWT
 
 router = APIRouter()
 

@@ -112,3 +112,19 @@ export async function verifyUser(): Promise<VerificationData> {
         return { statusCode: 0, result: '' } as VerificationData;
     });
 }
+
+export const createWebSocket = (endpoint: string, onMessage: (event: MessageEvent) => void): WebSocket => {
+    const ws = new WebSocket(`${API_ROUTE.replace(/^http/, 'ws')}/${endpoint}`);
+
+    ws.onopen = () => {
+        console.log('WebSocket connection established');
+    };
+
+    ws.onmessage = onMessage;
+
+    ws.onclose = () => {
+        console.log('WebSocket connection closed');
+    };
+
+    return ws;
+};

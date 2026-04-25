@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { verifyUser } from '../api';
+import { verifyUser, createWebSocket } from '../api';
 import { HandleLogout } from '../functions/HandleLogout';
 import { eventBus } from '../events';
 
@@ -15,22 +15,27 @@ const router = useRouter();
 const headerVisible = ref<boolean>(false);
 const drawerVisible = ref<boolean>(false);
 const pfpSource = ref<string>('/default-pfp.png');
+const websocket = ref<WebSocket | null>(null);
 
-const fetchPfp = async () => {
+const initiateHeader = async () => {
     verifyUser().then(res => {
         if (res.statusCode !== 401) headerVisible.value = true;
         pfpSource.value = res.result.user?.pfp ?? '/default-pfp.png';
     });
+
+    websocket.value = createWebSocket('notifications/', (event) => {
+        alert(event.data);
+    });
 }
 
-fetchPfp();
+initiateHeader();
 
 onMounted(() => {
-    eventBus.on('header-update', fetchPfp);
+    eventBus.on('header-update', initiateHeader);
 });
 
 onUnmounted(() => {
-    eventBus.off('header-update', fetchPfp);
+    eventBus.off('header-update', initiateHeader);
 });
 
 const Logout = () => {
