@@ -74,13 +74,14 @@ async def like_post(
         db_sess.add(like)
         db_sess.flush()
         
-        await NotificationController.create_notification(
-            session=db_sess,
-            receiver_id=post.user_id,
-            sender_id=user_id,
-            object_type='like',
-            object_id=like.id
-        )
+        if like.user_id != post.user_id:
+            await NotificationController.create_notification(
+                session=db_sess,
+                receiver_id=post.user_id,
+                sender_id=user_id,
+                object_type='like',
+                object_id=like.id
+            )
 
         return JSONResponse(content={'message': 'Successfully liked post'}, status_code=201)
     
