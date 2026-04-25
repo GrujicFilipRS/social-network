@@ -3,14 +3,18 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { verifyUser, createWebSocket } from '../api';
+import { createNotification } from '../functions/createNotification';
 import { HandleLogout } from '../functions/HandleLogout';
 import { eventBus } from '../events';
 
 import Drawer from 'primevue/drawer';
 import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 
 const router = useRouter();
+const toast = useToast();
 
 const headerVisible = ref<boolean>(false);
 const drawerVisible = ref<boolean>(false);
@@ -24,7 +28,10 @@ const initiateHeader = async () => {
     });
 
     websocket.value = createWebSocket('notifications/', (event) => {
-        alert(event.data);
+        createNotification(
+            event.data,
+            toast
+        );
     });
 }
 
@@ -51,6 +58,8 @@ const Logout = () => {
 </script>
 
 <template>
+    <Toast position='bottom-right' />
+
     <div id='header' v-if='headerVisible'>
         <Avatar
             class='avatar'
