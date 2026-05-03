@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 from sqlalchemy.orm import Session
 
@@ -29,7 +30,17 @@ class NotificationController:
         
         await ConnectionController.send_to_user_if_connected(
             receiver_id,
-            f'New notification from {sender_id} regarding {object_type} {object_id}'
+            NotificationController.generate_notification_message(notification)
         )
         
         return notification
+    
+    @staticmethod
+    def generate_notification_message(notification: Notification) -> dict[str, Any]:
+        message = {
+            'message_txt': f'You have a new notification from {notification.sender.username}',
+            'object_type': notification.object_type,
+            'object_id': str(notification.object_id)
+        }
+        
+        return message
