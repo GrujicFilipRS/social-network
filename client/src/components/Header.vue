@@ -61,7 +61,7 @@ const Logout = () => {
 </script>
 
 <template>
-    <Toast position='bottom-right' />
+    <Toast group='header-toast' position='bottom-right' />
 
     <div id='header' v-if='headerVisible'>
         <Avatar
