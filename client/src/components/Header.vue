@@ -21,6 +21,7 @@ const headerVisible = ref<boolean>(false);
 const drawerVisible = ref<boolean>(false);
 const pfpSource = ref<string>('/default-pfp.png');
 const websocket = ref<WebSocket | null>(null);
+const notificationLink = ref<string>('/');
 
 const initiateHeader = async () => {
     verifyUser().then(res => {
@@ -32,8 +33,9 @@ const initiateHeader = async () => {
         const notificationData = JSON.parse(event.data) as Notification;
 
         createNotification(
-            notificationData.message_txt,
-            toast
+            notificationData,
+            toast,
+            (val: string) => notificationLink.value = val
         );
     });
 }
@@ -61,7 +63,12 @@ const Logout = () => {
 </script>
 
 <template>
-    <Toast group='header-toast' position='bottom-right' />
+    <Toast
+        group='header-toast'
+        position='bottom-right'
+        style='cursor: pointer'
+        @click='() => router.push(notificationLink)'
+    />
 
     <div id='header' v-if='headerVisible'>
         <Avatar

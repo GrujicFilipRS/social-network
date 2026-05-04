@@ -1,11 +1,20 @@
+import { GetNotificationLink } from './GetNotificationLink';
+import type { Notification } from '../interfaces/Notification';
+
 import type { ToastServiceMethods } from 'primevue/toastservice';
 
-export const createNotification = (message: string, toast: ToastServiceMethods) => {
+export const createNotification = (
+    notification: Notification,
+    toast: ToastServiceMethods,
+    setLink: (link: string) => void
+) => {
     toast.add({
         group: 'header-toast',
         severity: 'info',
         summary: 'Notification',
-        detail: message,
+        detail: notification.message_txt,
         life: 3000
     });
+
+    setLink(GetNotificationLink(notification));
 }
