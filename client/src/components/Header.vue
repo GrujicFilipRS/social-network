@@ -3,6 +3,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { verifyUser, createWebSocket } from '../api';
+import type { Notification } from '../interfaces/Notification';
 import { createNotification } from '../functions/createNotification';
 import { HandleLogout } from '../functions/HandleLogout';
 import { eventBus } from '../events';
@@ -28,8 +29,10 @@ const initiateHeader = async () => {
     });
 
     websocket.value = createWebSocket('notifications/', (event) => {
+        const notificationData = JSON.parse(event.data) as Notification;
+
         createNotification(
-            event.data,
+            notificationData.message_txt,
             toast
         );
     });
