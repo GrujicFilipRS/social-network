@@ -17,6 +17,8 @@ const props = defineProps<{
     callbackFetch: () => void
 }>();
 
+const commentId = ref<string>(`comment-${props.commentData.id}`);
+
 const deleteLoading = ref<boolean>(false);
 const editLoading = ref<boolean>(false);
 const beingEdited = ref<boolean>(false);
@@ -68,52 +70,53 @@ const editComment = async () => {
 
 <template>
     <ConfirmPopup />
-    <div class='comment-header'>
-        <img :src='props.commentData.creator.pfp ?? "/default-pfp.png"' class='comment-pfp' />
-        <p>{{ props.commentData.creator.name ?? props.commentData.creator.username }}</p>
-        <p>{{ props.commentData.commented_at }}</p>
-    </div>
+    <div :id='commentId'>
+        <div class='comment-header'>
+            <img :src='props.commentData.creator.pfp ?? "/default-pfp.png"' class='comment-pfp' />
+            <p>{{ props.commentData.creator.name ?? props.commentData.creator.username }}</p>
+            <p>{{ props.commentData.commented_at }}</p>
+        </div>
 
-    <p style='white-space: pre-line;' v-if='!beingEdited'>{{ props.commentData.body }}</p>
+        <p style='white-space: pre-line;' v-if='!beingEdited'>{{ props.commentData.body }}</p>
 
-    <div
-        v-if='beingEdited'
-        class='comment-edit'
-    >
-        <Textarea
-            v-model='commentEditingText'
-            style='resize: none'
-        />
+        <div
+            v-if='beingEdited'
+            class='comment-edit'
+        >
+            <Textarea
+                v-model='commentEditingText'
+                style='resize: none'
+            />
 
-        <Button
-            icon='pi pi-check'
-            :loading='editLoading'
-            @click='editComment'
-        />
+            <Button
+                icon='pi pi-check'
+                :loading='editLoading'
+                @click='editComment'
+            />
 
-        <Button
-            icon='pi pi-times'
-            severity='danger'
-            @click='closeEditForm'
-        />
-    </div>
-    
-    <div v-if='props.commentData.creator.id === props.userId'>
-        <Button
-            :disabled='beingEdited'
-            icon='pi pi-pencil'
-            severity='secondary'
-            style='font-size: 0.7rem'
-            @click='beingEdited = true'
-        />
+            <Button
+                icon='pi pi-times'
+                severity='danger'
+                @click='closeEditForm'
+            />
+        </div>
         
-        <Button
-            icon='pi pi-trash'
-            severity='danger'
-            style='font-size: 0.7rem'
-            :loading='deleteLoading'
-            @click='confirmDelete'
-        />
+        <div v-if='props.commentData.creator.id === props.userId'>
+            <Button
+                :disabled='beingEdited'
+                icon='pi pi-pencil'
+                severity='secondary'
+                style='font-size: 0.7rem'
+                @click='beingEdited = true'
+            />
+            
+            <Button
+                icon='pi pi-trash'
+                severity='danger'
+                style='font-size: 0.7rem'
+                :loading='deleteLoading'
+                @click='confirmDelete'
+            />
+        </div>
     </div>
-    
 </template>
