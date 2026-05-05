@@ -61,7 +61,7 @@ async def post_comment(
         )
 
         db_sess.add(new_comment)
-        db_sess.flush()
+        db_sess.commit()
         
         await NotificationController.create_notification(
             session=db_sess,

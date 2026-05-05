@@ -72,7 +72,7 @@ async def like_post(
         like.liked_at = datetime.now(timezone.utc)
 
         db_sess.add(like)
-        db_sess.flush()
+        db_sess.commit()
         
         if like.user_id != post.user_id:
             await NotificationController.create_notification(

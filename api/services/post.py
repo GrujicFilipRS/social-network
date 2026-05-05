@@ -105,7 +105,7 @@ async def create_post(
             
             db_sess.add(photo_obj)
         
-        db_sess.flush()
+        db_sess.commit()
         
         for follower in post.user.followers:
             await NotificationController.create_notification(
