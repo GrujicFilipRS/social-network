@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from models import Follow, User
 from db import DBSessionManager
 
-from utils import JWT
+from utils import JWT, NotificationController
 
 from fastapi import APIRouter
 
@@ -28,6 +28,31 @@ def get_follow(follow_id: int, req_names: bool = False) -> JSONResponse:
 
         return JSONResponse(content=content, status_code=200)
 
+
+@router.get('/get_follower_username_from_follow_id/{follow_id}')
+def get_follower_username_from_follow_id(follow_id: str) -> JSONResponse:
+    try:
+        follow_id: UUID = UUID(follow_id)
+    except ValueError:
+        return JSONResponse(content={'message': 'Invalid follow id format'}, status_code=400)
+    
+    with DBSessionManager() as db_sess:
+        follow: Follow | None = db_sess.get(Follow, follow_id)
+
+        if follow is None:
+            return JSONResponse(content={'message': 'Follow not found'}, status_code=404)
+
+        follower: User | None = db_sess.get(User, follow.follower_id)
+
+        if follower is None:
+            return JSONResponse(content={'message': 'Follower user not found'}, status_code=404)
+
+        content: dict = {
+            'message': 'Successfully gotten follower username from follow id',
+            'follower_username': follower.username
+        }
+
+        return JSONResponse(content=content, status_code=200)
 
 @router.post('/follow_user/')
 @JWT.require_auth
@@ -53,6 +78,14 @@ async def follow_user(
 
         db_sess.add(follow)
         db_sess.commit()
+
+        await NotificationController.create_notification(
+            session=db_sess,
+            receiver_id=to_follow_id,
+            sender_id=user_id,
+            object_type='follow',
+            object_id=str(follow.id)
+        )
 
         return JSONResponse(content={'message': 'Successfully followed user'}, status_code=201)
 

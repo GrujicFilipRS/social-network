@@ -1,7 +1,7 @@
 import type { Notification } from '../interfaces/Notification';
-import { GetFollowerIdFromFollowId } from './GetFollowerIdFromFollowId';
 import { GetPostIdFromCommentId } from './GetPostIdFromCommentId';
 import { GetPostIdFromLikeId } from './GetPostIdFromLikeId';
+import { GetFollowerUsernameFromFollowId } from './GetFollowerUsernameFromFollowId';
 
 export const GetNotificationLink = async (notification: Notification): Promise<string> => {
     let postId = '';
@@ -15,6 +15,7 @@ export const GetNotificationLink = async (notification: Notification): Promise<s
             postId = await GetPostIdFromCommentId(notification.object_id);
             return `/post?post_id=${postId}#comment-${notification.object_id}`;
         case 'follow':
-            return `/profile?user_id=${GetFollowerIdFromFollowId(notification.object_id)}`;
+            const followerUsername = await GetFollowerUsernameFromFollowId(notification.object_id);
+            return `/profile?user=${followerUsername}`;
     }
 }
