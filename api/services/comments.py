@@ -32,6 +32,25 @@ def get_comment(comment_id: UUID | str) -> JSONResponse:
         return JSONResponse(content=content, status_code=200)
 
 
+@router.get('/get_post_id_from_comment_id/{comment_id}')
+def get_post_id_from_comment_id(comment_id: UUID | str) -> JSONResponse:
+    with DBSessionManager() as db_sess:
+        try:
+            comment: Comment | None = db_sess.get(Comment, UUID(comment_id))
+        except ValueError:
+            return JSONResponse(content={'message': 'Invalid comment_id'}, status_code=400)
+
+        if not comment:
+            return JSONResponse(content={'message': 'Comment not found'}, status_code=404)
+        
+        content: dict[str, str] = {
+            'message': 'Successfully gotten post_id from comment_id',
+            'post_id': str(comment.post_id)
+        }
+
+        return JSONResponse(content=content, status_code=200)
+
+
 @router.post('/post_comment/')
 @JWT.require_auth
 async def post_comment(
