@@ -63,13 +63,14 @@ async def post_comment(
         db_sess.add(new_comment)
         db_sess.commit()
         
-        await NotificationController.create_notification(
-            session=db_sess,
-            receiver_id=post.user_id,
-            sender_id=user_id,
-            object_type='comment',
-            object_id=new_comment.id
-        )
+        if post.user_id != user_id:
+            await NotificationController.create_notification(
+                session=db_sess,
+                receiver_id=post.user_id,
+                sender_id=user_id,
+                object_type='comment',
+                object_id=new_comment.id
+            )
 
         content: dict = {
             'message': 'Comment posted',
