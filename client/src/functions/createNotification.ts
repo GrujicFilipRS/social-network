@@ -3,7 +3,7 @@ import type { Notification } from '../interfaces/Notification';
 
 import type { ToastServiceMethods } from 'primevue/toastservice';
 
-export const createNotification = (
+export const createNotification = async (
     notification: Notification,
     toast: ToastServiceMethods,
     setLink: (link: string) => void
@@ -16,5 +16,5 @@ export const createNotification = (
         life: 3000
     });
 
-    setLink(GetNotificationLink(notification));
+    setLink(await GetNotificationLink(notification));
 }

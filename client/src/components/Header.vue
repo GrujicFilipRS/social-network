@@ -29,10 +29,10 @@ const initiateHeader = async () => {
         pfpSource.value = res.result.user?.pfp ?? '/default-pfp.png';
     });
 
-    websocket.value = createWebSocket('notifications/', (event) => {
+    websocket.value = createWebSocket('notifications/', async (event) => {
         const notificationData = JSON.parse(event.data) as Notification;
 
-        createNotification(
+        await createNotification(
             notificationData,
             toast,
             (val: string) => notificationLink.value = val

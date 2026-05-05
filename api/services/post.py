@@ -53,6 +53,35 @@ async def get_post(
         return JSONResponse(content=content, status_code=200)
 
 
+@router.get('/get_post_id_from_like_id/{like_id}')
+@JWT.optional_auth
+async def get_post_id_from_like_id(
+    request: Request,
+    like_id: str,
+    user_id: UUID | None = None
+) -> JSONResponse:
+    try:
+        like_uuid = UUID(like_id)
+    except ValueError:
+        return JSONResponse(content={'message': 'Invalid like_id'}, status_code=400)
+
+    with DBSessionManager() as db_sess:
+        like = db_sess.query(Like).get(like_uuid)
+
+        if not like:
+            return JSONResponse(content={'message': 'Like not found'}, status_code=404)
+
+        post = db_sess.get(Post, like.post_id)
+
+        if not post:
+            return JSONResponse(content={'message': 'Post not found'}, status_code=404)
+
+        if post.status == PostLiterals.PRIVATE and user_id != post.user_id:
+            return JSONResponse(content={'message': 'Post not found'}, status_code=404)
+
+        return JSONResponse(content={'post_id': str(post.id)}, status_code=200)
+
+
 @router.post('/create_post/')
 @JWT.require_auth
 async def create_post(
