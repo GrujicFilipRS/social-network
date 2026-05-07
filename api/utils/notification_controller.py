@@ -37,8 +37,18 @@ class NotificationController:
     
     @staticmethod
     def generate_notification_message(notification: Notification) -> dict[str, Any]:
+        message_txt = ''
+        if notification.object_type == 'follow':
+            message_txt = 'You have a new follower'
+        elif notification.object_type == 'comment':
+            message_txt = 'You have received a new comment.'
+        elif notification.object_type == 'like':
+            message_txt = 'Your post has been liked.'
+        elif notification.object_type == 'post':
+            message_txt = f'{notification.sender.username} has created a new post.'
+
         message = {
-            'message_txt': f'You have a new notification from {notification.sender.username}',
+            'message_txt': message_txt,
             'object_type': notification.object_type,
             'object_id': str(notification.object_id)
         }
