@@ -1,5 +1,5 @@
 <script lang='tsx' setup>
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import Comment from '../components/Comment.vue';
@@ -60,6 +60,23 @@ const editedBody = ref<string>('');
 const editedStatus = ref<'PUBLIC' | 'PRIVATE'>('PUBLIC');
 const deleteLoading = ref<boolean>(false);
 
+const scrollToComment = async () => {
+    await nextTick();
+
+    const hash = window.location.hash;
+
+    if (!hash) return;
+
+    const element = document.querySelector(hash);
+
+    if (element) {
+        element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
+};
+
 const resetEditingForm = () => {
     editedTitle.value = postData.value!.title;
     editedBody.value = postData.value!.body;
@@ -100,8 +117,7 @@ const confirmEdit = () => {
 }
 
 const fetchPostData = async () => {
-    const data = await GetPostData(postId!, router);
-    postData.value = data;
+    postData.value = await GetPostData(postId!, router);
     resetEditingForm();
 
     if (postData.value === null) {
@@ -110,6 +126,8 @@ const fetchPostData = async () => {
     }
 
     postLiked.value = postData.value!.liked_by_user!;
+
+    await scrollToComment();
 };
 
 fetchPostData();
