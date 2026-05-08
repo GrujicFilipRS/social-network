@@ -13,12 +13,12 @@ class Notification(SqlAlchemyBase):
     sender_id = Column(UUID, ForeignKey('users.id'), nullable=False)
     object_type = Column(Text, nullable=False)
     object_id = Column(UUID, nullable=False)
-    receiver_at = Column(DateTime, nullable=True)
+    received_at = Column(DateTime, nullable=True)
     
     receiver = relationship('User', foreign_keys=[receiver_id])
     sender = relationship('User', foreign_keys=[sender_id])
 
-    def get_object(self, session: Session):
+    def get_object(self, session: Session) -> Like | Comment | Post | Follow | None:
         if self.object_type == 'like':
             return session.get(Like, self.object_id)
         
