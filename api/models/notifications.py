@@ -1,5 +1,5 @@
 from uuid import uuid4
-from sqlalchemy import UUID, Column, DateTime, ForeignKey, Text
+from sqlalchemy import UUID, Boolean, Column, DateTime, ForeignKey, Text
 from sqlalchemy.orm import Session, relationship
 from db import SqlAlchemyBase
 from models import Like, Comment, Post, Follow
@@ -14,6 +14,7 @@ class Notification(SqlAlchemyBase):
     object_type = Column(Text, nullable=False)
     object_id = Column(UUID, nullable=False)
     received_at = Column(DateTime, nullable=True)
+    seen = Column(Boolean, default=False)
     
     receiver = relationship('User', foreign_keys=[receiver_id])
     sender = relationship('User', foreign_keys=[sender_id])
