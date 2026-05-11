@@ -26,12 +26,15 @@ class NotificationController:
             object_id=object_id
         )
         session.add(notification)
-        session.commit()
+        session.flush()
         
-        await ConnectionController.send_to_user_if_connected(
+        seen = await ConnectionController.send_to_user_if_connected(
             receiver_id,
             NotificationController.generate_notification_message(notification)
         )
+        
+        notification.seen = seen
+        session.commit()
         
         return notification
     
