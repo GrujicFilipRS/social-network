@@ -49,7 +49,7 @@ const initiateHeader = async () => {
 
 initiateHeader();
 
-onMounted(async () => {
+onMounted(() => {
     eventBus.on('header-update', initiateHeader);
 });
 
