@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import type { Notification } from '../interfaces/Notification';
 
-const props = defineProps<{
+defineProps<{
     notification: Notification;
 }>();
 
