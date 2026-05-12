@@ -33,3 +33,26 @@ class Notification(SqlAlchemyBase):
             return session.get(Follow, self.object_id)
         
         return None
+
+    def to_dict(self) -> dict[str, str]:
+        sender_name: str = (
+            self.sender.name
+            if self.sender.name
+            else self.sender.username
+        )
+        message_txt = ''
+        
+        if self.object_type == 'follow':
+            message_txt = f'{sender_name} is now following you.'
+        elif self.object_type == 'comment':
+            message_txt = f'{sender_name} has commented on your post.'
+        elif self.object_type == 'like':
+            message_txt = f'{sender_name} has liked your post.'
+        elif self.object_type == 'post':
+            message_txt = f'{sender_name} has posted.'
+
+        return {
+            'message_txt': message_txt,
+            'object_type': self.object_type,
+            'object_id': str(self.object_id),
+        }

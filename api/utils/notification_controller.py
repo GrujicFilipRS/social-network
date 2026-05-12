@@ -30,36 +30,10 @@ class NotificationController:
         
         seen = await ConnectionController.send_to_user_if_connected(
             receiver_id,
-            NotificationController.generate_notification_message(notification)
+            notification.to_dict()
         )
         
         notification.seen = seen
         session.commit()
         
         return notification
-    
-    @staticmethod
-    def generate_notification_message(notification: Notification) -> dict[str, Any]:
-        sender_name: str = (
-            notification.sender.name
-            if notification.sender.name
-            else notification.sender.username
-        )
-        message_txt = ''
-        
-        if notification.object_type == 'follow':
-            message_txt = f'{sender_name} is now following you.'
-        elif notification.object_type == 'comment':
-            message_txt = f'{sender_name} has commented on your post.'
-        elif notification.object_type == 'like':
-            message_txt = f'{sender_name} has liked your post.'
-        elif notification.object_type == 'post':
-            message_txt = f'{sender_name} has posted.'
-
-        message = {
-            'message_txt': message_txt,
-            'object_type': notification.object_type,
-            'object_id': str(notification.object_id)
-        }
-        
-        return message
