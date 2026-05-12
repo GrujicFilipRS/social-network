@@ -55,4 +55,5 @@ class Notification(SqlAlchemyBase):
             'message_txt': message_txt,
             'object_type': self.object_type,
             'object_id': str(self.object_id),
+            'received_at': self.received_at.isoformat() if self.received_at else ''
         }

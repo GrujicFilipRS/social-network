@@ -11,6 +11,7 @@
 .header-btn {
     position: relative;
     margin-bottom: 10px;
+    width: 100%;
 }
 
 .header-btn .p-button-icon {

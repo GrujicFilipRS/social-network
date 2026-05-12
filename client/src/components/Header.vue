@@ -9,6 +9,8 @@ import { GetUnreadNotifications } from '../functions/GetUnreadNotifications';
 import { HandleLogout } from '../functions/HandleLogout';
 import { eventBus } from '../events';
 
+import NotificationCard from './NotificationCard.vue';
+
 import Drawer from 'primevue/drawer';
 import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
@@ -20,9 +22,11 @@ const toast = useToast();
 
 const headerVisible = ref<boolean>(false);
 const drawerVisible = ref<boolean>(false);
+const notificationDrawerVisible = ref<boolean>(false);
 const pfpSource = ref<string>('/default-pfp.png');
 const websocket = ref<WebSocket | null>(null);
 const notificationLink = ref<string>('/');
+const unreadNotifications = ref<Notification[]>([]);
 
 const initiateHeader = async () => {
     verifyUser().then(res => {
@@ -46,7 +50,7 @@ initiateHeader();
 onMounted(async () => {
     eventBus.on('header-update', initiateHeader);
     
-    console.log(await GetUnreadNotifications());
+    unreadNotifications.value = await GetUnreadNotifications();
 });
 
 onUnmounted(() => {
@@ -93,7 +97,6 @@ const Logout = () => {
                 icon='pi pi-user'
                 label='View profile'
                 severity='secondary'
-                style='width: 100%;'
                 @click='() => { router.push("/profile"); drawerVisible = false; }'
             />
 
@@ -102,8 +105,15 @@ const Logout = () => {
                 icon='pi pi-user-edit'
                 label='Edit profile'
                 severity='secondary'
-                style='width: 100%;'
                 @click='() => { router.push("/edit_profile"); drawerVisible = false; }'
+            />
+
+            <Button
+                class='header-btn'
+                icon='pi pi-bell'
+                severity='secondary'
+                :label='`Unread notifications (${unreadNotifications.length})`'
+                @click='() => { notificationDrawerVisible = true; drawerVisible = false; }'
             />
 
             <Button
@@ -111,8 +121,24 @@ const Logout = () => {
                 icon='pi pi-sign-out'
                 label='Log out'
                 severity='danger'
-                style='width: 100%;'
                 @click='Logout'
+            />
+        </Drawer>
+
+        <Drawer
+            v-model:visible='notificationDrawerVisible'
+            position='right'
+            header='Unread notifications'
+            class='header-drawer'
+        >
+            <div v-if='unreadNotifications.length === 0' class='no-notifications'>
+                No unread notifications.
+            </div>
+
+            <NotificationCard
+                v-for='notification in unreadNotifications'
+                :key='notification.object_id'
+                :notification='notification'
             />
         </Drawer>
     </div>
