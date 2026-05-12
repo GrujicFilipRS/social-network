@@ -1,5 +1,5 @@
 from uuid import UUID
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Request, WebSocket, WebSocketDisconnect
 from models import Notification
 from utils import JWT, ConnectionController
 from db import DBSessionManager
@@ -24,6 +24,7 @@ async def websocket(
 @router.get('/get_unread_notifications/')
 @JWT.require_auth
 async def get_unread_notifications(
+    request: Request,
     user_id: UUID | None = None
 ):
     NOTIFICATION_LIMIT = 10

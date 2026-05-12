@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 import { verifyUser, createWebSocket } from '../api';
 import type { Notification } from '../interfaces/Notification';
 import { createNotification } from '../functions/createNotification';
+import { GetUnreadNotifications } from '../functions/GetUnreadNotifications';
 import { HandleLogout } from '../functions/HandleLogout';
 import { eventBus } from '../events';
 
@@ -42,8 +43,10 @@ const initiateHeader = async () => {
 
 initiateHeader();
 
-onMounted(() => {
+onMounted(async () => {
     eventBus.on('header-update', initiateHeader);
+    
+    console.log(await GetUnreadNotifications());
 });
 
 onUnmounted(() => {
