@@ -11,7 +11,9 @@ const props = defineProps<{
     <div class='notification-card'>
         <div class='notification-content'>
             <p>{{ notification.message_txt }}</p>
-            <span class='notification-time'>{{ notification.received_at }}</span>
+            <span class='notification-time'>
+                {{ new Date(notification.received_at).toLocaleString('sr-RS') }}
+            </span>
         </div>
     </div>
 </template>
