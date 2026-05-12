@@ -43,14 +43,14 @@ const initiateHeader = async () => {
             (val: string) => notificationLink.value = val
         );
     });
+
+    unreadNotifications.value = await GetUnreadNotifications();
 }
 
 initiateHeader();
 
 onMounted(async () => {
     eventBus.on('header-update', initiateHeader);
-    
-    unreadNotifications.value = await GetUnreadNotifications();
 });
 
 onUnmounted(() => {
