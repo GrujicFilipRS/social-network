@@ -1,4 +1,5 @@
 from uuid import UUID
+from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from models import Notification
@@ -22,7 +23,8 @@ class NotificationController:
             receiver_id=receiver_id,
             sender_id=sender_id,
             object_type=object_type,
-            object_id=object_id
+            object_id=object_id,
+            received_at=datetime.now(timezone.utc)
         )
         session.add(notification)
         session.flush()
