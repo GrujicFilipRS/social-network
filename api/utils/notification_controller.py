@@ -29,7 +29,7 @@ class NotificationController:
         session.add(notification)
         session.flush()
         
-        seen = await ConnectionController.send_to_user_if_connected(
+        seen = await ConnectionController.send_to_user(
             receiver_id,
             notification.to_dict()
         )

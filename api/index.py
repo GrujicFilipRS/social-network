@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,7 +8,7 @@ import traceback
 from env import Env
 from db import db_session
 
-from utils import ImageController
+from utils import ImageController, WorkerShareController, ConnectionController
 from services import router
 
 db_session.global_init()
@@ -34,3 +35,6 @@ app.include_router(router)
 
 ImageController.setup_connection()
 ImageController.test_connection()
+
+WorkerShareController.init()
+asyncio.create_task(ConnectionController.redis_listener())

@@ -45,4 +45,4 @@ class Env:
     JWT_EXPIRATION_HOURS = float(getenv('JWT_EXPIRATION_HOURS', '24'))
     FLASK_ENV = getenv('FLASK_ENV', 'development')
     CLOUDINARY_PFP_FOLDER = getenv('CLOUDINARY_PFP_FOLDER', 'fastapi_uploads_pfp')
-    REDIS_URL = getenv('REDIS_URL', 'redis://localhost:6379/0')
+    REDIS_URL = getenv('REDIS_URL', 'redis://redis:6379/0')
