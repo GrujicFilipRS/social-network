@@ -121,31 +121,18 @@ class JWT:
     @staticmethod
     def required_auth_websocket(func):
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
-            websocket = kwargs.get('websocket')
-
-            if not isinstance(websocket, WebSocket):
-                raise RuntimeError(
-                    '@required_auth_websocket requires `websocket` parameter to be of type WebSocket'
-                )
-
-            await websocket.accept()
+        async def wrapper(websocket: WebSocket, *args, **kwargs):
 
             token = JWT.get_cookie_from_websocket(websocket)
-            if not token:
-                await websocket.close(code=1008, reason='Missing Authorization Cookie')
-                return
+            user_id = JWT.decode_token(token) if token else None
 
-            user_id: UUID | None = JWT.decode_token(token)
             if not user_id:
-                await websocket.close(code=1008, reason='Invalid or expired token')
+                await websocket.close(code=1008)
                 return
 
-            kwargs['user_id'] = user_id
+            return await func(websocket, user_id=user_id, *args, **kwargs)
 
-            return await func(*args, **kwargs)
-
-        return async_wrapper
+        return wrapper
     
     @staticmethod
     def get_cookie_from_websocket(websocket: WebSocket) -> str | None:
