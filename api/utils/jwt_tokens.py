@@ -121,7 +121,7 @@ class JWT:
     @staticmethod
     def required_auth_websocket(func):
         @wraps(func)
-        async def wrapper(websocket: WebSocket, *args, **kwargs):
+        async def wrapper(websocket: WebSocket):
 
             token = JWT.get_cookie_from_websocket(websocket)
             user_id = JWT.decode_token(token) if token else None
@@ -130,7 +130,17 @@ class JWT:
                 await websocket.close(code=1008)
                 return
 
-            return await func(websocket, user_id=user_id, *args, **kwargs)
+            return await func(websocket, user_id)
+
+        wrapper.__signature__ = inspect.Signature(
+            parameters=[
+                inspect.Parameter(
+                    "websocket",
+                    inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                    annotation=WebSocket
+                )
+            ]
+        )
 
         return wrapper
     

@@ -1,24 +1,25 @@
 from uuid import UUID
-from fastapi import APIRouter, Request, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Request, WebSocket
 from models import Notification
 from utils import JWT, ConnectionController
 from db import DBSessionManager
 
 router = APIRouter()
 
+
 @router.websocket('/')
 @JWT.required_auth_websocket
-async def websocket(
-    websocket: WebSocket,
-    user_id: UUID | None = None
-):
+async def websocket(websocket: WebSocket, user_id: UUID):
+    await websocket.accept()
+
     ConnectionController.connect(user_id, websocket)
-    
+
     try:
         while True:
-            await websocket.receive_text() # Keep the connection alive
-    except WebSocketDisconnect:
-        ConnectionController.disconnect(user_id)
+            await websocket.receive_text()
+
+    except Exception as e:
+        print('WS ERROR:', e)
 
 
 @router.get('/get_unread_notifications/')
