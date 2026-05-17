@@ -54,11 +54,7 @@ async def read_notification(
     user_id: UUID | None = None
 ):
     with DBSessionManager() as db_sess:
-        notification = (
-            db_sess.query(Notification)
-            .filter_by(id=notification_id, receiver_id=user_id)
-            .first()
-        )
+        notification = db_sess.query(Notification).get(notification_id)
 
         if not notification:
             return JSONResponse(status_code=404, content={'error': 'Notification not found'})
