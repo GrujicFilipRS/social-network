@@ -1,21 +1,52 @@
-from sqlalchemy import Column, ForeignKey, UUID, DateTime
-from sqlalchemy.orm import relationship
-from db import SqlAlchemyBase
+from __future__ import annotations
+
+from datetime import datetime
+from typing import Any, TYPE_CHECKING
+import uuid
 from uuid import uuid4
+from sqlalchemy import DateTime, ForeignKey, UUID
+from sqlalchemy.orm import Mapped, relationship, mapped_column
+from db import SqlAlchemyBase
+
+if TYPE_CHECKING:
+    from models import User
 
 class Follow(SqlAlchemyBase):
     __tablename__ = 'follows'
 
-    id = Column(UUID, primary_key=True, default=uuid4)
-    followed_datetime = Column(DateTime, nullable=False)
-    follower_id = Column(UUID, ForeignKey('users.id'), nullable=False)
-    followed_id = Column(UUID, ForeignKey('users.id'), nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        primary_key=True,
+        default=uuid4
+    )
+    followed_datetime: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False
+    )
+    follower_id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        ForeignKey('users.id'),
+        nullable=False
+    )
+    followed_id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        ForeignKey('users.id'),
+        nullable=False
+    )
 
-    follower = relationship('User', foreign_keys=[follower_id], back_populates='follows')
-    followed = relationship('User', foreign_keys=[followed_id], back_populates='followers')
+    follower: Mapped['User'] = relationship(
+        'User',
+        foreign_keys=[follower_id],
+        back_populates='follows'
+    )
+    followed: Mapped['User'] = relationship(
+        'User',
+        foreign_keys=[followed_id],
+        back_populates='followers'
+    )
 
-    def to_dict(self, req_names=False) -> dict:
-        data: dict = {
+    def to_dict(self, req_names: bool = False) -> dict[str, Any]:
+        data: dict[str, Any] = {
             'id': str(self.id),
             'followed_at': str(self.followed_datetime)
         }

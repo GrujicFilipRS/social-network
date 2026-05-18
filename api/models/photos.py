@@ -1,24 +1,52 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+import uuid
 from fastapi import UploadFile
-from sqlalchemy import Column, ForeignKey, Integer, String, UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, Integer, String, UUID
+from sqlalchemy.orm import Mapped, relationship, mapped_column
 from db import SqlAlchemyBase
 from uuid import uuid4
 from PIL import Image
 from io import BytesIO
 
+if TYPE_CHECKING:
+    from models import Post
+
 class Photo(SqlAlchemyBase):
     __tablename__ = 'photos'
 
-    id = Column(UUID, primary_key=True, default=uuid4)
-    post_id = Column(UUID, ForeignKey('posts.id', ondelete='CASCADE'), nullable=False)
-    post_position = Column(Integer, nullable=False)
-    image_src = Column(String, nullable=False)
-    image_id = Column(String, nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        primary_key=True,
+        default=uuid4
+    )
+    post_id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        ForeignKey('posts.id', ondelete='CASCADE'),
+        nullable=False
+    )
+    post_position: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False
+    )
+    image_src: Mapped[str] = mapped_column(
+        String,
+        nullable=False
+    )
+    image_id: Mapped[str] = mapped_column(
+        String,
+        nullable=False
+    )
 
-    post = relationship('Post', foreign_keys=[post_id], back_populates='photos')
+    post: Mapped['Post'] = relationship(
+        'Post',
+        foreign_keys=[post_id],
+        back_populates='photos'
+    )
 
-    def to_dict(self, req_post: bool = False) -> dict:
-        ret: dict = {
+    def to_dict(self, req_post: bool = False) -> dict[str, object]:
+        ret: dict[str, object] = {
             'id': str(self.id),
             'post_position': self.post_position,
             'image_src': self.image_src,

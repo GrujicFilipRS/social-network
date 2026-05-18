@@ -1,23 +1,56 @@
+from __future__ import annotations
+from datetime import datetime
 from typing import Any
 import unicodedata
-from sqlalchemy import Column, UUID, DateTime, Text, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import UUID, DateTime, Text, ForeignKey
+from sqlalchemy.orm import Mapped, relationship, mapped_column
 from db import SqlAlchemyBase
+from models import Post, User
 import uuid
 
 class Comment(SqlAlchemyBase):
     __tablename__ = 'comments'
 
-    id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    body = Column(Text, nullable=False)
-    post_id = Column(UUID, ForeignKey('posts.id', ondelete='CASCADE'), nullable=False)
-    comment_id = Column(UUID, ForeignKey('comments.id'), nullable=True)
-    creator_id = Column(UUID, ForeignKey('users.id'), nullable=False)
-    commented_at = Column(DateTime, nullable=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        primary_key=True,
+        default=uuid.uuid4
+    )
+    body: Mapped[str] = mapped_column(
+        Text,
+        nullable=False
+    )
+    post_id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        ForeignKey('posts.id', ondelete='CASCADE'),
+        nullable=False
+    )
+    comment_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID,
+        ForeignKey('comments.id'),
+        nullable=True
+    )
+    creator_id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        ForeignKey('users.id'),
+        nullable=False
+    )
+    commented_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True
+    )
 
-    post = relationship('Post', foreign_keys=[post_id], back_populates='comments')
-    comment = relationship('Comment', foreign_keys=[comment_id])
-    creator = relationship('User', foreign_keys=[creator_id], back_populates='comments')
+    post: Mapped['Post'] = relationship(
+        foreign_keys=[post_id],
+        back_populates='comments'
+    )
+    comment: Mapped['Comment | None'] = relationship(
+        foreign_keys=[comment_id]
+    )
+    creator: Mapped['User'] = relationship(
+        foreign_keys=[creator_id],
+        back_populates='comments'
+    )
 
     def to_dict(self) -> dict[str, Any]:
         content: dict[str, Any] = {

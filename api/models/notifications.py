@@ -1,23 +1,62 @@
+from __future__ import annotations
+
+from datetime import datetime
+from typing import TYPE_CHECKING
+import uuid
 from uuid import uuid4
-from sqlalchemy import UUID, Boolean, Column, DateTime, ForeignKey, Text
-from sqlalchemy.orm import Session, relationship
+from sqlalchemy import Boolean, DateTime, ForeignKey, Text, UUID
+from sqlalchemy.orm import Mapped, Session, relationship, mapped_column
 from db import SqlAlchemyBase
 from models import Like, Comment, Post, Follow
+
+if TYPE_CHECKING:
+    from models import User
 
 
 class Notification(SqlAlchemyBase):
     __tablename__ = 'notifications'
     
-    id = Column(UUID, primary_key=True, default=uuid4)
-    receiver_id = Column(UUID, ForeignKey('users.id'), nullable=False)
-    sender_id = Column(UUID, ForeignKey('users.id'), nullable=False)
-    object_type = Column(Text, nullable=False)
-    object_id = Column(UUID, nullable=False)
-    received_at = Column(DateTime, nullable=True)
-    seen = Column(Boolean, default=False)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        primary_key=True,
+        default=uuid4
+    )
+    receiver_id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        ForeignKey('users.id'),
+        nullable=False
+    )
+    sender_id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        ForeignKey('users.id'),
+        nullable=False
+    )
+    object_type: Mapped[str] = mapped_column(
+        Text,
+        nullable=False
+    )
+    object_id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        nullable=False
+    )
+    received_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True
+    )
+    seen: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        nullable=False
+    )
     
-    receiver = relationship('User', foreign_keys=[receiver_id])
-    sender = relationship('User', foreign_keys=[sender_id])
+    receiver: Mapped['User'] = relationship(
+        'User',
+        foreign_keys=[receiver_id]
+    )
+    sender: Mapped['User'] = relationship(
+        'User',
+        foreign_keys=[sender_id]
+    )
 
     def get_object(self, session: Session) -> Like | Comment | Post | Follow | None:
         if self.object_type == 'like':

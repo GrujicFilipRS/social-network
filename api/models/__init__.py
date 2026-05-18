@@ -7,4 +7,4 @@ from .pfps import PFP
 from .photos import Photo
 from .notifications import Notification
 
-__all__ = ["User", "UserOptions", "Post", "Follow", "Like", "Comment", "PFP", "Photo", "Notification"]
+__all__ = ['User', 'UserOptions', 'Post', 'Follow', 'Like', 'Comment', 'PFP', 'Photo', 'Notification']

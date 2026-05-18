@@ -1,35 +1,77 @@
+from __future__ import annotations
+
+from datetime import datetime
+from typing import Any, TYPE_CHECKING
+import uuid
+from uuid import uuid4
+import unicodedata
 from fastapi import UploadFile as FastAPIUploadFile
 from starlette.datastructures import UploadFile
 from fastapi.datastructures import FormData
-from sqlalchemy import Column, ForeignKey, UUID, String, DateTime, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy import DateTime, ForeignKey, String, Text, UUID
+from sqlalchemy.orm import Mapped, relationship, mapped_column
 from db import SqlAlchemyBase
-from uuid import uuid4
-from typing import Any
-import unicodedata
+
+if TYPE_CHECKING:
+    from models import Comment, Like, Photo, User
 
 
 class Post(SqlAlchemyBase):
     __tablename__ = 'posts'
 
-    id = Column(UUID, primary_key=True, default=uuid4)
-    title = Column(String, nullable=False)
-    body = Column(Text)
-    status = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False)
-    user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        primary_key=True,
+        default=uuid4
+    )
+    title: Mapped[str] = mapped_column(
+        String,
+        nullable=False
+    )
+    body: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True
+    )
+    status: Mapped[str] = mapped_column(
+        String,
+        nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        ForeignKey('users.id'),
+        nullable=False
+    )
 
-    user = relationship('User', back_populates='posts')
-    likes = relationship('Like', back_populates='post', cascade='all, delete-orphan')
-    comments = relationship('Comment', back_populates='post', cascade='all, delete-orphan')
-    photos = relationship('Photo', back_populates='post', cascade='all, delete-orphan')
+    user: Mapped['User'] = relationship(
+        'User',
+        back_populates='posts'
+    )
+    likes: Mapped[list['Like']] = relationship(
+        'Like',
+        back_populates='post',
+        cascade='all, delete-orphan'
+    )
+    comments: Mapped[list['Comment']] = relationship(
+        'Comment',
+        back_populates='post',
+        cascade='all, delete-orphan'
+    )
+    photos: Mapped[list['Photo']] = relationship(
+        'Photo',
+        back_populates='post',
+        cascade='all, delete-orphan'
+    )
 
     def to_dict(
         self,
         req_likes: bool = False,
         req_comments: bool = False
-    ) -> dict:
-        output: dict = {
+    ) -> dict[str, Any]:
+        output: dict[str, Any] = {
             'id': str(self.id),
             'title': self.title,
             'body': self.body,

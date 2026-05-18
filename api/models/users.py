@@ -1,12 +1,19 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta, timezone
 import re
 import regex
-from sqlalchemy import Column, UUID, String, DateTime
-from sqlalchemy.orm import relationship
+import uuid
+from typing import TYPE_CHECKING
+from uuid import uuid4
+from sqlalchemy import DateTime, String, UUID
+from sqlalchemy.orm import Mapped, relationship, mapped_column
 from db import SqlAlchemyBase
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from uuid import uuid4
+
+if TYPE_CHECKING:
+    from models import Comment, Follow, Like, PFP, Post
 
 class UserOptions:
     USERNAME_UPDATE_LIMIT_HOURS = 24
@@ -14,26 +21,66 @@ class UserOptions:
 class User(SqlAlchemyBase):
     __tablename__ = 'users'
 
-    id = Column(UUID, primary_key=True, default=uuid4)
-    username = Column(String, unique=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    name = Column(String)
-    created_at = Column(DateTime)
-    last_username_edit = Column(DateTime)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        primary_key=True,
+        default=uuid4
+    )
+    username: Mapped[str] = mapped_column(
+        String,
+        unique=True,
+        nullable=False
+    )
+    hashed_password: Mapped[str] = mapped_column(
+        String,
+        nullable=False
+    )
+    name: Mapped[str | None] = mapped_column(
+        String,
+        nullable=True
+    )
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True
+    )
+    last_username_edit: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True
+    )
 
-    posts = relationship('Post', back_populates='user')
-    
-    follows = relationship('Follow', foreign_keys='Follow.follower_id', back_populates='follower')
-    followers = relationship('Follow', foreign_keys='Follow.followed_id', back_populates='followed')
+    posts: Mapped[list['Post']] = relationship(
+        'Post',
+        back_populates='user'
+    )
+    follows: Mapped[list['Follow']] = relationship(
+        'Follow',
+        foreign_keys='Follow.follower_id',
+        back_populates='follower'
+    )
+    followers: Mapped[list['Follow']] = relationship(
+        'Follow',
+        foreign_keys='Follow.followed_id',
+        back_populates='followed'
+    )
+    likes: Mapped[list['Like']] = relationship(
+        'Like',
+        foreign_keys='Like.user_id',
+        back_populates='user'
+    )
+    comments: Mapped[list['Comment']] = relationship(
+        'Comment',
+        foreign_keys='Comment.creator_id',
+        back_populates='creator'
+    )
+    pfp: Mapped['PFP | None'] = relationship(
+        'PFP',
+        foreign_keys='PFP.user_id',
+        back_populates='user',
+        uselist=False
+    )
 
-    likes = relationship('Like', foreign_keys='Like.user_id', back_populates='user')
-
-    comments = relationship('Comment', foreign_keys='Comment.creator_id', back_populates='creator')
-
-    pfp = relationship('PFP', foreign_keys='PFP.user_id', back_populates='user', uselist=False)
-
-    def to_dict(self, req_name=False, req_creation_date=False) -> dict:
-        output: dict = {
+    def to_dict(self, req_name: bool = False, req_creation_date: bool = False) -> dict[str, object]:
+        output: dict[str, object] = {
             'id': str(self.id),
             'username': self.username,
             'pfp': self.pfp.image_src if self.pfp else None
@@ -61,7 +108,7 @@ class User(SqlAlchemyBase):
         
         return True
     
-    def set_creation_date(self, creation_date: DateTime) -> None:
+    def set_creation_date(self, creation_date: datetime) -> None:
         self.created_at = creation_date
 
     def set_name(self, name: str) -> None:
