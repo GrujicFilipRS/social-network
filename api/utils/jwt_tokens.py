@@ -60,7 +60,7 @@ class JWT:
                     content={'message': 'Missing Authorization Cookie'}
                 )
 
-            user_id: UUID | None = JWT.decode_token(token)
+            user_id = JWT.decode_token(token)
             if not user_id:
                 return JSONResponse(
                     status_code=401,
@@ -95,7 +95,7 @@ class JWT:
 
             token = request.cookies.get(JWT.AUTH_COOKIE_NAME)
 
-            user_id: UUID | None = JWT.decode_token(token) if token else None
+            user_id = JWT.decode_token(token) if token else None
             kwargs['user_id'] = user_id
 
             if is_async:
@@ -112,10 +112,10 @@ class JWT:
             key=JWT.AUTH_COOKIE_NAME,
             value=token,
             httponly=True,
-            samesite='Lax',
+            samesite='lax',
             path='/',
             secure=Env.FLASK_ENV == 'production',
-            expires=Env.JWT_EXPIRATION_HOURS * 3600
+            expires=int(Env.JWT_EXPIRATION_HOURS * 3600)
         )
     
     @staticmethod
