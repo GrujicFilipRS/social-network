@@ -3,3 +3,4 @@ __pycache__
 
 network.sqlite
 .env
+.dmypy.json
