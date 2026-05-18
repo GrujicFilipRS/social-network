@@ -52,6 +52,7 @@ class Notification(SqlAlchemyBase):
             message_txt = f'{sender_name} has posted.'
 
         return {
+            'id': str(self.id),
             'message_txt': message_txt,
             'object_type': self.object_type,
             'object_id': str(self.object_id),
