@@ -3,12 +3,12 @@ import unicodedata
 from sqlalchemy import Column, UUID, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from db import SqlAlchemyBase
-from uuid import uuid4
+import uuid
 
 class Comment(SqlAlchemyBase):
     __tablename__ = 'comments'
 
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id = Column(UUID, primary_key=True, default=uuid.uuid4)
     body = Column(Text, nullable=False)
     post_id = Column(UUID, ForeignKey('posts.id', ondelete='CASCADE'), nullable=False)
     comment_id = Column(UUID, ForeignKey('comments.id'), nullable=True)
@@ -93,8 +93,8 @@ class Comment(SqlAlchemyBase):
             return False
         
         try:
-            UUID(post_id)
-            UUID(comment_id) if comment_id else None
+            uuid.UUID(post_id)
+            uuid.UUID(comment_id) if comment_id else None
         except ValueError:
             return False
         
