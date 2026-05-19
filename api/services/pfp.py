@@ -11,14 +11,9 @@ router = APIRouter()
 
 
 @router.get('/get_user_pfp/')
-def get_user_pfp(user_id: str | UUID) -> JSONResponse:
+def get_user_pfp(user_id: UUID) -> JSONResponse:
     with DBSessionManager() as db_sess:
-        try:
-            user_uuid: UUID = UUID(str(user_id))
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid user_id'}, status_code=400)
-
-        pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_uuid).first()
+        pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
 
         if pfp is None:
             return JSONResponse(content={'message': 'pfp not found'}, status_code=404)

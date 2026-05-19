@@ -59,6 +59,12 @@ async def post_comment(
 ) -> JSONResponse:
     data = await request.json()
     
+    if not user_id:
+        return JSONResponse(
+            content={'message': 'You must be logged in to comment'},
+            status_code=401
+        )
+
     if not Comment.validate_creation(data):
         return JSONResponse(content={'message': 'Invalid comment data'}, status_code=400)
     

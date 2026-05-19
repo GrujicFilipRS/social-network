@@ -79,7 +79,11 @@ class User(SqlAlchemyBase):
         uselist=False
     )
 
-    def to_dict(self, req_name: bool = False, req_creation_date: bool = False) -> dict[str, object]:
+    def to_dict(
+        self,
+        req_name: bool = False,
+        req_creation_date: bool = False
+    ) -> dict[str, object]:
         output: dict[str, object] = {
             'id': str(self.id),
             'username': self.username,

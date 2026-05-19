@@ -30,12 +30,7 @@ def get_follow(follow_id: int, req_names: bool = False) -> JSONResponse:
 
 
 @router.get('/get_follower_username_from_follow_id/{follow_id}')
-def get_follower_username_from_follow_id(follow_id: str) -> JSONResponse:
-    try:
-        follow_id: UUID = UUID(follow_id)
-    except ValueError:
-        return JSONResponse(content={'message': 'Invalid follow id format'}, status_code=400)
-    
+def get_follower_username_from_follow_id(follow_id: UUID) -> JSONResponse:    
     with DBSessionManager() as db_sess:
         follow: Follow | None = db_sess.get(Follow, follow_id)
 
@@ -60,6 +55,12 @@ async def follow_user(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    if not user_id:
+        return JSONResponse(
+            content={'message': 'You must be logged in to follow a user'},
+            status_code=401
+        )
+
     with DBSessionManager() as db_sess:
         to_follow_id: UUID = UUID((await request.json()).get('to_follow_id'))
         if to_follow_id == user_id:
@@ -84,7 +85,7 @@ async def follow_user(
             receiver_id=to_follow_id,
             sender_id=user_id,
             object_type='follow',
-            object_id=str(follow.id)
+            object_id=follow.id
         )
 
         return JSONResponse(content={'message': 'Successfully followed user'}, status_code=201)
@@ -139,14 +140,9 @@ def get_user_follows(
 
 @router.get('/get_user_followers/')
 def get_user_followers(
-    user_id: str | UUID
+    user_id: UUID
 ) -> JSONResponse:
     with DBSessionManager() as db_sess:
-        try:
-            user_id: UUID = UUID(user_id)
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid user id format'}, status_code=400)
-
         if not db_sess.get(User, user_id):
             return JSONResponse(content={'message': 'User with provided id not found'}, status_code=404)
 

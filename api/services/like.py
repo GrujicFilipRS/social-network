@@ -48,6 +48,12 @@ async def like_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    if not user_id:
+        return JSONResponse(
+            content={'message': 'You must be logged in to like a post'},
+            status_code=401
+        )
+
     with DBSessionManager() as db_sess:
         data = await request.json()
         try:
@@ -118,14 +124,9 @@ async def unlike_post(
 
 
 @router.get('/get_user_likes/')
-def get_user_likes(user_id: str) -> JSONResponse:
+def get_user_likes(user_id: UUID) -> JSONResponse:
     with DBSessionManager() as db_sess:
-        try:
-            user_uuid: UUID = UUID(str(user_id))
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid user_id'}, status_code=400)
-
-        user: User | None = db_sess.get(User, user_uuid)
+        user: User | None = db_sess.get(User, user_id)
 
         if not user:
             return JSONResponse(content={'message': 'User not found'}, status_code=404)

@@ -57,16 +57,11 @@ async def get_post(
 @JWT.optional_auth
 async def get_post_id_from_like_id(
     request: Request,
-    like_id: str,
+    like_id: UUID,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    try:
-        like_uuid = UUID(like_id)
-    except ValueError:
-        return JSONResponse(content={'message': 'Invalid like_id'}, status_code=400)
-
     with DBSessionManager() as db_sess:
-        like = db_sess.query(Like).get(like_uuid)
+        like = db_sess.query(Like).get(like_id)
 
         if not like:
             return JSONResponse(content={'message': 'Like not found'}, status_code=404)
@@ -88,14 +83,24 @@ async def create_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
     data = await request.form()
 
     if not await Post.verify_creation(data):
         return JSONResponse(content={'message': 'Invalid creation data'}, status_code=400)
 
-    title: str = data.get('title').strip()
-    body: str = data.get('body').strip()
-    status: str = data.get('status').strip().upper()
+    title = data.get('title')
+    body = data.get('body')
+    status = data.get('status')
+
+    assert isinstance(title, str)
+    assert isinstance(body, str)
+    assert isinstance(status, str)
+
+    title = title.strip()
+    body = body.strip()
+    status = status.strip().upper()
+
     photos: list[UploadFile] = [
         photo for photo in data.getlist('images') or []
         if isinstance(photo, (UploadFile, FastAPIUploadFile))

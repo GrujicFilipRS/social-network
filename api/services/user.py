@@ -17,25 +17,22 @@ router = APIRouter()
 
 @router.get('/get_user/')
 async def get_user(
-    user_id: str,
+    user_id: UUID,
     req_name: bool = False,
-    req_creation_date: bool = False,
-    req_pfp: bool = False
+    req_creation_date: bool = False
 ) -> JSONResponse:
     with DBSessionManager() as db_sess:
-        try:
-            user_uuid = UUID(user_id)
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid user UUID provided'}, status_code=400)
-        
-        user: User | None = db_sess.get(User, user_uuid)
+        user: User | None = db_sess.get(User, user_id)
 
         if not user:
             return JSONResponse(content={'message': 'User not found'}, status_code=404)
         
         content: dict = {
             'message': 'User found',
-            'user': user.to_dict(req_name=req_name, req_creation_date=req_creation_date, req_pfp=req_pfp)
+            'user': user.to_dict(
+                req_name=req_name,
+                req_creation_date=req_creation_date,
+            )
         }
 
         return JSONResponse(content=content, status_code=200)
