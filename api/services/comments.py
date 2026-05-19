@@ -14,10 +14,10 @@ router = APIRouter()
 
 
 @router.get('/get_comment/')
-def get_comment(comment_id: UUID | str) -> JSONResponse:
+def get_comment(comment_id: UUID) -> JSONResponse:
     with DBSessionManager() as db_sess:
         try:
-            comment: Comment | None = db_sess.get(Comment, UUID(comment_id))
+            comment: Comment | None = db_sess.get(Comment, comment_id)
         except ValueError:
             return JSONResponse(content={'message': 'Invalid comment_id'}, status_code=400)
 
@@ -33,10 +33,10 @@ def get_comment(comment_id: UUID | str) -> JSONResponse:
 
 
 @router.get('/get_post_id_from_comment_id/{comment_id}')
-def get_post_id_from_comment_id(comment_id: UUID | str) -> JSONResponse:
+def get_post_id_from_comment_id(comment_id: UUID) -> JSONResponse:
     with DBSessionManager() as db_sess:
         try:
-            comment: Comment | None = db_sess.get(Comment, UUID(comment_id))
+            comment: Comment | None = db_sess.get(Comment, comment_id)
         except ValueError:
             return JSONResponse(content={'message': 'Invalid comment_id'}, status_code=400)
 

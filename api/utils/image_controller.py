@@ -43,5 +43,5 @@ class ImageController:
     async def destroy_image(public_id: str) -> None:
         cloudinary.uploader.destroy(public_id)
     
-    def __new__():
+    def __new__(self):
         raise TypeError('ImageController class is not instantiable')

@@ -115,14 +115,9 @@ async def unfollow_user(
 
 @router.get('/get_user_follows/')
 def get_user_follows(
-    user_id: str | UUID
+    user_id: UUID
 ) -> JSONResponse:
     with DBSessionManager() as db_sess:
-        try:
-            user_id: UUID = UUID(user_id)
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid user id format'}, status_code=400)
-
         if not db_sess.get(User, user_id):
             return JSONResponse(content={'message': 'User with provided id not found'}, status_code=404)
 

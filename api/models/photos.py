@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 import uuid
-from fastapi import UploadFile
+import fastapi
 from sqlalchemy import ForeignKey, Integer, String, UUID
+import starlette
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 from db import SqlAlchemyBase
 from uuid import uuid4
@@ -59,7 +60,9 @@ class Photo(SqlAlchemyBase):
         return ret
 
     @staticmethod
-    async def verify_valid_photo(image: UploadFile) -> bool:
+    async def verify_valid_photo(
+        image: (starlette.datastructures.UploadFile | fastapi.datastructures.UploadFile)
+    ) -> bool:
         MAX_SIZE = 15 * 1024 * 1024  # 15MB
         ALLOWED_FORMATS = {'JPEG', 'PNG', 'WEBP', 'JPG'}
 

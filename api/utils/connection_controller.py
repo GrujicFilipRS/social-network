@@ -47,6 +47,9 @@ class ConnectionController:
         Otherwise publishes to Redis so another worker can send it.
         '''
 
+        if WorkerShareController.redis_client is None:
+            raise RuntimeError('Redis client is not initialized')
+
         sent = await ConnectionController.send_to_user_if_connected(
             user_id,
             message

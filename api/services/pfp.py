@@ -1,8 +1,7 @@
 from uuid import UUID
-from fastapi import Request
+from fastapi import Request, APIRouter
+from fastapi.datastructures import UploadFile
 from fastapi.responses import JSONResponse
-
-from fastapi import APIRouter
 
 from utils import ImageController, JWT
 from models import PFP
@@ -37,19 +36,22 @@ async def create_user_pfp(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    with DBSessionManager() as db_sess:
-        form = await request.form()
-        image = form.get('image')
+    form = await request.form()
+    form_image = form.get('image')
 
-        if not PFP.approve_pfp_file(image):
-            return JSONResponse(content={'message': 'Invalid image file'}, status_code=400)
+    if not PFP.approve_pfp_file(form_image):
+        return JSONResponse(content={'message': 'Invalid image file'}, status_code=400)
         
-        image_src, image_id = await ImageController.create_image(image)
-
+    if not isinstance(form_image, UploadFile):
+        return JSONResponse(content={'message': 'Image file is required'}, status_code=400)
+        
+    image_src, image_id = await ImageController.create_image(form_image)
+    
+    with DBSessionManager() as db_sess:
         previous_pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
 
         if previous_pfp is not None:
-            ImageController.destroy_image(previous_pfp.image_id)
+            await ImageController.destroy_image(previous_pfp.image_id)
             db_sess.delete(previous_pfp)
             db_sess.commit()
         
@@ -76,7 +78,7 @@ async def delete_pfp(
         if pfp is None:
             return JSONResponse(content={'message': 'pfp not found'}, status_code=404)
 
-        ImageController.destroy_image(pfp.image_id)
+        await ImageController.destroy_image(pfp.image_id)
 
         db_sess.delete(pfp)
         db_sess.commit()

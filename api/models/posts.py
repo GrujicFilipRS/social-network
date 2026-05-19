@@ -100,16 +100,16 @@ class Post(SqlAlchemyBase):
 
     @staticmethod
     async def verify_creation(data: FormData) -> bool:
-        title: Any = data.get('title')
-        body: Any = data.get('body')
-        status: Any = data.get('status')
+        title = data.get('title')
+        body = data.get('body')
+        status = data.get('status')
 
         if not isinstance(title, str) or not isinstance(body, str) or not isinstance(status, str):
             return False
         
-        title: str = title.strip()
-        body: str = body.strip()
-        status: str = status.strip().upper()
+        title = title.strip()
+        body = body.strip()
+        status = status.strip().upper()
         
         MIN_TITLE_LENGTH, MAX_TITLE_LENGTH = 3, 45
         if len(title) < MIN_TITLE_LENGTH or len(title) > MAX_TITLE_LENGTH:
@@ -172,16 +172,16 @@ class Post(SqlAlchemyBase):
     
     @staticmethod
     def verify_edit(data: Any) -> bool:
-        title: Any = data.get('title')
-        body: Any = data.get('body')
-        status: Any = data.get('status')
+        title = data.get('title')
+        body = data.get('body')
+        status = data.get('status')
 
         if not isinstance(title, str) or not isinstance(body, str) or not isinstance(status, str):
             return False
         
-        title: str = title.strip()
-        body: str = body.strip()
-        status: str = status.strip().upper()
+        title = title.strip()
+        body = body.strip()
+        status = status.strip().upper()
         
         MIN_TITLE_LENGTH, MAX_TITLE_LENGTH = 3, 45
         if len(title) < MIN_TITLE_LENGTH or len(title) > MAX_TITLE_LENGTH:
