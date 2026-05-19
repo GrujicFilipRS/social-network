@@ -31,6 +31,7 @@ async def create_user_pfp(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
     form = await request.form()
     form_image = form.get('image')
 
@@ -67,6 +68,8 @@ async def delete_pfp(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
+
     with DBSessionManager() as db_sess:
         pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
 

@@ -44,6 +44,8 @@ def get_current_user(
     request: Request,
     user_id: UUID | None = None,
 ) -> JSONResponse:
+    assert user_id is not None
+
     with DBSessionManager() as db_sess:
         user: User | None = db_sess.get(User, user_id)
         if not user:
@@ -146,6 +148,7 @@ async def set_user_name(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
     data = await request.json()
     
     new_name: str | None = data.get('new_name')
@@ -174,6 +177,7 @@ async def change_username(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
     data: Any = await request.json()
 
     new_username: str | None = data.get('new_username')
@@ -218,6 +222,7 @@ async def change_password(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
     data: Any = await request.json()
     old_password: str | None = data.get('old_password')
     new_password: str | None = data.get('new_password')
@@ -254,6 +259,7 @@ async def get_user_profile(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
     username: str | None = request.query_params.get('username')
     if not username:
         return JSONResponse(content={'message': '`username` parameter is required'}, status_code=400)
@@ -302,6 +308,8 @@ def get_current_user_profile(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
+
     with DBSessionManager() as db_sess:
         user: User | None = db_sess.get(User, user_id)
         if not user:

@@ -48,11 +48,7 @@ async def like_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    if not user_id:
-        return JSONResponse(
-            content={'message': 'You must be logged in to like a post'},
-            status_code=401
-        )
+    assert user_id is not None
 
     with DBSessionManager() as db_sess:
         data = await request.json()
@@ -98,6 +94,8 @@ async def unlike_post(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
+
     with DBSessionManager() as db_sess:
         data = await request.json()
         try:

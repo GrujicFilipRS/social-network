@@ -14,7 +14,7 @@ router = APIRouter()
 
 
 @router.get('/get_follow/')
-def get_follow(follow_id: int, req_names: bool = False) -> JSONResponse:
+def get_follow(follow_id: UUID, req_names: bool = False) -> JSONResponse:
     with DBSessionManager() as db_sess:
         follow: Follow | None = db_sess.get(Follow, follow_id)
 
@@ -55,11 +55,7 @@ async def follow_user(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
-    if not user_id:
-        return JSONResponse(
-            content={'message': 'You must be logged in to follow a user'},
-            status_code=401
-        )
+    assert user_id is not None
 
     with DBSessionManager() as db_sess:
         to_follow_id: UUID = UUID((await request.json()).get('to_follow_id'))
@@ -97,6 +93,8 @@ async def unfollow_user(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
+    
     with DBSessionManager() as db_sess:
         to_unfollow_id: UUID = UUID((await request.json()).get('to_unfollow_id'))
 

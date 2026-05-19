@@ -57,13 +57,9 @@ async def post_comment(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
+
     data = await request.json()
-    
-    if not user_id:
-        return JSONResponse(
-            content={'message': 'You must be logged in to comment'},
-            status_code=401
-        )
 
     if not Comment.validate_creation(data):
         return JSONResponse(content={'message': 'Invalid comment data'}, status_code=400)
@@ -111,6 +107,8 @@ async def edit_comment(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
+    
     data = await request.json()
     try:
         comment_id = UUID(data.get('comment_id'))
@@ -143,6 +141,8 @@ async def delete_comment(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    assert user_id is not None
+
     with DBSessionManager() as db_sess:
         data = await request.json()
         try:
@@ -170,6 +170,7 @@ def get_post_comments(
     request: Request,
     user_id: UUID | None = None
 ) -> JSONResponse:
+    
     with DBSessionManager() as db_sess:
         try:
             post_id: UUID | None = UUID(request.query_params.get('post_id'))

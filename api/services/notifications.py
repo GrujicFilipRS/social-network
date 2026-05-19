@@ -29,6 +29,8 @@ async def get_unread_notifications(
     request: Request,
     user_id: UUID | None = None
 ):
+    assert user_id is not None
+
     NOTIFICATION_LIMIT = 10
 
     with DBSessionManager() as db_sess:
@@ -53,6 +55,8 @@ async def read_notification(
     notification_id: UUID,
     user_id: UUID | None = None
 ):
+    assert user_id is not None
+
     with DBSessionManager() as db_sess:
         notification = db_sess.query(Notification).get(notification_id)
 
