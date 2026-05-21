@@ -28,6 +28,10 @@ const websocket = ref<WebSocket | null>(null);
 const notificationLink = ref<string>('/');
 const unreadNotifications = ref<Notification[]>([]);
 
+const loadNotifications = async () => {
+    unreadNotifications.value = await GetUnreadNotifications();
+}
+
 const initiateHeader = async () => {
     verifyUser().then(res => {
         if (res.statusCode !== 401) headerVisible.value = true;
@@ -44,7 +48,7 @@ const initiateHeader = async () => {
         );
     });
 
-    unreadNotifications.value = await GetUnreadNotifications();
+    loadNotifications();
 }
 
 initiateHeader();
@@ -139,6 +143,7 @@ const Logout = () => {
                 v-for='notification in unreadNotifications'
                 :key='notification.object_id'
                 :notification='notification'
+                :reload-notifications='loadNotifications'
             />
         </Drawer>
     </div>
