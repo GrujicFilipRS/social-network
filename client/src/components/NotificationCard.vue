@@ -17,16 +17,19 @@ const handleRead = async () => {
 
 <template>
     <div class='notification-card'>
-        <div class='notification-content'>
-            <p>{{ notification.message_txt }}</p>
-            <span class='notification-time'>
-                {{ new Date(notification.received_at).toLocaleString('sr-RS') }}
-            </span>
-
+        <div class='notification-content flex align-items-center justify-content-between'>
+            <div class='lside-not'>
+                <p>{{ notification.message_txt }}</p>
+                <span class='notification-time'>
+                    {{ new Date(notification.received_at).toLocaleString('sr-RS') }}
+                </span>
+            </div>
+            
             <Button
                 severity='secondary'
                 size='small'
                 icon='pi pi-eye'
+                title='Mark as read'
                 @click='handleRead()'
             />
         </div>
