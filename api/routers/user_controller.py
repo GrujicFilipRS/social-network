@@ -1,10 +1,13 @@
 from uuid import UUID
+from dishka.integrations.fastapi import FromDishka, inject
 from fastapi.responses import JSONResponse
-from fastapi import Request
+from fastapi import HTTPException, Request
 from pydantic import BaseModel
 from datetime import datetime, timezone
 from typing import Any
 
+from schemas import UserGetResponse
+from services.service_models import UserServiceModel
 from models import Like, User, UserOptions, Follow, Post
 from db import DBSessionManager
 
@@ -15,27 +18,21 @@ from fastapi import APIRouter
 router = APIRouter()
 
 
-@router.get('/get_user/')
+@router.get(
+    '/get_user/',
+    response_model=UserGetResponse
+)
+@inject
 async def get_user(
     user_id: UUID,
-    req_name: bool = False,
-    req_creation_date: bool = False
+    user_service: FromDishka[UserServiceModel]
 ) -> JSONResponse:
-    with DBSessionManager() as db_sess:
-        user: User | None = db_sess.get(User, user_id)
+    response = await user_service.get_user(user_id)
+    
+    if not response.success:
+        raise HTTPException(status_code=404, detail=response.message)
 
-        if not user:
-            return JSONResponse(content={'message': 'User not found'}, status_code=404)
-        
-        content: dict = {
-            'message': 'User found',
-            'user': user.to_dict(
-                req_name=req_name,
-                req_creation_date=req_creation_date,
-            )
-        }
-
-        return JSONResponse(content=content, status_code=200)
+    return response
 
 
 @router.get('/get_current_user/')

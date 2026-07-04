@@ -1,11 +1,9 @@
 from __future__ import annotations
-from dataclasses import dataclass
 
 from models import User
-from dto import DTO
-from user_dto import UserDTO
+from .dto import DTO
+from .user_dto import UserDTO
 
-@dataclass
 class UserGetResponse(DTO):
     user: UserDTO | None
     

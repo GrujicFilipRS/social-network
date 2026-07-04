@@ -8,7 +8,7 @@ import traceback
 from dishka import make_async_container
 from dishka.integrations.fastapi import setup_dishka
 
-from di.providers import DBSessionProvider
+from di.providers import DBSessionProvider, ServiceProvider
 from schemas import DTO
 from env import Env
 from db import db_session
@@ -37,7 +37,8 @@ async def global_exception_handler(req: Request, exc: Exception):
     )
 
 container = make_async_container(
-    DBSessionProvider()
+    DBSessionProvider(),
+    ServiceProvider()
 )
 
 setup_dishka(container=container, app=app)

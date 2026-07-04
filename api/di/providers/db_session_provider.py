@@ -1,7 +1,9 @@
+from collections.abc import Generator
+
 from dishka import Provider, Scope, provide
 from sqlalchemy.orm import Session
 
-from ...db import DBSessionManager
+from db import DBSessionManager
 
 
 class DBSessionProvider(Provider):
@@ -10,9 +12,6 @@ class DBSessionProvider(Provider):
         self._db_sess = db_sess
 
     @provide(scope=Scope.REQUEST)
-    def db_sess(self) -> Session:
-        if self._db_sess:
-            return self._db_sess
-        
+    def db_sess(self) -> Generator[Session, None, None]:
         with DBSessionManager() as session:
-            return session
+            yield session

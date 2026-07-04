@@ -1,7 +1,6 @@
 from uuid import UUID
 
-from api.schemas import UserGetResponse
-from schemas import DTO
+from schemas import DTO, UserGetResponse
 
 
 class UserServiceModel:

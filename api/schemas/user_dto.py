@@ -1,11 +1,10 @@
 from __future__ import annotations
-from dataclasses import dataclass
+
+from pydantic import BaseModel
 
 from models import User
 
-
-@dataclass
-class UserDTO:
+class UserDTO(BaseModel):
     id: str
     username: str
     name: str | None

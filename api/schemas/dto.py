@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from pydantic import BaseModel
 
-@dataclass
-class DTO:
+class DTO(BaseModel):
     success: bool
     message: str | None
     
