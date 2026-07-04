@@ -2,13 +2,18 @@ from uuid import UUID
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi.responses import JSONResponse
 from fastapi import Request, Response
-from pydantic import BaseModel
-from datetime import datetime, timezone
 from typing import Any
 
-from schemas import UserGetResponse, UserRegistrationRequest
+from schemas import (
+    UserGetResponse,
+    UserRegistrationRequest,
+    UserLoginRequest,
+    DTO,
+    SetNameRequest,
+    UserChangeUsernameRequest
+)
 from services.service_models import UserServiceModel
-from models import Like, User, UserOptions, Follow, Post
+from models import Like, User, Follow, Post
 from db import DBSessionManager
 
 from utils import JWT
@@ -67,108 +72,53 @@ async def register(
     return result
 
 
-class LoginData(BaseModel):
-    username: str
-    password: str
-
-@router.post('/login/')
-async def login(data: LoginData) -> JSONResponse:
-    username = data.username.strip()
-    password = data.password.strip()
-
-    with DBSessionManager() as db_sess:
-        user: User | None = db_sess.query(User).filter_by(username=username).first()
-
-        if not (user and user.check_password(password)):
-            return JSONResponse(content={'message': 'Incorrect credentials'}, status_code=400)
-        
-        token = JWT.encode_token(user.id)
-
-        response = JSONResponse(
-            content={
-                'message': 'User logged in',
-                'user': user.to_dict(),
-            },
-            status_code=200
-        )
-        
-        JWT.set_response_cookie(response, token)
-
-        return response
+@router.post(
+    '/login/',
+    response_model=UserGetResponse
+)
+@inject
+async def login(
+    data: UserLoginRequest,
+    response: Response,
+    user_service: FromDishka[UserServiceModel]
+):
+    result = await user_service.log_in(data.username, data.password)
+    
+    if result.user:
+        JWT.set_response_cookie(response, JWT.encode_token(UUID(result.user.id)))
+    
+    return result
 
 
-@router.put('/set_name/')
-@JWT.require_auth
+@router.put(
+    '/set_name/',
+    response_model=DTO
+)
+@inject
 async def set_user_name(
     request: Request,
-    user_id: UUID | None = None
-) -> JSONResponse:
-    assert user_id is not None
-    data = await request.json()
-    
-    new_name: str | None = data.get('new_name')
-
-    if not new_name:
-        return JSONResponse(content={'message': 'New name required'}, status_code=400)
-    
-    if not User.validate_name(new_name):
-        return JSONResponse(content={'message': 'Invalid format for new name'}, status_code=400)
-
-    with DBSessionManager() as db_sess:
-        user: User | None = db_sess.get(User, user_id)
-        if user is None:
-            return JSONResponse(content={'message': 'User doesn\'t exist'}, status_code=400)
-        
-        user.set_name(new_name)
-        db_sess.add(user)
-        db_sess.commit()
-
-        return JSONResponse(content={'message': f'Name successfully changed to {new_name}'}, status_code=200)
+    data: SetNameRequest,
+    user_service: FromDishka[UserServiceModel]
+):
+    user_id = JWT.get_id_from_request(request)
+    response = await user_service.set_name(user_id, data.new_name)
+    return response
 
 
-@router.put('/change_username/')
-@JWT.require_auth
+@router.put(
+    '/change_username/',
+    response_model=DTO
+)
+@inject
 async def change_username(
     request: Request,
-    user_id: UUID | None = None
+    data: UserChangeUsernameRequest,
+    user_service: FromDishka[UserServiceModel]
 ) -> JSONResponse:
-    assert user_id is not None
-    data: Any = await request.json()
-
-    new_username: str | None = data.get('new_username')
-    if not new_username:
-        return JSONResponse(content={'Invalid username format'}, status_code=400)
-
-    if not User.validate_username(new_username):
-        return JSONResponse(content={'Invalid username format'}, status_code=400)
-
-    with DBSessionManager() as db_sess:
-        user: User | None = db_sess.get(User, user_id)
-
-        if user is None:
-            return JSONResponse(content={'message': 'User doesn\'t exist'}, status_code=400)
-
-        if user.username == new_username:
-            return JSONResponse(content={'message': 'That doesn\'t change the username'}, status_code=400)
-
-        if db_sess.query(User).filter_by(username=new_username).first():
-            return JSONResponse(content={'message': 'User with such username already exists'}, status_code=400)
-        
-        able_to_change = user.able_to_change_username()
-        
-        if not able_to_change:
-            return JSONResponse(content={
-                'message': f'You can only update your username once every {UserOptions.USERNAME_UPDATE_LIMIT_HOURS} hours'},
-                status_code=401
-            )
-
-        user.username = new_username
-        user.last_username_edit = datetime.now(timezone.utc)
-        
-        db_sess.add(user)
-        db_sess.commit()
-
-        return JSONResponse(content={'message': f'Username successfully changed to {new_username}'}, status_code=200)
+    user_id = JWT.get_id_from_request(request)
+    response = await user_service.change_username(user_id, data.new_username)
+    
+    return response
 
 
 @router.put('/change_password/')

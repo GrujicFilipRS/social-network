@@ -157,7 +157,7 @@ class JWT:
         return cookies.get(JWT.AUTH_COOKIE_NAME)
     
     @staticmethod
-    def get_id_from_request(request: Request) -> str | None:
+    def get_id_from_request(request: Request) -> UUID | None:
         token = request.cookies.get(JWT.AUTH_COOKIE_NAME)
         
         if token is None:

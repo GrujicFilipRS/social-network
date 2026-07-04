@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 
 from models import User
+from models.users import UserOptions
 from schemas import UserGetResponse, DTO
 
 from ..service_models import UserServiceModel
@@ -55,6 +56,7 @@ class UserServiceSqlal(UserServiceModel):
         
         user.set_name(name)
         self.db_session.add(user)
+        self.db_session.commit()
         
         return DTO.ok()
     
@@ -63,8 +65,23 @@ class UserServiceSqlal(UserServiceModel):
         if not user:
             return DTO.error('User not found')
         
+        if user.username == username:
+            return DTO.error('That action did not change the username')
+        
+        exists = self.db_session.query(User).filter_by(username=username).first() is not None
+        if exists:
+            return DTO.error('That username is already taken')
+        
+        able_to_change = user.able_to_change_username()
+        
+        if not able_to_change:
+            return DTO.error(
+                f'You can only update your username once every {UserOptions.USERNAME_UPDATE_LIMIT_HOURS} hours'
+            )
+        
         user.username = username
         self.db_session.add(user)
+        self.db_session.commit()
         
         return DTO.ok()
     
@@ -77,4 +94,7 @@ class UserServiceSqlal(UserServiceModel):
             return DTO.error('Credentials incorrect')
         
         user.set_password(new_password)
+        self.db_session.add(user)
+        self.db_session.commit()
+        
         return DTO.ok()
