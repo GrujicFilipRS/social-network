@@ -1,12 +1,12 @@
 from uuid import UUID
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi.responses import JSONResponse
-from fastapi import Request
+from fastapi import Request, Response
 from pydantic import BaseModel
 from datetime import datetime, timezone
 from typing import Any
 
-from schemas import UserGetResponse, UserRegistrationRequest, DTO
+from schemas import UserGetResponse, UserRegistrationRequest
 from services.service_models import UserServiceModel
 from models import Like, User, UserOptions, Follow, Post
 from db import DBSessionManager
@@ -51,57 +51,20 @@ async def get_current_user(
 
 @router.post(
     '/register/',
-    response_model=DTO
+    response_model=UserGetResponse
 )
 @inject
 async def register(
     data: UserRegistrationRequest,
+    response: Response,
     user_service: FromDishka[UserServiceModel]
-) -> JSONResponse:
-    username = data.username
-    password = data.password
-    name = data.name
-
-    if not username or not password:
-        return JSONResponse(content={'message': 'Username and password required'}, status_code=400)
+):
+    result = await user_service.register(data.username, data.password, data.name)
     
-    username = username.strip()
-    password = password.strip()
-    if name is not None:
-        name = name.strip()
-
-    if (not User.validate_username(username) or
-        not User.validate_password(password) or
-        not User.validate_name(name)):
-        return JSONResponse(content={'message': 'Invalid username or password format'}, status_code=400)
-
-    with DBSessionManager() as db_sess:
-        if db_sess.query(User).filter_by(username=username).first():
-            return JSONResponse(content={'message': 'User with such username already exists'}, status_code=400)
-        
-        user = User(username=username)
-        user.set_password(password)
-        user.set_creation_date(datetime.now(timezone.utc))
-        if name:
-            user.set_name(name)
-        user.last_username_edit = datetime.now(timezone.utc)
-
-        db_sess.add(user)
-        db_sess.commit()
-        
-        token = JWT.encode_token(user.id)
-
-        response = JSONResponse(
-            content={
-                'message': 'User created and logged in',
-                'user': user.to_dict(),
-            },
-            status_code=200
-        )
-        
-        JWT.set_response_cookie(response, token)
-
-        return response
+    if result.user:
+        JWT.set_response_cookie(response, JWT.encode_token(UUID(result.user.id)))
+    
+    return result
 
 
 class LoginData(BaseModel):
