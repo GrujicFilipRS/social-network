@@ -1,12 +1,12 @@
 from uuid import UUID
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi.responses import JSONResponse
-from fastapi import HTTPException, Request
+from fastapi import Request
 from pydantic import BaseModel
 from datetime import datetime, timezone
 from typing import Any
 
-from schemas import UserGetResponse
+from schemas import UserGetResponse, UserRegistrationRequest, DTO
 from services.service_models import UserServiceModel
 from models import Like, User, UserOptions, Follow, Post
 from db import DBSessionManager
@@ -26,43 +26,38 @@ router = APIRouter()
 async def get_user(
     user_id: UUID,
     user_service: FromDishka[UserServiceModel]
-) -> JSONResponse:
+):
     response = await user_service.get_user(user_id)
-    
-    if not response.success:
-        raise HTTPException(status_code=404, detail=response.message)
-
     return response
 
 
-@router.get('/get_current_user/')
-@JWT.require_auth
-def get_current_user(
+@router.get(
+    '/get_current_user/',
+    response_model=UserGetResponse
+)
+@inject
+async def get_current_user(
     request: Request,
-    user_id: UUID | None = None,
+    user_service: FromDishka[UserServiceModel]
+):
+    user_id = JWT.get_id_from_request(request)
+    
+    if not user_id:
+        return UserGetResponse.error('Unauthorized')
+    
+    response = await user_service.get_user(user_id)
+    return response
+
+
+@router.post(
+    '/register/',
+    response_model=DTO
+)
+@inject
+async def register(
+    data: UserRegistrationRequest,
+    user_service: FromDishka[UserServiceModel]
 ) -> JSONResponse:
-    assert user_id is not None
-
-    with DBSessionManager() as db_sess:
-        user: User | None = db_sess.get(User, user_id)
-        if not user:
-            return JSONResponse(content={'message': 'Invalid token'}, status_code=401)
-
-        content: dict = {
-            'message': 'Successful verification',
-            'user': user.to_dict()
-        }
-
-        return JSONResponse(content=content, status_code=200)
-
-
-class RegistrationData(BaseModel):
-    username: str
-    password: str
-    name: str | None
-
-@router.post('/register/')
-async def register(data: RegistrationData) -> JSONResponse:
     username = data.username
     password = data.password
     name = data.name

@@ -1,5 +1,6 @@
 import asyncio
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi.responses import JSONResponse
@@ -28,13 +29,21 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        content=DTO.error('Invalid data').__dict__,
+        status_code=400
+    )
+
 @app.exception_handler(Exception)
 async def global_exception_handler(req: Request, exc: Exception):
     traceback.print_exc()
     return JSONResponse(
-        content=DTO.error('Internal server error'),
+        content=DTO.error('Internal server error').__dict__,
         status_code=500
     )
+    
 
 container = make_async_container(
     DBSessionProvider(),

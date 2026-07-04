@@ -155,3 +155,12 @@ class JWT:
             for item in cookie_header.split(';')
         )
         return cookies.get(JWT.AUTH_COOKIE_NAME)
+    
+    @staticmethod
+    def get_id_from_request(request: Request) -> str | None:
+        token = request.cookies.get(JWT.AUTH_COOKIE_NAME)
+        
+        if token is None:
+            return None
+        
+        return JWT.decode_token(token)
