@@ -5,11 +5,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import traceback
 
+from dishka import make_async_container
+from dishka.integrations.fastapi import setup_dishka
+
+from di.providers import DBSessionProvider
+from schemas import DTO
 from env import Env
 from db import db_session
 
 from utils import ImageController, WorkerShareController, ConnectionController
-from services import router
+from routers import router
 
 db_session.global_init()
 
@@ -27,9 +32,15 @@ app.add_middleware(
 async def global_exception_handler(req: Request, exc: Exception):
     traceback.print_exc()
     return JSONResponse(
-        status_code=500,
-        content={'message': 'Internal server error'}
+        content=DTO.error('Internal server error'),
+        status_code=500
     )
+
+container = make_async_container(
+    DBSessionProvider()
+)
+
+setup_dishka(container=container, app=app)
 
 app.include_router(router)
 
