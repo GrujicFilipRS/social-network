@@ -2,7 +2,6 @@ from uuid import UUID
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi.responses import JSONResponse
 from fastapi import Request, Response
-from typing import Any
 
 from schemas import (
     UserGetResponse,
@@ -10,7 +9,8 @@ from schemas import (
     UserLoginRequest,
     DTO,
     SetNameRequest,
-    UserChangeUsernameRequest
+    UserChangeUsernameRequest,
+    UserChangePasswordRequest
 )
 from services.service_models import UserServiceModel
 from models import Like, User, Follow, Post
@@ -114,7 +114,7 @@ async def change_username(
     request: Request,
     data: UserChangeUsernameRequest,
     user_service: FromDishka[UserServiceModel]
-) -> JSONResponse:
+):
     user_id = JWT.get_id_from_request(request)
     response = await user_service.change_username(user_id, data.new_username)
     
@@ -122,40 +122,16 @@ async def change_username(
 
 
 @router.put('/change_password/')
-@JWT.require_auth
+@inject
 async def change_password(
     request: Request,
-    user_id: UUID | None = None
-) -> JSONResponse:
-    assert user_id is not None
-    data: Any = await request.json()
-    old_password: str | None = data.get('old_password')
-    new_password: str | None = data.get('new_password')
+    data: UserChangePasswordRequest,
+    user_service: FromDishka[UserServiceModel]
+):
+    user_id = JWT.get_id_from_request(request)
     
-    if not old_password or not new_password:
-        return JSONResponse(content={'message': 'New password and old password required'}, status_code=400)
-    
-    if old_password == new_password:
-        return JSONResponse(content={'message': 'New password must be different than old password'}, status_code=400)
-    
-    if not User.validate_password(new_password):
-        return JSONResponse(content={'message': 'Invalid new password format'}, status_code=400)
-
-    with DBSessionManager() as db_sess:
-        user: User | None = db_sess.get(User, user_id)
-
-        if user is None:
-            return JSONResponse(content={'message': 'User doesn\'t exist'}, status_code=400)
-
-        if not user.check_password(old_password):
-            return JSONResponse(content={'message': 'Old password is incorrect'}, status_code=400)
-        
-        user.set_password(new_password)
-
-        db_sess.add(user)
-        db_sess.commit()
-
-        return JSONResponse(content={'message': 'Password successfully changed'}, status_code=200)
+    response = await user_service.change_password(user_id, data.old_password, data.new_password)
+    return response
 
 
 @router.get('/get_user_profile/')
