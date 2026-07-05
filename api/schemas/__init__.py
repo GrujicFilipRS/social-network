@@ -8,6 +8,7 @@ from .user.user_login_request import UserLoginRequest
 from .user.user_set_name_request import SetNameRequest
 from .user.user_change_username_request import UserChangeUsernameRequest
 from .user.user_change_password_request import UserChangePasswordRequest
+from .user.user_profile_response import UserProfileResponse
 
 from .follow.follow_dto import FollowDTO
 from .follow.follow_list_response import FollowListResponse
@@ -22,6 +23,7 @@ __all__ = [
     'SetNameRequest',
     'UserChangeUsernameRequest',
     'UserChangePasswordRequest',
+    'UserProfileResponse',
     'FollowDTO',
     'FollowListResponse'
 ]

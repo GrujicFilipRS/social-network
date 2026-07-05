@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from models import User
-from ..dto import DTO
+from ..shared.dto import DTO
 from .user_dto import UserDTO
 
 class UserGetResponse(DTO):

@@ -19,6 +19,10 @@ class UserServiceSqlal(UserServiceModel):
         user = self.db_session.get(User, id)
         return UserGetResponse.ok(user) if user else UserGetResponse.Error('User not found')
     
+    async def get_user_by_username(self, username: str) -> UserGetResponse:
+        user = self.db_session.query(User).filter_by(username=username).first()
+        return UserGetResponse.ok(user) if user else UserGetResponse.Error('User not found') 
+    
     async def register(self, username: str, password: str, name: str | None) -> UserGetResponse:
         user_exists = self.db_session.query(User).filter_by(username=username).first() is not None
         
