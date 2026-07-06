@@ -14,8 +14,6 @@ from schemas import (
     UserProfileResponse
 )
 from services.service_models import UserServiceModel, FollowServiceModel, PostServiceModel
-from models import Like, User, Post
-from db import DBSessionManager
 
 from utils import JWT
 
@@ -181,47 +179,57 @@ async def get_user_profile(
     )
     
 
-@router.get('/get_current_user_profile/')
-@JWT.require_auth
-def get_current_user_profile(
+@router.get(
+    '/get_current_user_profile/',
+    response_model=UserProfileResponse
+)
+@inject
+async def get_current_user_profile(
     request: Request,
-    user_id: UUID | None = None
-) -> JSONResponse:
-    assert user_id is not None
-
-    with DBSessionManager() as db_sess:
-        user: User | None = db_sess.get(User, user_id)
-        if not user:
-            return JSONResponse(content={'message': 'User not found'}, status_code=404)
+    user_service: FromDishka[UserServiceModel],
+    follow_service: FromDishka[FollowServiceModel],
+    post_service: FromDishka[PostServiceModel]
+):
+    user_id = JWT.get_id_from_request(request)
     
-        user_posts: list[Post] = (
-            db_sess.query(Post)
-            .filter(Post.user == user)
-            .order_by(Post.created_at.desc())
-            .limit(10)
-            .all()
-        )
-        
-        content: dict = {
-            'message': 'User profile found',
-            'user_id': str(user.id),
-            'username': user.username,
-            'user_name': user.name,
-            'num_followers': len(user.followers),
-            'num_followed': len(user.follows),
-            'posts': [{
-                **post.to_dict(req_likes=True),
-                'liked_by_user': db_sess.query(Like).filter_by(user_id=user_id, post_id=post.id).first()
-                is not None
-            } for post in user_posts],
-            'pfp_src': user.pfp.image_src if user.pfp else None
-        }
-        
-        return JSONResponse(content=content, status_code=200)
+    user_get_response = await user_service.get_user(user_id)
+    user = user_get_response.user
+    
+    if not user:
+        return UserProfileResponse.error('User not found')
+    
+    user_followed = await follow_service.exists(user_id, user.id)
+    
+    user_followers_response = await follow_service.get_user_followers(user.id)
+    if not user_followers_response.success:
+        return UserProfileResponse.error(user_followers_response.message)
+    
+    user_follows_response = await follow_service.get_user_followers(user.id)
+    if not user_follows_response.success:
+        return UserProfileResponse.error(user_follows_response.message)
+    
+    num_followers = len(user_followers_response.follows)
+    num_follows = len(user_followers_response.follows)
+    
+    posts_response = await post_service.get_user_posts(user.id)
+    if not posts_response.success:
+        UserProfileResponse.error(posts_response.message)
+    
+    return UserProfileResponse.ok(
+        user_get_response.user,
+        user_followed.exists,
+        num_followers,
+        num_follows,
+        posts_response.posts
+    )
+    
 
-@router.post('/logout/')
+@router.post(
+    '/logout/',
+    response_model=DTO
+)
 def logout() -> JSONResponse:
-    response = JSONResponse(content={'message': 'Successfully logged out'}, status_code=200)
+    response = JSONResponse(content=DTO.ok().__dict__, status_code=200)
     
     JWT.set_response_cookie(response, '')
     

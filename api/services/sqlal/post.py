@@ -37,8 +37,7 @@ class PostServiceSqlal(PostServiceModel):
         if not user:
             return PostListResponse.error('User not found')
         
-        posts = self.db_session.query(Post)\
-            .filter_by(user_id=id)
+        posts = self.db_session.query(Post).filter_by(user_id=id)
         
         if filter_private:
             posts = posts.filter(Post.status != 'PRIVATE')
