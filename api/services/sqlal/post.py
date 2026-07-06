@@ -31,12 +31,16 @@ class PostServiceSqlal(PostServiceModel):
         
         return DTO.ok()
     
-    async def get_user_posts(self, id: UUID) -> PostListResponse:
+    async def get_user_posts(self, id: UUID, filter_private: bool = False) -> PostListResponse:
         user = self.db_session.get(User, id)
         
         if not user:
             return PostListResponse.error('User not found')
         
-        posts = user.posts
+        posts = self.db_session.query(Post)\
+            .filter_by(user_id=id)
         
-        return PostListResponse.ok(posts)
+        if filter_private:
+            posts = posts.filter(Post.status != 'PRIVATE')
+        
+        return PostListResponse.ok(list(posts))

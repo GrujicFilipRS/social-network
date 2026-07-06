@@ -13,7 +13,7 @@ from schemas import (
     UserChangePasswordRequest,
     UserProfileResponse
 )
-from services.service_models import UserServiceModel, FollowServiceModel
+from services.service_models import UserServiceModel, FollowServiceModel, PostServiceModel
 from models import Like, User, Post
 from db import DBSessionManager
 
@@ -144,7 +144,8 @@ async def get_user_profile(
     request: Request,
     username: str,
     user_service: FromDishka[UserServiceModel],
-    follow_service: FromDishka[FollowServiceModel]
+    follow_service: FromDishka[FollowServiceModel],
+    post_service: FromDishka[PostServiceModel]
 ):  
     user_id = JWT.get_id_from_request(request)
     
@@ -167,41 +168,18 @@ async def get_user_profile(
     num_followers = len(user_followers_response.follows)
     num_follows = len(user_followers_response.follows)
     
+    posts_response = await post_service.get_user_posts(user.id, user.id != user_id)
+    if not posts_response.success:
+        UserProfileResponse.error(posts_response.message)
+    
     return UserProfileResponse.ok(
         user_get_response.user,
         user_followed.exists,
         num_followers,
-        num_follows
+        num_follows,
+        posts_response.posts
     )
     
-    #     user_posts_querry = (
-    #         db_sess.query(Post)
-    #         .filter(Post.user == user)
-    #         .order_by(Post.created_at.desc())
-    #     )
-        
-    #     if user.id != user_id:
-    #         user_posts_querry = user_posts_querry.filter(Post.status != 'PRIVATE')
-        
-    #     user_posts: list[Post] = user_posts_querry.all()
-
-    #     content: dict = {
-    #         'message': 'User profile found',
-    #         'user_id': str(user.id),
-    #         'username': user.username,
-    #         'user_name': user.name,
-    #         'num_followers': len(user.followers),
-    #         'num_followed': len(user.follows),
-    #         'posts': [{
-    #             **post.to_dict(req_likes=True),
-    #             'liked_by_user': db_sess.query(Like).filter_by(user_id=user_id, post_id=post.id).first()
-    #             is not None
-    #         } for post in user_posts],
-    #         'pfp_src': user.pfp.image_src if user.pfp else None,
-    #         'user_followed': user_followed
-    #     }
-
-    #     return JSONResponse(content=content, status_code=200)
 
 @router.get('/get_current_user_profile/')
 @JWT.require_auth

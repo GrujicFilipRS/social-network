@@ -21,5 +21,6 @@ class PostDTO(BaseModel):
             id = str(post.id),
             title = post.title,
             body = post.body,
-            status = post.status
+            status = post.status,
+            created_at = post.created_at
         )

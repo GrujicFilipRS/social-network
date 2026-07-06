@@ -4,12 +4,14 @@ from models import User
 
 from ..shared.dto import DTO
 from .user_dto import UserDTO
+from ..post.post_dto import PostDTO
 
 class UserProfileResponse(DTO):
     user: UserDTO | None
     num_followers: int | None
     num_follows: int | None
     user_followed: bool | None
+    posts: list[PostDTO]
     
     @staticmethod
     def ok(
@@ -17,6 +19,7 @@ class UserProfileResponse(DTO):
         user_followed: bool,
         num_followers: int,
         num_follows: int,
+        posts: list[PostDTO],
         message: str | None = None
     ) -> UserProfileResponse:
         return UserProfileResponse(
@@ -25,7 +28,8 @@ class UserProfileResponse(DTO):
             user = UserDTO.to_dto(user),
             user_followed = user_followed,
             num_followers = num_followers,
-            num_follows = num_follows
+            num_follows = num_follows,
+            posts = posts
         )
     
     @staticmethod
@@ -36,5 +40,6 @@ class UserProfileResponse(DTO):
             user = None,
             user_followed = False,
             num_followers = None,
-            num_follows = None
+            num_follows = None,
+            posts = []
         )
