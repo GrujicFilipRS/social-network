@@ -3,7 +3,8 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from schemas import ExistsGetResponse, DTO, FollowListResponse
+from utils import NotificationController
+from schemas import ExistsGetResponse, DTO, UserListResponse, UserGetResponse
 from models import Follow, User
 
 from ..service_models import FollowServiceModel
@@ -43,6 +44,14 @@ class FollowServiceSqlal(FollowServiceModel):
         self.db_session.add(follow)
         self.db_session.commit()
         
+        await NotificationController.create_notification(
+            session=self.db_session,
+            receiver_id=followed_id,
+            sender_id=follower_id,
+            object_type='follow',
+            object_id=follow.id
+        )
+        
         return DTO.ok()
     
     async def remove_follow(self, follower_id: UUID, followed_id: UUID) -> DTO:
@@ -59,16 +68,32 @@ class FollowServiceSqlal(FollowServiceModel):
         
         return DTO.ok()
     
-    async def get_user_follows(self, user_id: UUID) -> FollowListResponse:
+    async def get_user_follows(self, user_id: UUID) -> UserListResponse:
         user = self.db_session.get(User, user_id)
         if not user:
-            return FollowListResponse.error('User doesn\'t exist')
+            return UserListResponse.error('User doesn\'t exist')
         
-        return FollowListResponse.ok(user.follows)
+        return UserListResponse.ok([follow.follower for follow in user.follows])
 
-    async def get_user_followers(self, user_id: UUID) -> FollowListResponse:
+    async def get_user_followers(self, user_id: UUID) -> UserListResponse:
         user = self.db_session.get(User, user_id)
         if not user:
-            return FollowListResponse.error('User doesn\'t exist')
+            return UserListResponse.error('User doesn\'t exist')
         
-        return FollowListResponse.ok(user.followers)
+        return UserListResponse.ok([follow.followed for follow in user.followers])
+    
+    async def get_follower_from_follow(self, follow_id: UUID) -> UserGetResponse:
+        follow = self.db_session.get(Follow, follow_id)
+        
+        if not follow:
+            return UserGetResponse.error('Follow not found')
+        
+        return UserGetResponse.ok(follow.follower)
+        
+    async def get_followed_from_follow(self, follow_id: UUID) -> UserGetResponse:
+        follow = self.db_session.get(Follow, follow_id)
+            
+        if not follow:
+            return UserGetResponse.error('Follow not found')
+            
+        return UserGetResponse.ok(follow.followed)

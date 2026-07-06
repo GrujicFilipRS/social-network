@@ -100,6 +100,10 @@ async def set_user_name(
     user_service: FromDishka[UserServiceModel]
 ):
     user_id = JWT.get_id_from_request(request)
+    
+    if not user_id:
+        return DTO.error('Unauthorized')
+    
     response = await user_service.set_name(user_id, data.new_name)
     return response
 
@@ -115,6 +119,10 @@ async def change_username(
     user_service: FromDishka[UserServiceModel]
 ):
     user_id = JWT.get_id_from_request(request)
+    
+    if not user_id:
+        return DTO.error('Unauthorized')
+    
     response = await user_service.change_username(user_id, data.new_username)
     
     return response
@@ -128,6 +136,9 @@ async def change_password(
     user_service: FromDishka[UserServiceModel]
 ):
     user_id = JWT.get_id_from_request(request)
+    
+    if not user_id:
+        return DTO.error('Unauthorized')
     
     response = await user_service.change_password(user_id, data.old_password, data.new_password)
     return response
@@ -146,6 +157,9 @@ async def get_user_profile(
     post_service: FromDishka[PostServiceModel]
 ):  
     user_id = JWT.get_id_from_request(request)
+        
+    if not user_id:
+        return DTO.error('Unauthorized')
     
     user_get_response = await user_service.get_user_by_username(username)
     user = user_get_response.user
@@ -191,6 +205,9 @@ async def get_current_user_profile(
     post_service: FromDishka[PostServiceModel]
 ):
     user_id = JWT.get_id_from_request(request)
+    
+    if not user_id:
+        return DTO.error('Unauthorized')
     
     user_get_response = await user_service.get_user(user_id)
     user = user_get_response.user

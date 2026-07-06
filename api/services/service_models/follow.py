@@ -1,11 +1,27 @@
+from abc import abstractmethod
 from uuid import UUID
 
-from schemas import DTO, ExistsGetResponse, FollowListResponse
+from schemas import DTO, ExistsGetResponse, UserListResponse, UserGetResponse
 
 
 class FollowServiceModel:
+    @abstractmethod
     async def exists(self, follower_id: UUID, followed_id: UUID) -> ExistsGetResponse: ...
+    
+    @abstractmethod
     async def create_follow(self, follower_id: UUID, followed_id: UUID) -> DTO: ...
+    
+    @abstractmethod
     async def remove_follow(self, follower_id: UUID, followed_id: UUID) -> DTO: ...
-    async def get_user_follows(self, user_id: UUID) -> FollowListResponse: ...
-    async def get_user_followers(self, user_id: UUID) -> FollowListResponse: ...
+    
+    @abstractmethod
+    async def get_user_follows(self, user_id: UUID) -> UserListResponse: ...
+    
+    @abstractmethod
+    async def get_user_followers(self, user_id: UUID) -> UserListResponse: ...
+    
+    @abstractmethod
+    async def get_follower_from_follow(self, follow_id: UUID) -> UserGetResponse: ...
+    
+    @abstractmethod
+    async def get_followed_from_follow(self, follow_id: UUID) -> UserGetResponse: ...

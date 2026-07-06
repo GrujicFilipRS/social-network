@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
+from .dto import DTO
 
-class ExistsGetResponse(BaseModel):
+class ExistsGetResponse(DTO):
     exists: bool
     
     @staticmethod

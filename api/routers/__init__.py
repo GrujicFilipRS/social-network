@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from .user_controller import router as user_router
 from .post import router as post_router
-from .follow import router as follow_router
+from .follow_controller import router as follow_router
 from .like import router as like_router
 from .comments import router as comment_router
 from .pfp import router as pfp_router
