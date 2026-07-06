@@ -13,6 +13,10 @@ from .user.user_profile_response import UserProfileResponse
 from .follow.follow_dto import FollowDTO
 from .follow.follow_list_response import FollowListResponse
 
+from .post.post_dto import PostDTO
+from .post.post_get_response import PostGetResponse
+from .post.post_list_response import PostListResponse
+
 __all__ = [
     'DTO',
     'ExistsGetResponse',
@@ -25,5 +29,8 @@ __all__ = [
     'UserChangePasswordRequest',
     'UserProfileResponse',
     'FollowDTO',
-    'FollowListResponse'
+    'FollowListResponse',
+    'PostDTO',
+    'PostGetResponse',
+    'PostListResponse'
 ]

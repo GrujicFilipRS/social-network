@@ -14,7 +14,7 @@ from schemas import (
     UserProfileResponse
 )
 from services.service_models import UserServiceModel, FollowServiceModel
-from models import Like, User, Follow, Post
+from models import Like, User, Post
 from db import DBSessionManager
 
 from utils import JWT

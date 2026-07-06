@@ -1,0 +1,9 @@
+from uuid import UUID
+
+from schemas import DTO, PostGetResponse, PostListResponse
+
+
+class PostServiceModel:
+    async def get_post(self, id: UUID) -> PostGetResponse: ...
+    async def remove_post(self, id: UUID) -> DTO: ...
+    async def get_user_posts(self, id: UUID) -> PostListResponse: ...
