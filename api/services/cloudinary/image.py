@@ -1,16 +1,21 @@
-import cloudinary
-import cloudinary.api
-import cloudinary.uploader
 import io
-from fastapi import UploadFile as FastAPIUploadFile
+
+import cloudinary
+
 from starlette.datastructures import UploadFile
-from uuid import uuid4
+from fastapi import UploadFile as FastAPIUploadFile
 
 from env import Env
 
-class ImageController:
-    @staticmethod
-    def setup_connection() -> None:
+from uuid import UUID, uuid4
+
+from ..service_models import ImageServiceModel
+
+
+class ImageServiceCloudinary(ImageServiceModel):
+    def __init__(self): ...
+    
+    async def setup(self) -> None:
         cloudinary.config(
             cloud_name=Env.CLOUDINARY_CLOUD_NAME,
             api_key=Env.CLOUDINARY_API_KEY,
@@ -18,14 +23,12 @@ class ImageController:
             secure=True
         )
     
-    @staticmethod
-    def test_connection() -> None:
+    async def test_connection(self) -> None:
         result = cloudinary.api.config()
         print('Cloudinary connection successful!')
         print(f'Cloud name: {result.get('cloud_name')}')
     
-    @staticmethod
-    async def create_image(image: UploadFile | FastAPIUploadFile) -> tuple[str, str]:
+    async def create_image(self, image: UploadFile | FastAPIUploadFile) -> tuple[str, str]:
         file_bytes = await image.read()
         await image.seek(0)
 
@@ -38,10 +41,6 @@ class ImageController:
         )
 
         return (result['secure_url'], result['public_id'])
-
-    @staticmethod
-    async def destroy_image(public_id: str) -> None:
-        cloudinary.uploader.destroy(public_id)
     
-    def __new__(self):
-        raise TypeError('ImageController class is not instantiable')
+    async def destroy_image(self, public_id: UUID) -> None:
+        cloudinary.uploader.destroy(public_id)

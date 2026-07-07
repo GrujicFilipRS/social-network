@@ -1,8 +1,14 @@
 from dishka import Provider, Scope, provide
 from sqlalchemy.orm import Session
 
-from services.service_models import UserServiceModel, FollowServiceModel, PostServiceModel
+from services.service_models import (
+    UserServiceModel,
+    FollowServiceModel,
+    PostServiceModel,
+    ImageServiceModel
+)
 from services.sqlal import UserServiceSqlal, FollowServiceSqlal, PostServiceSqlal
+from services.cloudinary import ImageServiceCloudinary
 
 
 class ServiceProvider(Provider):
@@ -17,3 +23,7 @@ class ServiceProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def post_service(self, db_sess: Session) -> PostServiceModel:
         return PostServiceSqlal(db_sess)
+    
+    @provide(scope=Scope.REQUEST)
+    def image_service(self) -> ImageServiceModel:
+        return ImageServiceCloudinary()

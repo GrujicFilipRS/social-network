@@ -3,12 +3,15 @@ from starlette.datastructures import UploadFile
 from fastapi.responses import JSONResponse
 from fastapi import Request, UploadFile as FastAPIUploadFile
 from datetime import datetime, timezone
+from dishka.integrations.fastapi import inject
+from dishka import FromDishka
 
 from utils import NotificationController
 from models import Post, Like, Photo
 from db import DBSessionManager
+from services.service_models import ImageServiceModel
 
-from utils import JWT, PostLiterals, ImageController
+from utils import JWT, PostLiterals
 
 from fastapi import APIRouter
 
@@ -16,6 +19,7 @@ router = APIRouter()
 
 
 @router.get('/get_post/')
+@inject
 @JWT.optional_auth
 async def get_post(
     request: Request,
@@ -78,9 +82,11 @@ async def get_post_id_from_like_id(
 
 
 @router.post('/create_post/')
+@inject
 @JWT.require_auth
 async def create_post(
     request: Request,
+    image_service: FromDishka[ImageServiceModel],
     user_id: UUID | None = None
 ) -> JSONResponse:
     assert user_id is not None
@@ -128,7 +134,7 @@ async def create_post(
         
         # Create all individual photos
         for position, photo in enumerate(photos):
-            image_src, public_id = await ImageController.create_image(photo)
+            image_src, public_id = await image_service.create_image(photo)
             
             photo_obj = Photo(
                 post_id=post.id,

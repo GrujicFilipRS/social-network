@@ -6,15 +6,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import traceback
 
-from dishka import make_async_container
+from dishka import FromDishka, make_async_container
 from dishka.integrations.fastapi import setup_dishka
 
 from di.providers import DBSessionProvider, ServiceProvider
+from services.service_models import ImageServiceModel
 from schemas import DTO
 from env import Env
 from db import db_session
 
-from utils import ImageController, WorkerShareController, ConnectionController
+from utils import WorkerShareController, ConnectionController
 from routers import router
 
 db_session.global_init()
@@ -54,8 +55,9 @@ setup_dishka(container=container, app=app)
 
 app.include_router(router)
 
-ImageController.setup_connection()
-ImageController.test_connection()
+async def setup(image_service: FromDishka[ImageServiceModel]):
+    await image_service.init()
+    await image_service.test_connection()
 
 WorkerShareController.init()
 asyncio.create_task(ConnectionController.redis_listener())
