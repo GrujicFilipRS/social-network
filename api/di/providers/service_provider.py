@@ -27,3 +27,7 @@ class ServiceProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def image_service(self) -> ImageServiceModel:
         return ImageServiceCloudinary()
+    
+    @provide(scope=Scope.APP)
+    def image_service_app(self) -> ImageServiceModel:
+        return ImageServiceCloudinary()

@@ -1,6 +1,7 @@
 import io
 
 import cloudinary
+import cloudinary.api
 
 from starlette.datastructures import UploadFile
 from fastapi import UploadFile as FastAPIUploadFile

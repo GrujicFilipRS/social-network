@@ -6,7 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import traceback
 
-from dishka import FromDishka, make_async_container
+from contextlib import asynccontextmanager
+
+from dishka import make_async_container
 from dishka.integrations.fastapi import setup_dishka
 
 from di.providers import DBSessionProvider, ServiceProvider
@@ -20,7 +22,26 @@ from routers import router
 
 db_session.global_init()
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    image_service = await container.get(ImageServiceModel)
+
+    await image_service.init()
+    await image_service.test_connection()
+
+    WorkerShareController.init()
+
+    redis_task = asyncio.create_task(ConnectionController.redis_listener())
+
+    yield
+
+    redis_task.cancel()
+    try:
+        await redis_task
+    except asyncio.CancelledError:
+        pass
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -54,10 +75,3 @@ container = make_async_container(
 setup_dishka(container=container, app=app)
 
 app.include_router(router)
-
-async def setup(image_service: FromDishka[ImageServiceModel]):
-    await image_service.init()
-    await image_service.test_connection()
-
-WorkerShareController.init()
-asyncio.create_task(ConnectionController.redis_listener())
