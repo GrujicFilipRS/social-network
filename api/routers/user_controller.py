@@ -177,8 +177,8 @@ async def get_user_profile(
     if not user_follows_response.success:
         return UserProfileResponse.error(user_follows_response.message)
     
-    num_followers = len(user_followers_response.follows)
-    num_follows = len(user_followers_response.follows)
+    num_followers = len(user_followers_response.users)
+    num_follows = len(user_followers_response.users)
     
     posts_response = await post_service.get_user_posts(user.id, user.id != user_id)
     if not posts_response.success:
@@ -225,8 +225,8 @@ async def get_current_user_profile(
     if not user_follows_response.success:
         return UserProfileResponse.error(user_follows_response.message)
     
-    num_followers = len(user_followers_response.follows)
-    num_follows = len(user_followers_response.follows)
+    num_followers = len(user_followers_response.users)
+    num_follows = len(user_followers_response.users)
     
     posts_response = await post_service.get_user_posts(user.id)
     if not posts_response.success:

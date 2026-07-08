@@ -31,8 +31,8 @@ class ServiceProvider(Provider):
         return PostServiceSqlal(db_sess)
 
     @provide(scope=Scope.REQUEST)
-    def pfp_service(self, db_sess: Session) -> PfpServiceModel:
-        return PfpServiceSqlal(db_sess)
+    def pfp_service(self, db_sess: Session, upload_service: ImageUploadServiceModel) -> PfpServiceModel:
+        return PfpServiceSqlal(db_sess, upload_service)
     
     @provide(scope=Scope.REQUEST)
     def image_service(self) -> ImageUploadServiceModel:

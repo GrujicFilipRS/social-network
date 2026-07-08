@@ -30,7 +30,7 @@ async def create_user_pfp(
     form = await request.form()
     form_image = form.get('image')
 
-    if not PFP.approve_pfp_file(form_image):
+    if not await PFP.approve_pfp_file(form_image):
         return DTO.error('Invalid image file')
         
     if not isinstance(form_image, UploadFile):
