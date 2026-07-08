@@ -9,7 +9,7 @@ from dishka import FromDishka
 from utils import NotificationController
 from models import Post, Like, Photo
 from db import DBSessionManager
-from services.service_models import ImageServiceModel
+from services.service_models import ImageUploadServiceModel
 
 from utils import JWT, PostLiterals
 
@@ -86,7 +86,7 @@ async def get_post_id_from_like_id(
 @JWT.require_auth
 async def create_post(
     request: Request,
-    image_service: FromDishka[ImageServiceModel],
+    image_service: FromDishka[ImageUploadServiceModel],
     user_id: UUID | None = None
 ) -> JSONResponse:
     assert user_id is not None

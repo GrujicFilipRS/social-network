@@ -6,38 +6,27 @@ from fastapi.responses import JSONResponse
 
 from dishka.integrations.fastapi import inject
 
-from services.service_models import ImageServiceModel
+from services.service_models import ImageUploadServiceModel, UserServiceModel, PfpServiceModel
 from utils import JWT
 from models import PFP
 from db import DBSessionManager
+from schemas import DTO
 
 router = APIRouter()
 
 
-@router.get('/get_user_pfp/')
-def get_user_pfp(user_id: UUID) -> JSONResponse:
-    with DBSessionManager() as db_sess:
-        pfp: PFP | None = db_sess.query(PFP).filter_by(user_id=user_id).first()
-
-        if pfp is None:
-            return JSONResponse(content={'message': 'pfp not found'}, status_code=404)
-        
-        content: dict = {
-            'message': 'Successfully found pfp',
-            'image_src': pfp.image_src
-        }
-
-        return JSONResponse(content=content, status_code=200)
-
-@router.post('/create_user_pfp/')
+@router.post(
+    '/create_user_pfp/',
+    response_model=DTO
+)
 @inject
-@JWT.require_auth
 async def create_user_pfp(
     request: Request,
-    image_service: FromDishka[ImageServiceModel],
-    user_id: UUID | None = None
+    user_service: FromDishka[UserServiceModel],
+    pfp_service: FromDishka[PfpServiceModel],
+    image_service: FromDishka[ImageUploadServiceModel]
 ) -> JSONResponse:
-    assert user_id is not None
+    user_id = JWT.get_id_from_request(request)
     form = await request.form()
     form_image = form.get('image')
 
@@ -73,7 +62,7 @@ async def create_user_pfp(
 @JWT.require_auth
 async def delete_pfp(
     request: Request,
-    image_service: FromDishka[ImageServiceModel],
+    image_service: FromDishka[ImageUploadServiceModel],
     user_id: UUID | None = None
 ) -> JSONResponse:
     assert user_id is not None

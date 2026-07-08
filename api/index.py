@@ -12,7 +12,7 @@ from dishka import make_async_container
 from dishka.integrations.fastapi import setup_dishka
 
 from di.providers import DBSessionProvider, ServiceProvider
-from services.service_models import ImageServiceModel
+from services.service_models import ImageUploadServiceModel
 from schemas import DTO
 from env import Env
 from db import db_session
@@ -24,7 +24,7 @@ db_session.global_init()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    image_service = await container.get(ImageServiceModel)
+    image_service = await container.get(ImageUploadServiceModel)
 
     await image_service.init()
     await image_service.test_connection()
