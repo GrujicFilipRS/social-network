@@ -5,9 +5,15 @@ from services.service_models import (
     UserServiceModel,
     FollowServiceModel,
     PostServiceModel,
-    ImageUploadServiceModel
+    ImageUploadServiceModel,
+    PfpServiceModel
 )
-from services.sqlal import UserServiceSqlal, FollowServiceSqlal, PostServiceSqlal
+from services.sqlal import (
+    UserServiceSqlal,
+    FollowServiceSqlal,
+    PostServiceSqlal,
+    PfpServiceSqlal
+)
 from services.cloudinary import ImageServiceCloudinary
 
 
@@ -23,6 +29,10 @@ class ServiceProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def post_service(self, db_sess: Session) -> PostServiceModel:
         return PostServiceSqlal(db_sess)
+
+    @provide(scope=Scope.REQUEST)
+    def pfp_service(self, db_sess: Session) -> PfpServiceModel:
+        return PfpServiceSqlal(db_sess)
     
     @provide(scope=Scope.REQUEST)
     def image_service(self) -> ImageUploadServiceModel:
