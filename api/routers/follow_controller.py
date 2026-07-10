@@ -2,10 +2,8 @@ from uuid import UUID
 from dishka.integrations.fastapi import inject, FromDishka
 from fastapi import Request
 
-from services.service_models import FollowServiceModel
+from services.service_models import FollowServiceModel, AuthServiceModel
 from schemas import UserGetResponse, DTO, FollowCreateRequest, UserListResponse, ExistsGetResponse
-
-from utils import JWT
 
 from fastapi import APIRouter
 
@@ -31,9 +29,10 @@ async def get_follower(
 async def follow_user(
     request: Request,
     data: FollowCreateRequest,
-    follow_service: FromDishka[FollowServiceModel]
+    follow_service: FromDishka[FollowServiceModel],
+    auth_service: FromDishka[AuthServiceModel]
 ):
-    user_id = JWT.get_id_from_request(request)
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
     
     if not user_id:
         return DTO.error('Unauthorized')
@@ -49,9 +48,10 @@ async def follow_user(
 async def unfollow_user(
     request: Request,
     data: FollowCreateRequest,
-    follow_service: FromDishka[FollowServiceModel]
+    follow_service: FromDishka[FollowServiceModel],
+    auth_service: FromDishka[AuthServiceModel]
 ):
-    user_id = JWT.get_id_from_request(request)
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
     
     if not user_id:
         return DTO.error('Unauthorized')
@@ -91,9 +91,10 @@ async def get_user_followers(
 async def check_if_following(
     request: Request,
     user_id: UUID,
-    follow_service: FromDishka[FollowServiceModel]
+    follow_service: FromDishka[FollowServiceModel],
+    auth_service: FromDishka[AuthServiceModel]
 ):
-    id = JWT.get_id_from_request(request)
+    id = auth_service.decode_token(request.cookies['auth_token'])
     
     if not id:
         return ExistsGetResponse.error('Unauthorized')
