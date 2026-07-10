@@ -1,12 +1,14 @@
 from datetime import datetime, timezone
 from uuid import UUID
 from fastapi.responses import JSONResponse
+from dishka.integrations.fastapi import inject, FromDishka
 
 from models import Comment, Post
 from db import DBSessionManager
 from utils import NotificationController
+from services.service_models import AuthServiceModel
 
-from utils import JWT, PostLiterals
+from utils import PostLiterals
 
 from fastapi import APIRouter, Request
 
@@ -52,12 +54,12 @@ def get_post_id_from_comment_id(comment_id: UUID) -> JSONResponse:
 
 
 @router.post('/post_comment/')
-@JWT.require_auth
+@inject
 async def post_comment(
     request: Request,
-    user_id: UUID | None = None
+    auth_service: FromDishka[AuthServiceModel]
 ) -> JSONResponse:
-    assert user_id is not None
+    user = auth_service.get_user_from_token(request.cookies['auth_token'])
 
     data = await request.json()
 
@@ -77,18 +79,18 @@ async def post_comment(
             body=body,
             post_id=post.id,
             comment_id=comment_id,
-            creator_id=user_id,
+            creator_id=user.id,
             commented_at=datetime.now(timezone.utc)
         )
 
         db_sess.add(new_comment)
         db_sess.commit()
         
-        if post.user_id != user_id:
+        if post.user_id != user.id:
             await NotificationController.create_notification(
                 session=db_sess,
                 receiver_id=post.user_id,
-                sender_id=user_id,
+                sender_id=user.id,
                 object_type='comment',
                 object_id=new_comment.id
             )
@@ -102,12 +104,12 @@ async def post_comment(
 
 
 @router.put('/edit_comment/')
-@JWT.require_auth
+@inject
 async def edit_comment(
     request: Request,
-    user_id: UUID | None = None
+    auth_service: FromDishka[AuthServiceModel]
 ) -> JSONResponse:
-    assert user_id is not None
+    user = auth_service.get_user_from_token(request.cookies['auth_token'])
     
     data = await request.json()
     try:
@@ -126,7 +128,7 @@ async def edit_comment(
         if comment is None:
             return JSONResponse(content={'message': 'Comment not found'}, status_code=404)
 
-        if comment.creator_id != user_id:
+        if comment.creator != user:
             return JSONResponse(content={'message': 'You are not authorized to delete this comment'}, status_code=401)
         
         comment.body = body
@@ -136,7 +138,7 @@ async def edit_comment(
     return JSONResponse(content={'message': 'Successfully edited comment'}, status_code=200)
 
 @router.delete('/remove_comment/')
-@JWT.require_auth
+@inject
 async def delete_comment(
     request: Request,
     user_id: UUID | None = None

@@ -2,6 +2,7 @@ from dishka import Provider, Scope, provide
 from sqlalchemy.orm import Session
 
 from services.service_models import (
+    AuthServiceModel,
     UserServiceModel,
     FollowServiceModel,
     PostServiceModel,
@@ -9,6 +10,7 @@ from services.service_models import (
     PfpServiceModel
 )
 from services.sqlal import (
+    AuthServiceJWTSqlal,
     UserServiceSqlal,
     FollowServiceSqlal,
     PostServiceSqlal,
@@ -33,6 +35,10 @@ class ServiceProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def pfp_service(self, db_sess: Session, upload_service: ImageUploadServiceModel) -> PfpServiceModel:
         return PfpServiceSqlal(db_sess, upload_service)
+    
+    @provide(scope=Scope.REQUEST)
+    def auth_service(self, db_sess: Session) -> AuthServiceModel:
+        return AuthServiceJWTSqlal(db_sess)
     
     @provide(scope=Scope.REQUEST)
     def image_service(self) -> ImageUploadServiceModel:
