@@ -141,9 +141,9 @@ async def edit_comment(
 @inject
 async def delete_comment(
     request: Request,
-    user_id: UUID | None = None
+    auth_service: FromDishka[AuthServiceModel]
 ) -> JSONResponse:
-    assert user_id is not None
+    user = auth_service.get_user_from_token(request.cookies['auth_token'])
 
     with DBSessionManager() as db_sess:
         data = await request.json()
@@ -157,7 +157,7 @@ async def delete_comment(
         if comment is None:
             return JSONResponse(content={'message': 'Comment not found'}, status_code=404)
 
-        if comment.creator_id != user_id:
+        if comment.creator != user:
             return JSONResponse(content={'message': 'You are not authorized to delete this comment'}, status_code=401)
         
         db_sess.delete(comment)
@@ -167,11 +167,12 @@ async def delete_comment(
 
 
 @router.get('/get_post_comments/')
-@JWT.optional_auth
+@inject
 def get_post_comments(
     request: Request,
-    user_id: UUID | None = None
+    auth_service: FromDishka[AuthServiceModel]
 ) -> JSONResponse:
+    user = auth_service.get_user_from_token(request.cookies['auth_token'])
     
     with DBSessionManager() as db_sess:
         try:
@@ -192,7 +193,7 @@ def get_post_comments(
         if post.status == PostLiterals.PUBLIC:
             return JSONResponse(content=content, status_code=200)
 
-        if post.user_id != user_id:
+        if post.user != user:
             return JSONResponse(content={
                 'message': 'You are not authorized to view this post'
             }, status_code=401)
