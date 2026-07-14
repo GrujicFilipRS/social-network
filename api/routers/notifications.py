@@ -1,13 +1,10 @@
 from uuid import UUID
 from fastapi import APIRouter, Request, WebSocket
-from fastapi.responses import JSONResponse
 from dishka.integrations.fastapi import inject, FromDishka
 
-from models import Notification
-from utils import JWT, ConnectionController
-from db import DBSessionManager
+from utils import ConnectionController
 from services.service_models import AuthServiceModel, NotificationModelServiceModel
-from schemas import NotificationListResponse
+from schemas import NotificationListResponse, DTO
 
 router = APIRouter()
 
@@ -53,25 +50,20 @@ async def get_unread_notifications(
 ):
     user_id = auth_service.decode_token(request.cookies['auth_token'])
     
-    return notification_service.get_unread_notifications(user_id)
+    return await notification_service.get_unread_notifications(user_id)
         
 
-@router.post('/read_notification/{notification_id}/')
-@JWT.require_auth
+@router.post(
+    '/read_notification/{notification_id}/',
+    response_model=DTO
+)
+@inject
 async def read_notification(
     request: Request,
     notification_id: UUID,
-    user_id: UUID | None = None
+    auth_service: FromDishka[AuthServiceModel],
+    notification_service: FromDishka[NotificationModelServiceModel]
 ):
-    assert user_id is not None
-
-    with DBSessionManager() as db_sess:
-        notification = db_sess.query(Notification).get(notification_id)
-
-        if not notification:
-            return JSONResponse(status_code=404, content={'error': 'Notification not found'})
-
-        notification.seen = True
-        db_sess.commit()
-
-        return JSONResponse(status_code=200, content={'message': 'Notification marked as read'})
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    
+    return await notification_service.read_notification(notification_id, user_id)

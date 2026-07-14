@@ -31,6 +31,9 @@ class NotificationModelServiceSqlal(NotificationModelServiceModel):
         if not notification:
             return DTO.error('Notification doesn\'t exist')
         
+        if notification.receiver != user:
+            return DTO.error('Unauthorized')
+        
         if notification.seen:
             return DTO.error('Notification already seen')
         
