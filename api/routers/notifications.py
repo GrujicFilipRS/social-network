@@ -1,16 +1,34 @@
 from uuid import UUID
 from fastapi import APIRouter, Request, WebSocket
 from fastapi.responses import JSONResponse
+from dishka.integrations.fastapi import inject, FromDishka
+
 from models import Notification
 from utils import JWT, ConnectionController
 from db import DBSessionManager
+from services.service_models import AuthServiceModel, NotificationModelServiceModel
+from schemas import NotificationListResponse
 
 router = APIRouter()
 
 
 @router.websocket('/')
-@JWT.required_auth_websocket
-async def websocket(websocket: WebSocket, user_id: UUID):
+@inject
+async def websocket(
+    websocket: WebSocket,
+    auth_service: FromDishka[AuthServiceModel]
+):
+    cookie_header = websocket.headers.get('cookie')
+    if not cookie_header:
+        return None
+
+    cookies = dict(
+        item.strip().split('=', 1)
+        for item in cookie_header.split(';')
+    )
+    
+    user_id = auth_service.decode_token(cookies['auth_token'])
+
     await websocket.accept()
 
     ConnectionController.connect(user_id, websocket)
@@ -23,29 +41,19 @@ async def websocket(websocket: WebSocket, user_id: UUID):
         print('WS ERROR:', e)
 
 
-@router.get('/get_unread_notifications/')
-@JWT.require_auth
+@router.get(
+    '/get_unread_notifications/',
+    response_model=NotificationListResponse
+)
+@inject
 async def get_unread_notifications(
     request: Request,
-    user_id: UUID | None = None
+    auth_service: FromDishka[AuthServiceModel],
+    notification_service: FromDishka[NotificationModelServiceModel]
 ):
-    assert user_id is not None
-
-    NOTIFICATION_LIMIT = 10
-
-    with DBSessionManager() as db_sess:
-        notifications = (
-            db_sess.query(Notification)
-            .filter_by(receiver_id=user_id, seen=False)
-            .order_by(Notification.received_at.desc())
-            .limit(NOTIFICATION_LIMIT)
-            .all()
-        )
-
-        return [
-            notification.to_dict()
-            for notification in notifications
-        ]
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    
+    return notification_service.get_unread_notifications(user_id)
         
 
 @router.post('/read_notification/{notification_id}/')

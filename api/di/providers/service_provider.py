@@ -7,14 +7,16 @@ from services.service_models import (
     FollowServiceModel,
     PostServiceModel,
     ImageUploadServiceModel,
-    PfpServiceModel
+    PfpServiceModel,
+    NotificationModelServiceModel
 )
 from services.sqlal import (
     AuthServiceJWTSqlal,
     UserServiceSqlal,
     FollowServiceSqlal,
     PostServiceSqlal,
-    PfpServiceSqlal
+    PfpServiceSqlal,
+    
 )
 from services.cloudinary import ImageServiceCloudinary
 
@@ -39,6 +41,10 @@ class ServiceProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def auth_service(self, db_sess: Session) -> AuthServiceModel:
         return AuthServiceJWTSqlal(db_sess)
+    
+    @provide(scope=Scope.REQUEST)
+    def notification_model_service(self, db_sess: Session) -> NotificationModelServiceModel:
+        return 
     
     @provide(scope=Scope.REQUEST)
     def image_service(self) -> ImageUploadServiceModel:
