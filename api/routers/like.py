@@ -7,7 +7,7 @@ from dishka.integrations.fastapi import inject, FromDishka
 from services.service_models import AuthServiceModel, LikeServiceModel
 from models import Like, User, Post
 
-from schemas import LikeGetResponse
+from schemas import LikeGetResponse, DTO
 
 from fastapi import APIRouter
 
@@ -30,50 +30,20 @@ async def get_like(
     return await like_service.get_like(id, user_id)
 
 
-@router.post('/like_post/')
-@JWT.require_auth
+@router.post(
+    '/like_post/{post_id}',
+    response_model=DTO
+)
+@inject
 async def like_post(
     request: Request,
-    user_id: UUID | None = None
-) -> JSONResponse:
-    assert user_id is not None
-
-    with DBSessionManager() as db_sess:
-        data = await request.json()
-        try:
-            post_id: UUID = UUID(data.get('post_id'))
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid post_id'}, status_code=400)
-
-        user: User | None = db_sess.get(User, user_id)
-        if not user:
-            return JSONResponse(content={'message': 'You must be logged in to like a message'}, status_code=401)
-
-        if any([like.post_id == post_id for like in user.likes]):
-            return JSONResponse(content={'message': 'You already liked this post'}, status_code=400)
-        
-        post: Post | None = db_sess.get(Post, post_id)
-        if not post:
-            return JSONResponse(content={'message': 'Post not found'}, status_code=404)
-        
-        like = Like()
-        like.post_id = post_id
-        like.user_id = user_id
-        like.liked_at = datetime.now(timezone.utc)
-
-        db_sess.add(like)
-        db_sess.commit()
-        
-        if like.user_id != post.user_id:
-            await NotificationController.create_notification(
-                session=db_sess,
-                receiver_id=post.user_id,
-                sender_id=user_id,
-                object_type='like',
-                object_id=like.id
-            )
-
-        return JSONResponse(content={'message': 'Successfully liked post'}, status_code=201)
+    post_id: UUID,
+    auth_service: FromDishka[AuthServiceModel],
+    like_service: FromDishka[LikeServiceModel]
+):
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    
+    return await like_service.like_post(post_id, user_id)
     
 
 @router.delete('/unlike_post/')
