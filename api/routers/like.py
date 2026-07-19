@@ -19,35 +19,15 @@ router = APIRouter()
     LikeGetResponse
 )
 @inject
-def get_like(
+async def get_like(
     request: Request,
     id: UUID,
     auth_service: FromDishka[AuthServiceModel],
     like_service: FromDishka[LikeServiceModel]
-) -> JSONResponse:
+):
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
     
-    
-    with DBSessionManager() as db_sess:
-        try:
-            like_id: UUID | None = UUID(request.query_params.get('like_id'))
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid like_id'}, status_code=400)
-
-        like: Like | None = db_sess.get(Like, like_id)
-
-        if not like:
-            return JSONResponse(content={'message': 'Like not found'}, status_code=404)
-        
-        if (like.post.status == PostLiterals.PRIVATE and
-            user_id != like.post.user_id):
-            return JSONResponse(content={'message': 'The liked post is private'}, status_code=401)
-
-        content: dict = {
-            'message': 'Like successfully found',
-            'like': like.to_dict()
-        }
-
-        return JSONResponse(content=content, status_code=200)
+    return await like_service.get_like(id, user_id)
 
 
 @router.post('/like_post/')

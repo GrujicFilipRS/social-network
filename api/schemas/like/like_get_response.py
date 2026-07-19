@@ -16,3 +16,11 @@ class LikeGetResponse(DTO):
             message = message,
             like = LikeDTO.to_dto(like)
         )
+    
+    @staticmethod
+    def error(message: str) -> LikeGetResponse:
+        return LikeGetResponse(
+            success = False,
+            message = message,
+            like = None
+        )
