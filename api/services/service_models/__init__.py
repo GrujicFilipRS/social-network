@@ -4,6 +4,7 @@ from .follow import FollowServiceModel
 from .post import PostServiceModel
 from .image_upload import ImageUploadServiceModel
 from .pfp import PfpServiceModel
+from .like import LikeServiceModel
 from .notification_model import NotificationModelServiceModel
 
 __all__ = [
@@ -13,5 +14,6 @@ __all__ = [
     'PostServiceModel',
     'ImageUploadServiceModel',
     'PfpServiceModel',
+    'LikeServiceModel',
     'NotificationModelServiceModel'
 ]

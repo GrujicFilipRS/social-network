@@ -2,23 +2,31 @@ from uuid import UUID
 from fastapi.responses import JSONResponse
 from fastapi import Request
 from datetime import datetime, timezone
+from dishka.integrations.fastapi import inject, FromDishka
 
+from services.service_models import AuthServiceModel, LikeServiceModel
 from models import Like, User, Post
 
-from db import DBSessionManager
-from utils import NotificationController, JWT, PostLiterals
+from schemas import LikeGetResponse
 
 from fastapi import APIRouter
 
 router = APIRouter()
 
 
-@router.get('/get_like/')
-@JWT.optional_auth
+@router.get(
+    '/get_like/{id}',
+    LikeGetResponse
+)
+@inject
 def get_like(
     request: Request,
-    user_id: UUID | None = None
+    id: UUID,
+    auth_service: FromDishka[AuthServiceModel],
+    like_service: FromDishka[LikeServiceModel]
 ) -> JSONResponse:
+    
+    
     with DBSessionManager() as db_sess:
         try:
             like_id: UUID | None = UUID(request.query_params.get('like_id'))

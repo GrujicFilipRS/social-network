@@ -8,6 +8,7 @@ from services.service_models import (
     PostServiceModel,
     ImageUploadServiceModel,
     PfpServiceModel,
+    LikeServiceModel,
     NotificationModelServiceModel
 )
 from services.sqlal import (
@@ -16,7 +17,8 @@ from services.sqlal import (
     FollowServiceSqlal,
     PostServiceSqlal,
     PfpServiceSqlal,
-    
+    LikeServiceSqlal,
+    NotificationModelServiceSqlal
 )
 from services.cloudinary import ImageServiceCloudinary
 
@@ -44,7 +46,11 @@ class ServiceProvider(Provider):
     
     @provide(scope=Scope.REQUEST)
     def notification_model_service(self, db_sess: Session) -> NotificationModelServiceModel:
-        return 
+        return NotificationModelServiceSqlal(db_sess)
+    
+    @provide(scope=Scope.REQUEST)
+    def like_service(self, db_sess: Session) -> LikeServiceModel:
+        return LikeServiceSqlal(db_sess)
     
     @provide(scope=Scope.REQUEST)
     def image_service(self) -> ImageUploadServiceModel:

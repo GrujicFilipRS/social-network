@@ -19,6 +19,9 @@ from .post.post_dto import PostDTO
 from .post.post_get_response import PostGetResponse
 from .post.post_list_response import PostListResponse
 
+from .like.like_dto import LikeDTO
+from .like.like_get_response import LikeGetResponse
+
 from .notification.notification_dto import NotificationDTO
 from .notification.notification_list_response import NotificationListResponse
 
@@ -41,6 +44,8 @@ __all__ = [
     'PostDTO',
     'PostGetResponse',
     'PostListResponse',
+    'LikeDTO',
+    'LikeGetResponse',
     'NotificationDTO',
     'NotificationListResponse'
 ]
