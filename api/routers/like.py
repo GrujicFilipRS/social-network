@@ -1,11 +1,9 @@
 from uuid import UUID
 from fastapi.responses import JSONResponse
 from fastapi import Request
-from datetime import datetime, timezone
 from dishka.integrations.fastapi import inject, FromDishka
 
 from services.service_models import AuthServiceModel, LikeServiceModel
-from models import Like, User, Post
 
 from schemas import LikeGetResponse, DTO
 
@@ -43,53 +41,26 @@ async def like_post(
 ):
     user_id = auth_service.decode_token(request.cookies['auth_token'])
     
+    if not user_id:
+        return DTO.error('Unauthorized')
+    
     return await like_service.like_post(post_id, user_id)
     
 
-@router.delete('/unlike_post/')
-@JWT.require_auth
+@router.delete(
+    '/unlike_post/{post_id}',
+    response_model=DTO
+)
+@inject
 async def unlike_post(
     request: Request,
-    user_id: UUID | None = None
+    post_id: UUID,
+    auth_service: FromDishka[AuthServiceModel],
+    like_service: FromDishka[LikeServiceModel]
 ) -> JSONResponse:
-    assert user_id is not None
-
-    with DBSessionManager() as db_sess:
-        data = await request.json()
-        try:
-            post_id: UUID = UUID(data.get('post_id'))
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid post_id'}, status_code=400)
-
-        user: User | None = db_sess.get(User, user_id)
-        if not user:
-            return JSONResponse(content={'message': 'You must be logged in to unlike a message'}, status_code=401)
-
-        if not any([like.post_id == post_id for like in user.likes]):
-            return JSONResponse(content={'message': 'The post isn\'t liked'}, status_code=400)
-
-        like: Like | None = db_sess.query(Like).filter_by(user_id=user_id, post_id=post_id).first()
-
-        if not like:
-            return JSONResponse(content={'message': 'Like not found'}, status_code=404)
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
         
-        db_sess.delete(like)
-        db_sess.commit()
-
-        return JSONResponse(content={'message': 'Successfully unliked post'}, status_code=200)
-
-
-@router.get('/get_user_likes/')
-def get_user_likes(user_id: UUID) -> JSONResponse:
-    with DBSessionManager() as db_sess:
-        user: User | None = db_sess.get(User, user_id)
-
-        if not user:
-            return JSONResponse(content={'message': 'User not found'}, status_code=404)
-        
-        content: dict = {
-            'message': 'Likes successfully found',
-            'likes': [ like.to_dict() for like in user.likes ]
-        }
-
-        return JSONResponse(content=content, status_code=200)
+    if not user_id:
+        return DTO.error('Unauthorized')
+    
+    return await like_service.unlike_post(post_id, user_id)

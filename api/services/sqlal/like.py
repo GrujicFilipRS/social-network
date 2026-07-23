@@ -23,9 +23,6 @@ class LikeServiceSqlal(LikeServiceModel):
         return LikeGetResponse.ok(like)
     
     async def like_post(self, post_id, user_id) -> DTO:
-        if not user_id:
-            return DTO.error('Unauthorized')
-        
         if self.db_session.get(User, user_id).first() is None:
             return DTO.error('Unauthorized')
         
@@ -60,5 +57,28 @@ class LikeServiceSqlal(LikeServiceModel):
                 'like',
                 like.id
             )
+        
+        return DTO.ok()
+    
+    async def unlike_post(self, post_id, user_id):
+        if self.db_session.get(User, user_id).first() is None:
+            return DTO.error('Unauthorized')
+        
+        post = self.db_session.get(Post, post_id)
+        
+        if not post:
+            return DTO.error('Post doesn\'t exist')
+        
+        if post.status == 'PRIVATE' and post.user_id != user_id:
+            return DTO.error('Post doesn\'t exist')
+        
+        like = self.db_session.query(Like)\
+            .filter_by(user_id = user_id, post_id = post_id).first()
+            
+        if not like:
+            return DTO.error('Post not liked')
+        
+        self.db_session.delete(like)
+        self.db_session.commit()
         
         return DTO.ok()
