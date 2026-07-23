@@ -1,16 +1,24 @@
 from uuid import UUID
+from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
-from models import Post, User
+from utils import PhotoVerificationMethods
+from services.service_models import ImageUploadServiceModel
+from models import Post, User, Photo
 
 from ..service_models import PostServiceModel
 from schemas import PostGetResponse, PostListResponse, DTO
 
 
 class PostServiceSqlal(PostServiceModel):
-    def __init__(self, db_session: Session):
+    def __init__(
+        self,
+        db_session: Session,
+        upload_service: ImageUploadServiceModel
+    ):
         self.db_session = db_session
+        self.upload_service = upload_service
     
     async def get_post(self, id: UUID) -> PostGetResponse:
         post = self.db_session.get(Post, id)
@@ -43,3 +51,40 @@ class PostServiceSqlal(PostServiceModel):
             posts = posts.filter(Post.status != 'PRIVATE')
         
         return PostListResponse.ok(list(posts))
+    
+    async def create_post(self, user_id, title, body, status, image_streams) -> PostGetResponse:
+        user = self.db_session.get(User, id)
+                
+        if not user:
+            return PostListResponse.error('User not found')
+        
+        post = Post(
+            title = title,
+            body = body,
+            status = status,
+            created_at = datetime.now(timezone.utc),
+            user_id=user_id,
+        )
+        
+        self.db_session.add(post)
+        self.db_session.flush()
+        
+        for i, stream in enumerate(image_streams):
+            if not PhotoVerificationMethods.verify_photo(stream):
+                self.db_session.rollback()
+                return PostGetResponse.error('Invalid photo format')
+            
+            image_src, public_id = await self.upload_service.create_image(stream)
+            
+            photo = Photo(
+                post_id = post.id,
+                post_position = i + 1,
+                image_src = image_src,
+                image_id = public_id
+            )
+            
+            self.db_session.add(photo)
+            self.db_session.flush()
+        
+        self.db_session.commit()
+        return PostGetResponse.ok(post)

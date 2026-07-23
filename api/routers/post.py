@@ -1,15 +1,15 @@
+from io import BytesIO
+from typing import Annotated
 from uuid import UUID
 from starlette.datastructures import UploadFile
 from fastapi.responses import JSONResponse
-from fastapi import Request, UploadFile as FastAPIUploadFile
-from datetime import datetime, timezone
+from fastapi import Depends, File, Form, Request
 from dishka.integrations.fastapi import inject
 from dishka import FromDishka
 
-from utils import NotificationController
-from models import Post, Like, Photo
+from models import Post, Like
 from db import DBSessionManager
-from services.service_models import ImageUploadServiceModel
+from services.service_models import PostServiceModel
 
 from utils import JWT, PostLiterals
 
@@ -83,85 +83,26 @@ async def get_post_id_from_like_id(
 
 @router.post('/create_post/')
 @inject
-@JWT.require_auth
 async def create_post(
-    request: Request,
-    image_service: FromDishka[ImageUploadServiceModel],
-    user_id: UUID | None = None
-) -> JSONResponse:
-    assert user_id is not None
-    data = await request.form()
-
-    if not await Post.verify_creation(data):
-        return JSONResponse(content={'message': 'Invalid creation data'}, status_code=400)
-
-    title = data.get('title')
-    body = data.get('body')
-    status = data.get('status')
-
-    assert isinstance(title, str)
-    assert isinstance(body, str)
-    assert isinstance(status, str)
-
-    title = title.strip()
-    body = body.strip()
-    status = status.strip().upper()
-
-    photos: list[UploadFile] = [
-        photo for photo in data.getlist('images') or []
-        if isinstance(photo, (UploadFile, FastAPIUploadFile))
+    title: Annotated[str, Form()],
+    body: Annotated[str | None, Form()],
+    status: Annotated[str, Form()],
+    images: Annotated[list[UploadFile], File()] = [],
+    post_service: FromDishka[PostServiceModel] = Depends(),
+    user_id: UUID | None = None,
+):
+    image_streams = [
+        BytesIO(await image.read())
+        for image in images
     ]
 
-    with DBSessionManager() as db_sess:
-        post = Post(
-            title=title,
-            body=body,
-            status=status,
-            created_at=datetime.now(timezone.utc),
-            user_id=user_id
-        )
-        
-        db_sess.add(post)
-        db_sess.flush()
-        
-        # User automatically likes their own post
-        user_like = Like(
-            user_id=user_id,
-            post_id=post.id
-        )
-        
-        db_sess.add(user_like)
-        
-        # Create all individual photos
-        for position, photo in enumerate(photos):
-            image_src, public_id = await image_service.create_image(photo)
-            
-            photo_obj = Photo(
-                post_id=post.id,
-                post_position=position,
-                image_src=image_src,
-                image_id=public_id
-            )
-            
-            db_sess.add(photo_obj)
-        
-        db_sess.commit()
-        
-        for follower in post.user.followers:
-            await NotificationController.create_notification(
-                session=db_sess,
-                receiver_id=follower.follower_id,
-                sender_id=user_id,
-                object_type='post',
-                object_id=post.id
-            )
-
-        content: dict = {
-            'message': 'Successfully created post',
-            'post': post.to_dict()
-        }
-
-        return JSONResponse(content=content, status_code=201)
+    return await post_service.create_post(
+        user_id=user_id,
+        title=title,
+        body=body,
+        status=status,
+        image_streams=image_streams,
+    )
 
 
 @router.put('/edit_post/')
