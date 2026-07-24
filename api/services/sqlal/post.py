@@ -20,10 +20,13 @@ class PostServiceSqlal(PostServiceModel):
         self.db_session = db_session
         self.upload_service = upload_service
     
-    async def get_post(self, id: UUID) -> PostGetResponse:
-        post = self.db_session.get(Post, id)
+    async def get_post(self, post_id: UUID, user_id: UUID | None) -> PostGetResponse:
+        post = self.db_session.get(Post, post_id)
         
         if not post:
+            return PostGetResponse.error('Post not found')
+        
+        if post.status == 'PRIVATE' and post.user_id != user_id:
             return PostGetResponse.error('Post not found')
         
         return PostGetResponse.ok(post)
@@ -53,7 +56,7 @@ class PostServiceSqlal(PostServiceModel):
         return PostListResponse.ok(list(posts))
     
     async def create_post(self, user_id, title, body, status, image_streams) -> PostGetResponse:
-        user = self.db_session.get(User, id)
+        user = self.db_session.get(User, user_id)
                 
         if not user:
             return PostListResponse.error('User not found')
@@ -88,3 +91,26 @@ class PostServiceSqlal(PostServiceModel):
         
         self.db_session.commit()
         return PostGetResponse.ok(post)
+
+    async def edit_post(self, post_id, user_id, title, body, status) -> DTO:
+        user = self.db_session.get(User, user_id)
+                        
+        if not user:
+            return DTO.error('User not found')
+        
+        post = self.db_session.get(Post, post_id)
+        
+        if not post:
+            return DTO.error('Post not found')
+        
+        if post.user != user:
+            return DTO.error('Unauthorized')
+        
+        post.title = title
+        post.body = body
+        post.status = status
+        
+        self.db_session.add(post)
+        self.db_session.commit()
+        
+        return DTO.ok()

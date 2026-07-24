@@ -18,6 +18,7 @@ from .follow.create_follow_request import FollowCreateRequest
 from .post.post_dto import PostDTO
 from .post.post_get_response import PostGetResponse
 from .post.post_list_response import PostListResponse
+from .post.post_edit_request import PostEditRequest
 
 from .like.like_dto import LikeDTO
 from .like.like_get_response import LikeGetResponse
@@ -44,6 +45,7 @@ __all__ = [
     'PostDTO',
     'PostGetResponse',
     'PostListResponse',
+    'PostEditRequest',
     'LikeDTO',
     'LikeGetResponse',
     'NotificationDTO',

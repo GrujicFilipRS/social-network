@@ -7,7 +7,7 @@ from schemas import DTO, PostGetResponse, PostListResponse
 
 class PostServiceModel:
     @abstractmethod
-    async def get_post(self, id: UUID) -> PostGetResponse: ...
+    async def get_post(self, post_id: UUID, user_id: UUID | None) -> PostGetResponse: ...
     
     @abstractmethod
     async def remove_post(self, id: UUID) -> DTO: ...
@@ -24,3 +24,13 @@ class PostServiceModel:
         status: str,
         image_streams: list[BytesIO]
     ) -> PostGetResponse: ...
+    
+    @abstractmethod
+    async def edit_post(
+        self,
+        post_id: UUID,
+        user_id: UUID,
+        title: str,
+        body: str | None,
+        status: str,
+    ) -> DTO: ...
