@@ -1,11 +1,15 @@
 from uuid import UUID
-from dishka.integrations.fastapi import inject, FromDishka
-from fastapi import Request
 
-from services.service_models import FollowServiceModel, AuthServiceModel
-from schemas import UserGetResponse, DTO, FollowCreateRequest, UserListResponse, ExistsGetResponse
-
-from fastapi import APIRouter
+from dishka.integrations.fastapi import FromDishka, inject
+from fastapi import APIRouter, Request
+from schemas import (
+    DTO,
+    ExistsGetResponse,
+    FollowCreateRequest,
+    UserGetResponse,
+    UserListResponse,
+)
+from services.service_models import AuthServiceModel, FollowServiceModel
 
 router = APIRouter()
 

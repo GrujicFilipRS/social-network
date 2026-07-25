@@ -1,9 +1,11 @@
-from uuid import UUID
 from datetime import datetime, timezone
-from sqlalchemy.orm import Session
+from uuid import UUID
 
 from models import Notification
+from sqlalchemy.orm import Session
+
 from .connection_controller import ConnectionController
+
 
 class NotificationController:
     '''

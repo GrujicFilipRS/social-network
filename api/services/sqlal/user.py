@@ -1,12 +1,10 @@
 from datetime import datetime, timezone
-
-from sqlalchemy.orm import Session
-
 from uuid import UUID
 
 from models import User
 from models.users import UserOptions
-from schemas import UserGetResponse, DTO
+from schemas import DTO, UserGetResponse
+from sqlalchemy.orm import Session
 
 from ..service_models import UserServiceModel
 

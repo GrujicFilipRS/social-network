@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from uuid import UUID
 
-from schemas import LikeGetResponse, DTO
+from schemas import DTO, LikeGetResponse
 
 
 class LikeServiceModel:

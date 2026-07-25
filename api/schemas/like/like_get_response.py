@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from .like_dto import LikeDTO
-from ..shared.dto import DTO
-
 from models import Like
+
+from ..shared.dto import DTO
+from .like_dto import LikeDTO
 
 
 class LikeGetResponse(DTO):

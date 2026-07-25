@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from models import User
 from pydantic import BaseModel
 
-from models import User
 
 class UserDTO(BaseModel):
     id: str

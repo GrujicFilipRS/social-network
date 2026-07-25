@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
 import uuid
-import fastapi
-from sqlalchemy import ForeignKey, Integer, String, UUID
-import starlette
-from sqlalchemy.orm import Mapped, relationship, mapped_column
-from db import SqlAlchemyBase
+from typing import TYPE_CHECKING
 from uuid import uuid4
-from PIL import Image
-from io import BytesIO
+
+from db import SqlAlchemyBase
+from sqlalchemy import UUID, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from models import Post
@@ -40,7 +37,7 @@ class Photo(SqlAlchemyBase):
         nullable=False
     )
 
-    post: Mapped['Post'] = relationship(
+    post: Mapped[Post] = relationship(
         'Post',
         foreign_keys=[post_id],
         back_populates='photos'
@@ -58,41 +55,3 @@ class Photo(SqlAlchemyBase):
             ret['post'] = self.post.to_dict()
         
         return ret
-
-    @staticmethod
-    async def verify_valid_photo(
-        image: (starlette.datastructures.UploadFile | fastapi.datastructures.UploadFile)
-    ) -> bool:
-        MAX_SIZE = 15 * 1024 * 1024  # 15MB
-        ALLOWED_FORMATS = {'JPEG', 'PNG', 'WEBP', 'JPG'}
-
-        if not image.content_type or not image.content_type.startswith('image/'):
-            return False
-
-        try:
-            file_bytes = await image.read()
-            await image.seek(0)
-        except Exception:
-            return False
-
-        if len(file_bytes) == 0 or len(file_bytes) > MAX_SIZE:
-            return False
-
-        try:
-            img = Image.open(BytesIO(file_bytes))
-            img.verify()
-        except Exception:
-            return False
-
-        if img.format not in ALLOWED_FORMATS:
-            return False
-
-        img = Image.open(BytesIO(file_bytes))
-        w, h = img.size
-        if w > 6000 or h > 6000:
-            return False
-        
-        if w < 300 or h < 300:
-            return False
-
-        return True

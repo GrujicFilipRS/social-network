@@ -1,17 +1,17 @@
 from .auth import AuthServiceJWTSqlal
-from .user import UserServiceSqlal
 from .follow import FollowServiceSqlal
-from .post import PostServiceSqlal
-from .pfp import PfpServiceSqlal
 from .like import LikeServiceSqlal
 from .notification_model import NotificationModelServiceSqlal
+from .pfp import PfpServiceSqlal
+from .post import PostServiceSqlal
+from .user import UserServiceSqlal
 
 __all__ = [
     'AuthServiceJWTSqlal',
-    'UserServiceSqlal',
     'FollowServiceSqlal',
-    'PostServiceSqlal',
-    'PfpServiceSqlal',
     'LikeServiceSqlal',
-    'NotificationModelServiceSqlal'
+    'NotificationModelServiceSqlal',
+    'PfpServiceSqlal',
+    'PostServiceSqlal',
+    'UserServiceSqlal'
 ]

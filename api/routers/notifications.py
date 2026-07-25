@@ -1,10 +1,10 @@
 from uuid import UUID
-from fastapi import APIRouter, Request, WebSocket
-from dishka.integrations.fastapi import inject, FromDishka
 
-from utils import ConnectionController
+from dishka.integrations.fastapi import FromDishka, inject
+from fastapi import APIRouter, Request, WebSocket
+from schemas import DTO, NotificationListResponse
 from services.service_models import AuthServiceModel, NotificationModelServiceModel
-from schemas import NotificationListResponse, DTO
+from utils import ConnectionController
 
 router = APIRouter()
 
@@ -17,7 +17,7 @@ async def websocket(
 ):
     cookie_header = websocket.headers.get('cookie')
     if not cookie_header:
-        return None
+        return
 
     cookies = dict(
         item.strip().split('=', 1)

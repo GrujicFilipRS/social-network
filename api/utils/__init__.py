@@ -1,13 +1,13 @@
-from .notification_controller import NotificationController
 from .connection_controller import ConnectionController
-from .worker_share_controller import WorkerShareController
-from .photo_verification import PhotoVerificationMethods
 from .literals import PostLiterals
+from .notification_controller import NotificationController
+from .photo_verification import PhotoVerificationMethods
+from .worker_share_controller import WorkerShareController
 
 __all__ = [
     'ConnectionController',
     'NotificationController',
-    'WorkerShareController',
     'PhotoVerificationMethods',
-    'PostLiterals'
+    'PostLiterals',
+    'WorkerShareController'
 ]

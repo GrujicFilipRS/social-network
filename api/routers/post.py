@@ -1,18 +1,16 @@
 from io import BytesIO
 from typing import Annotated
 from uuid import UUID
-from starlette.datastructures import UploadFile
-from fastapi.responses import JSONResponse
-from fastapi import Depends, File, Form, Request
-from dishka.integrations.fastapi import inject
-from dishka import FromDishka
 
-from models import Post
 from db import DBSessionManager
-from services.service_models import PostServiceModel, AuthServiceModel
+from dishka import FromDishka
+from dishka.integrations.fastapi import inject
+from fastapi import APIRouter, Depends, File, Form, Request
+from fastapi.responses import JSONResponse
+from models import Post
 from schemas import PostEditRequest, PostGetResponse
-
-from fastapi import APIRouter
+from services.service_models import AuthServiceModel, PostServiceModel
+from starlette.datastructures import UploadFile
 
 router = APIRouter()
 

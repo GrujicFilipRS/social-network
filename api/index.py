@@ -1,24 +1,20 @@
 import asyncio
+import traceback
+from contextlib import asynccontextmanager
+
+from db import db_session
+from di.providers import DBSessionProvider, ServiceProvider
+from dishka import make_async_container
+from dishka.integrations.fastapi import setup_dishka
+from env import Env
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-
 from fastapi.responses import JSONResponse
-import traceback
-
-from contextlib import asynccontextmanager
-
-from dishka import make_async_container
-from dishka.integrations.fastapi import setup_dishka
-
-from di.providers import DBSessionProvider, ServiceProvider
-from services.service_models import ImageUploadServiceModel
-from schemas import DTO
-from env import Env
-from db import db_session
-
-from utils import WorkerShareController, ConnectionController
 from routers import router
+from schemas import DTO
+from services.service_models import ImageUploadServiceModel
+from utils import ConnectionController, WorkerShareController
 
 db_session.global_init()
 

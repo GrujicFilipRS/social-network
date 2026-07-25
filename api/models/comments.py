@@ -1,12 +1,16 @@
 from __future__ import annotations
+
+import unicodedata
+import uuid
 from datetime import datetime
 from typing import Any
-import unicodedata
-from sqlalchemy import UUID, DateTime, Text, ForeignKey
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+
 from db import SqlAlchemyBase
+from sqlalchemy import UUID, DateTime, ForeignKey, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from models import Post, User
-import uuid
+
 
 class Comment(SqlAlchemyBase):
     __tablename__ = 'comments'
@@ -40,14 +44,14 @@ class Comment(SqlAlchemyBase):
         nullable=True
     )
 
-    post: Mapped['Post'] = relationship(
+    post: Mapped[Post] = relationship(
         foreign_keys=[post_id],
         back_populates='comments'
     )
-    comment: Mapped['Comment | None'] = relationship(
+    comment: Mapped[Comment | None] = relationship(
         foreign_keys=[comment_id]
     )
-    creator: Mapped['User'] = relationship(
+    creator: Mapped[User] = relationship(
         foreign_keys=[creator_id],
         back_populates='comments'
     )
@@ -106,10 +110,7 @@ class Comment(SqlAlchemyBase):
         ):
             return False
         
-        if not body.replace('\n', '').strip():
-            return False
-        
-        return True
+        return body.replace('\n', '').strip() != ''
     
     @staticmethod
     def validate_creation(data: dict[str, Any]) -> bool:

@@ -1,15 +1,16 @@
 from __future__ import annotations
 
+import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
-import uuid
 from uuid import uuid4
-from sqlalchemy import DateTime, ForeignKey, UUID
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+
 from db import SqlAlchemyBase
+from sqlalchemy import UUID, DateTime, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
-    from models import User, Post
+    from models import Post, User
 
 class Like(SqlAlchemyBase):
     __tablename__ = 'likes'
@@ -34,12 +35,12 @@ class Like(SqlAlchemyBase):
         nullable=True
     )
 
-    user: Mapped['User'] = relationship(
+    user: Mapped[User] = relationship(
         'User',
         foreign_keys=[user_id],
         back_populates='likes'
     )
-    post: Mapped['Post'] = relationship(
+    post: Mapped[Post] = relationship(
         'Post',
         foreign_keys=[post_id],
         back_populates='likes'

@@ -1,19 +1,19 @@
 from .auth import AuthServiceModel
-from .user import UserServiceModel
 from .follow import FollowServiceModel
-from .post import PostServiceModel
 from .image_upload import ImageUploadServiceModel
-from .pfp import PfpServiceModel
 from .like import LikeServiceModel
 from .notification_model import NotificationModelServiceModel
+from .pfp import PfpServiceModel
+from .post import PostServiceModel
+from .user import UserServiceModel
 
 __all__ = [
     'AuthServiceModel',
-    'UserServiceModel',
     'FollowServiceModel',
-    'PostServiceModel',
     'ImageUploadServiceModel',
-    'PfpServiceModel',
     'LikeServiceModel',
-    'NotificationModelServiceModel'
+    'NotificationModelServiceModel',
+    'PfpServiceModel',
+    'PostServiceModel',
+    'UserServiceModel'
 ]

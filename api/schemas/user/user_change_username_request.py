@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 
+
 class UserChangeUsernameRequest(BaseModel):
     new_username: str = Field(
         min_length=7,

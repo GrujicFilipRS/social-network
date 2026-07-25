@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Any, TYPE_CHECKING
 import uuid
+from datetime import datetime
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
-from sqlalchemy import DateTime, ForeignKey, UUID
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+
 from db import SqlAlchemyBase
+from sqlalchemy import UUID, DateTime, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from models import User
@@ -34,12 +35,12 @@ class Follow(SqlAlchemyBase):
         nullable=False
     )
 
-    follower: Mapped['User'] = relationship(
+    follower: Mapped[User] = relationship(
         'User',
         foreign_keys=[follower_id],
         back_populates='follows'
     )
-    followed: Mapped['User'] = relationship(
+    followed: Mapped[User] = relationship(
         'User',
         foreign_keys=[followed_id],
         back_populates='followers'

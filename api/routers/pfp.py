@@ -1,14 +1,12 @@
 from dishka import FromDishka
-from fastapi import Request, APIRouter
+from dishka.integrations.fastapi import inject
+from fastapi import APIRouter, Request
 from fastapi.datastructures import UploadFile
 from fastapi.responses import JSONResponse
-
-from dishka.integrations.fastapi import inject
-
-from services.service_models import PfpServiceModel
-from utils import JWT
 from models import PFP
 from schemas import DTO
+from services.service_models import PfpServiceModel
+from utils import JWT
 
 router = APIRouter()
 

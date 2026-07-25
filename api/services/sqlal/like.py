@@ -1,10 +1,11 @@
-from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 
-from utils import NotificationController
 from models import Like, Post, User
+from schemas import DTO, LikeGetResponse
+from sqlalchemy.orm import Session
+from utils import NotificationController
+
 from ..service_models import LikeServiceModel
-from schemas import LikeGetResponse, DTO
 
 
 class LikeServiceSqlal(LikeServiceModel):

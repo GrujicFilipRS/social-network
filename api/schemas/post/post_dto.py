@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 from datetime import datetime
 
+from models import Post
 from pydantic import BaseModel
 
-from models import Post
 
 class PostDTO(BaseModel):
     id: str

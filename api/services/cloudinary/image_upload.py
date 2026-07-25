@@ -1,11 +1,10 @@
 from typing import BinaryIO
-
-import cloudinary
-import cloudinary.api
+from uuid import UUID, uuid4
 
 from env import Env
 
-from uuid import UUID, uuid4
+import cloudinary
+import cloudinary.api
 
 from ..service_models import ImageUploadServiceModel
 

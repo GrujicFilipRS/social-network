@@ -1,10 +1,10 @@
-import jwt
-from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
+import jwt
 from env import Env
 from models import User
+from sqlalchemy.orm import Session
 
 from ..service_models import AuthServiceModel
 

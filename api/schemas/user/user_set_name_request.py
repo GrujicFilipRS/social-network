@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 
+
 class SetNameRequest(BaseModel):
     new_name: str = Field(
         min_length=3,

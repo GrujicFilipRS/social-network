@@ -1,11 +1,10 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy.orm import Session
-
-from utils import NotificationController
-from schemas import ExistsGetResponse, DTO, UserListResponse, UserGetResponse
 from models import Follow, User
+from schemas import DTO, ExistsGetResponse, UserGetResponse, UserListResponse
+from sqlalchemy.orm import Session
+from utils import NotificationController
 
 from ..service_models import FollowServiceModel
 

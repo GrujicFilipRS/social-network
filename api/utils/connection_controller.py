@@ -1,7 +1,8 @@
 import json
 from typing import Any
-from fastapi import WebSocket
 from uuid import UUID
+
+from fastapi import WebSocket
 
 from .worker_share_controller import WorkerShareController
 

@@ -1,23 +1,24 @@
 from uuid import UUID
-from dishka.integrations.fastapi import FromDishka, inject
-from fastapi.responses import JSONResponse
-from fastapi import Request, Response
 
+from dishka.integrations.fastapi import FromDishka, inject
+from fastapi import APIRouter, Request, Response
+from fastapi.responses import JSONResponse
 from schemas import (
-    UserGetResponse,
-    UserRegistrationRequest,
-    UserLoginRequest,
     DTO,
     SetNameRequest,
-    UserChangeUsernameRequest,
     UserChangePasswordRequest,
-    UserProfileResponse
+    UserChangeUsernameRequest,
+    UserGetResponse,
+    UserLoginRequest,
+    UserProfileResponse,
+    UserRegistrationRequest,
 )
-from services.service_models import UserServiceModel, FollowServiceModel, PostServiceModel
-
+from services.service_models import (
+    FollowServiceModel,
+    PostServiceModel,
+    UserServiceModel,
+)
 from utils import JWT
-
-from fastapi import APIRouter
 
 router = APIRouter()
 

@@ -1,6 +1,6 @@
-from typing import Optional
 
 from pydantic import BaseModel, Field
+
 
 class UserRegistrationRequest(BaseModel):
     username: str = Field(
@@ -14,7 +14,7 @@ class UserRegistrationRequest(BaseModel):
         max_length=14
     )
 
-    name: Optional[str] = Field(
+    name: str | None = Field(
         default=None,
         min_length=3,
         max_length=30,

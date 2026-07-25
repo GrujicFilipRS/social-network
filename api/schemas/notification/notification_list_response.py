@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from models import Notification
+
 from ..shared.dto import DTO
 from .notification_dto import NotificationDTO
+
 
 class NotificationListResponse(DTO):
     notifications: list[NotificationDTO]

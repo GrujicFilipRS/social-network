@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
 import uuid
-from fastapi import UploadFile
-from sqlalchemy import ForeignKey, String, UUID
-from sqlalchemy.orm import Mapped, relationship, mapped_column
-from db import SqlAlchemyBase
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
-from PIL import Image
-from io import BytesIO
+
+from db import SqlAlchemyBase
+from sqlalchemy import UUID, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from models import User
@@ -36,7 +34,7 @@ class PFP(SqlAlchemyBase):
         nullable=False
     )
 
-    user: Mapped['User'] = relationship(
+    user: Mapped[User] = relationship(
         'User',
         foreign_keys=[user_id],
         back_populates='pfp'
@@ -53,41 +51,3 @@ class PFP(SqlAlchemyBase):
             content['user'] = self.user.to_dict()
         
         return content
-
-    @staticmethod
-    async def approve_pfp_file(pfp: Any) -> bool:
-        MAX_SIZE = 5 * 1024 * 1024  # 5MB
-        ALLOWED_FORMATS = {'JPEG', 'PNG', 'WEBP'}
-
-        if pfp is None or not isinstance(pfp, UploadFile):
-            return False
-
-        if not pfp.content_type or not pfp.content_type.startswith('image/'):
-            return False
-
-        try:
-            file_bytes = await pfp.read()
-        except Exception:
-            return False
-
-        if len(file_bytes) == 0 or len(file_bytes) > MAX_SIZE:
-            return False
-
-        try:
-            img = Image.open(BytesIO(file_bytes))
-            img.verify()
-        except Exception:
-            return False
-
-        if img.format not in ALLOWED_FORMATS:
-            return False
-
-        try:
-            img = Image.open(BytesIO(file_bytes))
-            w, h = img.size
-            if w > 2048 or h > 2048:
-                return False
-        except Exception:
-            return False
-
-        return True

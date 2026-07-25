@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from uuid import UUID
 
-from schemas import NotificationListResponse, DTO
+from schemas import DTO, NotificationListResponse
 
 
 class NotificationModelServiceModel:

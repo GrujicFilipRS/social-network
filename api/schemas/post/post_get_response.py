@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from models import Post
+
 from ..shared.dto import DTO
 from .post_dto import PostDTO
+
 
 class PostGetResponse(DTO):
     post: PostDTO | None

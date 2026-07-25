@@ -2,8 +2,9 @@
 # It checks if the required environment variables are loaded,
 # as well as init a class that's used to store environment variables
 
+from os import environ, getenv
+
 from dotenv import load_dotenv
-from os import getenv, environ
 
 load_dotenv()
 
@@ -19,12 +20,12 @@ raise_exc: bool = False
 missing_vars: list[str] = []
 
 for var in REQUIRED_ENV_VARS:
-    if var not in environ.keys():
+    if var not in environ:
         raise_exc = True
         missing_vars.append(var)
     
 if raise_exc:
-    raise Exception(f'Missing required environment variables: { ', '.join(missing_vars) }')
+    raise RuntimeError(f'Missing required environment variables: { ', '.join(missing_vars) }')
 
 def get_required_env(var_name: str) -> str:
     value = getenv(var_name)

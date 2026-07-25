@@ -1,5 +1,6 @@
-from redis.asyncio import Redis
 from env import Env
+from redis.asyncio import Redis
+
 
 class WorkerShareController:
     redis_client: Redis | None = None

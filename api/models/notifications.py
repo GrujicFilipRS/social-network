@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
-import uuid
 from uuid import uuid4
-from sqlalchemy import Boolean, DateTime, ForeignKey, Text, UUID
-from sqlalchemy.orm import Mapped, Session, relationship, mapped_column
+
 from db import SqlAlchemyBase
-from models import Like, Comment, Post, Follow
+from sqlalchemy import UUID, Boolean, DateTime, ForeignKey, Text
+from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
+
+from models import Comment, Follow, Like, Post
 
 if TYPE_CHECKING:
     from models import User
@@ -49,11 +51,11 @@ class Notification(SqlAlchemyBase):
         nullable=False
     )
     
-    receiver: Mapped['User'] = relationship(
+    receiver: Mapped[User] = relationship(
         'User',
         foreign_keys=[receiver_id]
     )
-    sender: Mapped['User'] = relationship(
+    sender: Mapped[User] = relationship(
         'User',
         foreign_keys=[sender_id]
     )

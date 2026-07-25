@@ -1,19 +1,20 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
 import re
-import regex
 import uuid
+from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
 from uuid import uuid4
-from sqlalchemy import DateTime, String, UUID
-from sqlalchemy.orm import Mapped, relationship, mapped_column
-from db import SqlAlchemyBase
+
+import regex
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+from db import SqlAlchemyBase
+from sqlalchemy import UUID, DateTime, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
-    from models import Comment, Follow, Like, PFP, Post
+    from models import PFP, Comment, Follow, Like, Post
 
 class UserOptions:
     USERNAME_UPDATE_LIMIT_HOURS = 24
@@ -48,31 +49,31 @@ class User(SqlAlchemyBase):
         nullable=True
     )
 
-    posts: Mapped[list['Post']] = relationship(
+    posts: Mapped[list[Post]] = relationship(
         'Post',
         back_populates='user'
     )
-    follows: Mapped[list['Follow']] = relationship(
+    follows: Mapped[list[Follow]] = relationship(
         'Follow',
         foreign_keys='Follow.follower_id',
         back_populates='follower'
     )
-    followers: Mapped[list['Follow']] = relationship(
+    followers: Mapped[list[Follow]] = relationship(
         'Follow',
         foreign_keys='Follow.followed_id',
         back_populates='followed'
     )
-    likes: Mapped[list['Like']] = relationship(
+    likes: Mapped[list[Like]] = relationship(
         'Like',
         foreign_keys='Like.user_id',
         back_populates='user'
     )
-    comments: Mapped[list['Comment']] = relationship(
+    comments: Mapped[list[Comment]] = relationship(
         'Comment',
         foreign_keys='Comment.creator_id',
         back_populates='creator'
     )
-    pfp: Mapped['PFP | None'] = relationship(
+    pfp: Mapped[PFP | None] = relationship(
         'PFP',
         foreign_keys='PFP.user_id',
         back_populates='user',
@@ -125,10 +126,7 @@ class User(SqlAlchemyBase):
         last_edit = self.last_username_edit.replace(tzinfo=timezone.utc)
         delta = datetime.now(timezone.utc) - last_edit
 
-        if delta < timedelta(hours = UserOptions.USERNAME_UPDATE_LIMIT_HOURS):
-            return False
-
-        return True
+        return not delta < timedelta(hours=UserOptions.USERNAME_UPDATE_LIMIT_HOURS)
     
     @staticmethod
     def validate_username(username: str) -> bool:
@@ -137,10 +135,7 @@ class User(SqlAlchemyBase):
         if not pattern.match(username):
             return False
 
-        if len(username) < 7 or len(username) > 15:
-            return False
-
-        return True
+        return not (len(username) < 7 or len(username) > 15)
 
     @staticmethod
     def validate_password(password: str) -> bool:

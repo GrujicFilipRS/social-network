@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from uuid import UUID
 
-from schemas import DTO, ExistsGetResponse, UserListResponse, UserGetResponse
+from schemas import DTO, ExistsGetResponse, UserGetResponse, UserListResponse
 
 
 class FollowServiceModel:

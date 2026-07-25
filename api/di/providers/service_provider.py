@@ -1,26 +1,25 @@
 from dishka import Provider, Scope, provide
-from sqlalchemy.orm import Session
-
+from services.cloudinary import ImageServiceCloudinary
 from services.service_models import (
     AuthServiceModel,
-    UserServiceModel,
     FollowServiceModel,
-    PostServiceModel,
     ImageUploadServiceModel,
-    PfpServiceModel,
     LikeServiceModel,
-    NotificationModelServiceModel
+    NotificationModelServiceModel,
+    PfpServiceModel,
+    PostServiceModel,
+    UserServiceModel,
 )
 from services.sqlal import (
     AuthServiceJWTSqlal,
-    UserServiceSqlal,
     FollowServiceSqlal,
-    PostServiceSqlal,
-    PfpServiceSqlal,
     LikeServiceSqlal,
-    NotificationModelServiceSqlal
+    NotificationModelServiceSqlal,
+    PfpServiceSqlal,
+    PostServiceSqlal,
+    UserServiceSqlal,
 )
-from services.cloudinary import ImageServiceCloudinary
+from sqlalchemy.orm import Session
 
 
 class ServiceProvider(Provider):

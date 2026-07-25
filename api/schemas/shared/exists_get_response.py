@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from .dto import DTO
 
+
 class ExistsGetResponse(DTO):
     exists: bool
     

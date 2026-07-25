@@ -1,8 +1,8 @@
+from models import Notification, User
+from schemas import DTO, NotificationListResponse
+from services.service_models import NotificationModelServiceModel
 from sqlalchemy.orm import Session
 
-from services.service_models import NotificationModelServiceModel
-from models import User, Notification
-from schemas import NotificationListResponse, DTO
 
 class NotificationModelServiceSqlal(NotificationModelServiceModel):
     def __init__(self, db_session: Session):

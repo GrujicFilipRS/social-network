@@ -1,16 +1,13 @@
 from datetime import datetime, timezone
 from uuid import UUID
-from fastapi.responses import JSONResponse
-from dishka.integrations.fastapi import inject, FromDishka
 
-from models import Comment, Post
 from db import DBSessionManager
-from utils import NotificationController
-from services.service_models import AuthServiceModel
-
-from utils import PostLiterals
-
+from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
+from models import Comment, Post
+from services.service_models import AuthServiceModel
+from utils import NotificationController, PostLiterals
 
 router = APIRouter()
 

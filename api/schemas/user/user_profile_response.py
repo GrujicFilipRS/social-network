@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from models import User
 
+from ..post.post_dto import PostDTO
 from ..shared.dto import DTO
 from .user_dto import UserDTO
-from ..post.post_dto import PostDTO
+
 
 class UserProfileResponse(DTO):
     user: UserDTO | None

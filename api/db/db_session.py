@@ -1,11 +1,8 @@
-from sqlalchemy import create_engine
-import sqlalchemy.orm as orm
-
 from env import Env
+from sqlalchemy import create_engine, orm
 
 SqlAlchemyBase = orm.declarative_base()
-__factory = None
-
+__factory: orm.sessionmaker[orm.Session] | None = None
 
 def global_init():
     global __factory
@@ -30,9 +27,8 @@ def global_init():
 
 
 def create_session():
-    global __factory
     if not __factory:
-        raise Exception('Database session not initialized. Call global_init first.')
+        global_init()
     return __factory()
 
 
