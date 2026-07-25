@@ -2,13 +2,11 @@ from io import BytesIO
 from typing import Annotated
 from uuid import UUID
 
-from db import DBSessionManager
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
-from fastapi import APIRouter, Depends, File, Form, Request
+from fastapi import APIRouter, File, Form, Request
 from fastapi.responses import JSONResponse
-from models import Post
-from schemas import PostEditRequest, PostGetResponse
+from schemas import DTO, PostEditRequest, PostGetResponse
 from services.service_models import AuthServiceModel, PostServiceModel
 from starlette.datastructures import UploadFile
 
@@ -41,9 +39,9 @@ async def create_post(
     title: Annotated[str, Form()],
     body: Annotated[str | None, Form()],
     status: Annotated[str, Form()],
-    images: Annotated[list[UploadFile], File()] = [],
-    auth_service: FromDishka[AuthServiceModel] = Depends(),
-    post_service: FromDishka[PostServiceModel] = Depends()
+    auth_service: FromDishka[AuthServiceModel],
+    post_service: FromDishka[PostServiceModel],
+    images: Annotated[list[UploadFile], File()] = []  # noqa: B006
 ):
     user_id = auth_service.decode_token(request.cookies['auth_token'])
     
@@ -64,7 +62,10 @@ async def create_post(
     )
 
 
-@router.put('/edit_post/{post_id}')
+@router.put(
+    '/edit_post/{post_id}',
+    response_model=DTO
+)
 @inject
 async def edit_post(
     request: Request,
@@ -86,29 +87,20 @@ async def edit_post(
     )
 
 
-@router.delete('/delete_post/')
+@router.delete(
+    '/delete_post/{post_id}',
+    response_model=DTO
+)
+@inject
 async def delete_post(
     request: Request,
-    user_id: UUID | None = None
+    post_id: UUID,
+    auth_service: FromDishka[AuthServiceModel],
+    post_service: FromDishka[PostServiceModel]
 ) -> JSONResponse:
-    assert user_id is not None
-
-    with DBSessionManager() as db_sess:
-        data = await request.json()
-        try:
-            post_id: UUID | None = UUID(data.get('post_id'))
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid post_id'}, status_code=400)
-
-        post = db_sess.get(Post, post_id)
-
-        if not post:
-            return JSONResponse(content={'message': 'Post not found'}, status_code=404)
-
-        if post.user_id != user_id:
-            return JSONResponse(content={'message': 'You are not authorized to delete this post'}, status_code=401)
-        
-        db_sess.delete(post)
-        db_sess.commit()
-
-        return JSONResponse(content={'message': 'Successfully deleted post'}, status_code=200)
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
+            
+    if not user_id:
+        return PostGetResponse.error('Unauthorized')
+    
+    return await post_service.delete_post(post_id)

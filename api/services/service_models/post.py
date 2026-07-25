@@ -34,3 +34,6 @@ class PostServiceModel:
         body: str | None,
         status: str,
     ) -> DTO: ...
+    
+    @abstractmethod
+    async def delete_post(self, post_id: UUID, user_id: UUID) -> DTO: ...

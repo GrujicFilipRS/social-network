@@ -1,11 +1,10 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy.orm import Session
-
 from models import Photo, Post, User
 from schemas import DTO, PostGetResponse, PostListResponse
 from services.service_models import ImageUploadServiceModel
+from sqlalchemy.orm import Session
 from utils import PhotoVerificationMethods
 
 from ..service_models import PostServiceModel
@@ -111,6 +110,20 @@ class PostServiceSqlal(PostServiceModel):
         post.status = status
         
         self.db_session.add(post)
+        self.db_session.commit()
+        
+        return DTO.ok()
+    
+    async def delete_post(self, post_id, user_id) -> DTO:
+        post = self.db_session.get(Post, post_id)
+                
+        if not post:
+            return DTO.error('Post not found')
+                
+        if post.user_id != user_id:
+            return DTO.error('Unauthorized')
+        
+        self.db_session.delete(post)
         self.db_session.commit()
         
         return DTO.ok()

@@ -5,7 +5,7 @@ from .follow_controller import router as follow_router
 from .like import router as like_router
 from .notifications import router as notifications_router
 from .pfp import router as pfp_router
-from .post import router as post_router
+from .post_controller import router as post_router
 from .user_controller import router as user_router
 
 router = APIRouter()
