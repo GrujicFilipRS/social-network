@@ -1,5 +1,6 @@
 from io import BytesIO
-from PIL import Image
+
+from PIL import Image, UnidentifiedImageError
 
 
 class PhotoVerificationMethods:
@@ -8,12 +9,9 @@ class PhotoVerificationMethods:
         MAX_SIZE = 15 * 1024 * 1024  # 15 MB
         ALLOWED_FORMATS = {"JPEG", "PNG", "WEBP", "JPG"}
 
-        try:
-            stream.seek(0, 2)  # Seek to end
-            size = stream.tell()
-            stream.seek(0)
-        except Exception:
-            return False
+        stream.seek(0, 2)  # Seek to end
+        size = stream.tell()
+        stream.seek(0)
 
         if size == 0 or size > MAX_SIZE:
             return False
@@ -22,18 +20,13 @@ class PhotoVerificationMethods:
             img = Image.open(stream)
             img.verify()
             img_format = img.format
-        except Exception:
+        except (UnidentifiedImageError, OSError, ValueError):
             return False
 
         if img_format not in ALLOWED_FORMATS:
             return False
 
-        try:
-            stream.seek(0)
-            img = Image.open(stream)
-            width, height = img.size
-        except Exception:
-            return False
+        width, height = img.size
 
         if width > 6000 or height > 6000:
             return False
@@ -43,3 +36,24 @@ class PhotoVerificationMethods:
 
         stream.seek(0)
         return True
+    
+    @staticmethod
+    def verify_pfp(stream: BytesIO) -> bool:
+        MAX_SIZE = 5 * 1024 * 1024  # 5MB
+        ALLOWED_FORMATS = {'JPEG', 'PNG', 'WEBP', 'JPG'}
+        
+        if stream.getbuffer().nbytes > MAX_SIZE:
+            return False
+
+        try:
+            img = Image.open(stream)
+            img.verify()
+            img_format = img.format
+            width, height = img.size
+        except (UnidentifiedImageError, OSError, ValueError):
+            return False
+
+        if img_format not in ALLOWED_FORMATS:
+            return False
+
+        return not (width > 512 or height > 512)

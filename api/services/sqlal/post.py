@@ -1,14 +1,13 @@
-from uuid import UUID
 from datetime import datetime, timezone
+from uuid import UUID
 
-from sqlalchemy.orm import Session
-
-from utils import PhotoVerificationMethods
+from models import Photo, Post, User
+from schemas import DTO, PostGetResponse, PostListResponse
 from services.service_models import ImageUploadServiceModel
-from models import Post, User, Photo
+from sqlalchemy.orm import Session
+from utils import PhotoVerificationMethods
 
 from ..service_models import PostServiceModel
-from schemas import PostGetResponse, PostListResponse, DTO
 
 
 class PostServiceSqlal(PostServiceModel):
