@@ -5,7 +5,6 @@ from uuid import UUID
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
 from fastapi import APIRouter, File, Form, Request
-from fastapi.responses import JSONResponse
 from schemas import DTO, PostEditRequest, PostGetResponse
 from services.service_models import AuthServiceModel, PostServiceModel
 from starlette.datastructures import UploadFile
@@ -73,7 +72,7 @@ async def edit_post(
     edit_request: PostEditRequest,
     auth_service: FromDishka[AuthServiceModel],
     post_service: FromDishka[PostServiceModel],
-) -> JSONResponse:
+):
     user_id = auth_service.decode_token(request.cookies['auth_token'])
         
     if not user_id:
@@ -97,7 +96,7 @@ async def delete_post(
     post_id: UUID,
     auth_service: FromDishka[AuthServiceModel],
     post_service: FromDishka[PostServiceModel]
-) -> JSONResponse:
+):
     user_id = auth_service.decode_token(request.cookies['auth_token'])
             
     if not user_id:

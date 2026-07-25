@@ -2,7 +2,6 @@ from uuid import UUID
 
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
 from schemas import DTO, LikeGetResponse
 from services.service_models import AuthServiceModel, LikeServiceModel
 
@@ -54,7 +53,7 @@ async def unlike_post(
     post_id: UUID,
     auth_service: FromDishka[AuthServiceModel],
     like_service: FromDishka[LikeServiceModel]
-) -> JSONResponse:
+):
     user_id = auth_service.decode_token(request.cookies['auth_token'])
         
     if not user_id:
