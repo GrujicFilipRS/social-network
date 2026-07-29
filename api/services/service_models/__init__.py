@@ -1,4 +1,5 @@
 from .auth import AuthServiceModel
+from .comment import CommentServiceModel
 from .follow import FollowServiceModel
 from .image_upload import ImageUploadServiceModel
 from .like import LikeServiceModel
@@ -9,6 +10,7 @@ from .user import UserServiceModel
 
 __all__ = [
     'AuthServiceModel',
+    'CommentServiceModel',
     'FollowServiceModel',
     'ImageUploadServiceModel',
     'LikeServiceModel',

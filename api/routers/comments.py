@@ -6,57 +6,26 @@ from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from models import Comment, Post
+from schemas import DTO
 from services.service_models import AuthServiceModel
 from utils import NotificationController, PostLiterals
 
 router = APIRouter()
 
 
-@router.get('/get_comment/')
-def get_comment(comment_id: UUID) -> JSONResponse:
-    with DBSessionManager() as db_sess:
-        try:
-            comment: Comment | None = db_sess.get(Comment, comment_id)
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid comment_id'}, status_code=400)
-
-        if not comment:
-            return JSONResponse(content={'message': 'Comment not found'}, status_code=404)
-        
-        content: dict[str, str | dict] = {
-            'message': 'Comment found',
-            'comment': comment.to_dict()
-        }
-
-        return JSONResponse(content=content, status_code=200)
-
-
-@router.get('/get_post_id_from_comment_id/{comment_id}')
-def get_post_id_from_comment_id(comment_id: UUID) -> JSONResponse:
-    with DBSessionManager() as db_sess:
-        try:
-            comment: Comment | None = db_sess.get(Comment, comment_id)
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid comment_id'}, status_code=400)
-
-        if not comment:
-            return JSONResponse(content={'message': 'Comment not found'}, status_code=404)
-        
-        content: dict[str, str] = {
-            'message': 'Successfully gotten post_id from comment_id',
-            'post_id': str(comment.post_id)
-        }
-
-        return JSONResponse(content=content, status_code=200)
-
-
-@router.post('/post_comment/')
+@router.post(
+    '/post_comment/',
+    response_model=DTO
+)
 @inject
 async def post_comment(
     request: Request,
     auth_service: FromDishka[AuthServiceModel]
 ) -> JSONResponse:
     user = auth_service.get_user_from_token(request.cookies['auth_token'])
+    
+    if not user:
+        return DTO.error('Unauthorized')
 
     data = await request.json()
 

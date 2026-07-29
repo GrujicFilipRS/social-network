@@ -1,3 +1,5 @@
+from .comment.comment_dto import CommentDTO
+from .comment.comment_get_response import CommentGetResponse
 from .follow.create_follow_request import FollowCreateRequest
 from .follow.follow_dto import FollowDTO
 from .follow.follow_list_response import FollowListResponse
@@ -22,8 +24,9 @@ from .user.user_registration_request import UserRegistrationRequest
 from .user.user_set_name_request import SetNameRequest
 
 __all__ = [
-    
     'DTO',
+    'CommentDTO',
+    'CommentGetResponse',
     'ExistsGetResponse',
     'FollowCreateRequest',
     'FollowDTO',

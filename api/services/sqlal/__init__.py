@@ -1,4 +1,5 @@
 from .auth import AuthServiceJWTSqlal
+from .comment import CommentServiceSqlal
 from .follow import FollowServiceSqlal
 from .like import LikeServiceSqlal
 from .notification_model import NotificationModelServiceSqlal
@@ -8,6 +9,7 @@ from .user import UserServiceSqlal
 
 __all__ = [
     'AuthServiceJWTSqlal',
+    'CommentServiceSqlal',
     'FollowServiceSqlal',
     'LikeServiceSqlal',
     'NotificationModelServiceSqlal',

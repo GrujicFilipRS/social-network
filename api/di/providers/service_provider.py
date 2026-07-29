@@ -2,6 +2,7 @@ from dishka import Provider, Scope, provide
 from services.cloudinary import ImageServiceCloudinary
 from services.service_models import (
     AuthServiceModel,
+    CommentServiceModel,
     FollowServiceModel,
     ImageUploadServiceModel,
     LikeServiceModel,
@@ -12,6 +13,7 @@ from services.service_models import (
 )
 from services.sqlal import (
     AuthServiceJWTSqlal,
+    CommentServiceSqlal,
     FollowServiceSqlal,
     LikeServiceSqlal,
     NotificationModelServiceSqlal,
@@ -50,6 +52,10 @@ class ServiceProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def like_service(self, db_sess: Session) -> LikeServiceModel:
         return LikeServiceSqlal(db_sess)
+    
+    @provide(scope=Scope.REQUEST)
+    def comment_service(self, db_sess: Session) -> CommentServiceModel:
+        return CommentServiceSqlal(db_sess)
     
     @provide(scope=Scope.REQUEST)
     def image_service(self) -> ImageUploadServiceModel:

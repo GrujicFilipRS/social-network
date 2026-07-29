@@ -1,9 +1,8 @@
 from collections.abc import Generator
 
+from db import DBSessionManager
 from dishka import Provider, Scope, provide
 from sqlalchemy.orm import Session
-
-from db import DBSessionManager
 
 
 class DBSessionProvider(Provider):
