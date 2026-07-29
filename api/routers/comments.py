@@ -6,11 +6,28 @@ from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from models import Comment, Post
-from schemas import DTO
-from services.service_models import AuthServiceModel
+from schemas import DTO, CommentGetResponse
+from services.service_models import AuthServiceModel, CommentServiceModel
 from utils import NotificationController, PostLiterals
 
 router = APIRouter()
+
+@router.get(
+    '/get_comment/{comment_id}',
+    response_model=CommentGetResponse
+)
+async def get_comment(
+    request: Request,
+    comment_id: UUID,
+    auth_service: FromDishka[AuthServiceModel],
+    comment_service: FromDishka[CommentServiceModel]
+):
+    user_id = auth_service.get_user_from_token(request.cookes['auth_token'])
+    
+    if not user_id:
+        return CommentGetResponse.error('Unauthorized')
+    
+    return comment_service.get_comment(comment_id, user_id)
 
 
 @router.post(
