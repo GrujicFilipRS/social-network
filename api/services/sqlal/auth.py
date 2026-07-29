@@ -24,7 +24,10 @@ class AuthServiceJWTSqlal(AuthServiceModel):
         token = jwt.encode(payload, Env.SECRET_KEY, algorithm='HS256')
         return token
     
-    def decode_token(self, token: str) -> UUID | None:
+    def decode_token(self, token: str | None) -> UUID | None:
+        if not token:
+            return None
+        
         try:
             payload = jwt.decode(token, Env.SECRET_KEY, algorithms=['HS256'])
             return UUID(payload.get('user_id'))
