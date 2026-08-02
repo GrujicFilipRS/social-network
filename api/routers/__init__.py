@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 
-from .comments import router as comment_router
+from .comments_controller import router as comment_router
 from .follow_controller import router as follow_router
 from .like_controller import router as like_router
-from .notifications import router as notifications_router
-from .pfp import router as pfp_router
+from .notifications_controller import router as notifications_router
+from .pfp_controller import router as pfp_router
 from .post_controller import router as post_router
 from .user_controller import router as user_router
 
