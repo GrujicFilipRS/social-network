@@ -2,17 +2,17 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING
 from uuid import uuid4
 
 from db import SqlAlchemyBase
 from sqlalchemy import UUID, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 
-from models import Comment, Follow, Like, Post
-
-if TYPE_CHECKING:
-    from models import User
+from .comments import Comment
+from .follows import Follow
+from .likes import Like
+from .posts import Post
+from .users import User
 
 
 class Notification(SqlAlchemyBase):

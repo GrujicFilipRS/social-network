@@ -9,7 +9,8 @@ from db import SqlAlchemyBase
 from sqlalchemy import UUID, DateTime, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from models import Post, User
+from .posts import Post
+from .users import User
 
 
 class Comment(SqlAlchemyBase):
