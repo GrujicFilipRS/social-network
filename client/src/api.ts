@@ -1,3 +1,7 @@
+import axios from "axios";
+import { type GetUserResponse } from "./interfaces/GetUserResponse";
+import type { UserData } from "./interfaces/UserData";
+
 const API_ROUTE = import.meta.env.VITE_API_ROUTE;
 
 interface FetchOptions {
@@ -93,24 +97,25 @@ export const FetchWithFormData = async (
     return fetch(`${API_ROUTE}/${endpoint}`, options);
 }
 
-interface VerificationData {
-    statusCode: number;
-    result: any;
+export class UserUnverifiedError extends Error {
+    constructor(message?: string) {
+        super(message);
+
+        this.name = 'UserUnverifiedError';
+
+        Object.setPrototypeOf(this, UserUnverifiedError.prototype);
+    }
 }
 
-export async function verifyUser(): Promise<VerificationData> {
-    return Fetch('user/get_current_user/')
-    .then(async (res) => {
-        const data = await res.json();
-        return {
-            statusCode: res.status,
-            result: data,
-        } as VerificationData;
-    })
-    .catch((err) => {
-        console.log(err);
-        return { statusCode: 0, result: '' } as VerificationData;
-    });
+export async function verifyUser(): Promise<UserData> {
+    return axios.get('user/get_current_user/')
+        .then(res => {
+            const data: GetUserResponse = res.data;
+            if (!data.success || data.user === null)
+                throw new UserUnverifiedError();
+
+            return data.user;
+        })
 }
 
 export const createWebSocket = (endpoint: string, onMessage: (event: MessageEvent) => void): WebSocket => {

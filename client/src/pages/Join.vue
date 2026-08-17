@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { verifyUser } from '../api';
+import { UserUnverifiedError, verifyUser } from '../api';
 
 import { handleSignup } from '../functions/Signup';
 import { handleLogin } from '../functions/Login';
@@ -11,10 +11,7 @@ import InputText from 'primevue/inputtext';
 
 const router = useRouter();
 
-const verificationData = await verifyUser();
-if (verificationData.statusCode !== 200) {
-    router.push('/join');
-}
+await verifyUser().catch((_: UserUnverifiedError) => router.push('/'));
 
 const signupMode = ref(true);
 const errorText = ref<string>('');

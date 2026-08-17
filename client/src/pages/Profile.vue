@@ -18,12 +18,11 @@ import ProfilePostView from '../components/ProfilePostView.vue';
 const route = useRoute();
 const router = useRouter();
 
-const verificationData = await verifyUser();
-if (verificationData.statusCode !== 200) {
-    router.push('/join');
-}
+let userId: string = '';
 
-const userId: string = verificationData.result['user']['id'];
+try {
+    userId = (await verifyUser()).id;
+} catch { router.push('/') }
 
 const fetchData = ref<{status: number, data?: ProfileData}>({
     status: 0,

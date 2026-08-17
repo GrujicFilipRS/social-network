@@ -1,6 +1,6 @@
 export interface UserData {
     id: string;
     username: string;
-    name: string;
-    pfp: string | null;
+    name: string | null;
+    pfp_src: string | null;
 };

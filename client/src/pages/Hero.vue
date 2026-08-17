@@ -7,10 +7,7 @@ const router = useRouter();
 const route = useRoute();
 
 async function verifyAndRedirect() {
-    const verificationData = await verifyUser();
-    if (verificationData.statusCode === 200) {
-        router.push('/feed');
-    }
+    await verifyUser().then(() => router.push('/feed'));
 }
 
 verifyAndRedirect();

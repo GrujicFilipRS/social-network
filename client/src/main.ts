@@ -8,6 +8,9 @@ import App from './App.vue';
 import router from './router';
 import { ToastService } from 'primevue';
 import ConfirmationService from 'primevue/confirmationservice';
+import axios from 'axios';
+
+axios.defaults.baseURL = import.meta.env.VITE_API_ROUTE;
 
 const app = createApp(App);
 

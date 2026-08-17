@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { verifyUser, createWebSocket } from '../api';
+import { verifyUser, createWebSocket, UserUnverifiedError } from '../api';
 import type { Notification } from '../interfaces/Notification';
 import { createNotification } from '../functions/createNotification';
 import { GetUnreadNotifications } from '../functions/GetUnreadNotifications';
@@ -34,9 +34,9 @@ const loadNotifications = async () => {
 
 const initiateHeader = async () => {
     verifyUser().then(res => {
-        if (res.statusCode !== 401) headerVisible.value = true;
-        pfpSource.value = res.result.user?.pfp ?? '/default-pfp.png';
-    });
+        headerVisible.value = true;
+        pfpSource.value = res.pfp_src ?? '/default-pfp.png';
+    }).catch((_: UserUnverifiedError) => headerVisible.value = false);
 
     websocket.value = createWebSocket('notifications/', async (event) => {
         const notificationData = JSON.parse(event.data) as Notification;

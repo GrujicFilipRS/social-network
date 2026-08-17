@@ -2,14 +2,11 @@
 
 import { useRouter } from 'vue-router';
 
-import { verifyUser } from '../api';
+import { verifyUser, UserUnverifiedError } from '../api';
 
 const router = useRouter();
 
-const verificationData = await verifyUser();
-if (verificationData.statusCode !== 200) {
-    router.push('/join');
-}
+await verifyUser().catch((_: UserUnverifiedError) => router.push('/'));
 
 </script>
 

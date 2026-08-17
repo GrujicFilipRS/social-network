@@ -21,21 +21,18 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { useConfirm } from 'primevue/useconfirm';
+import type { UserData } from '../interfaces/UserData.ts';
 
 const router = useRouter();
 
 const currentUserId = ref<string>('');
 
-verifyUser().then(async (res) => {
-    if (res.statusCode !== 200) {
-        window.location.href = '/join';
-    }
+let userDataNullable: UserData | null = null;
+try {
+    userDataNullable = await verifyUser();
+} catch { router.push('/') }
 
-    const data = await res;
-    currentUserId.value = data.result.user.id;
-}).catch(() => {
-    window.location.href = '/join';
-});
+const userData = userDataNullable as UserData;
 
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('post_id');
@@ -224,7 +221,7 @@ const postComment = async () => {
     <ConfirmPopup />
     <div class='user-header'>
         <div class='lside-user'>
-            <img :src='postData?.user.pfp ?? "/default-pfp.png"' class='pfp' />
+            <img :src='postData?.user.pfp_src ?? "/default-pfp.png"' class='pfp' />
             <p class='text-3xl'>{{ postData?.user.name ?? postData?.user.username }}</p>
             <p>{{ postData?.user.name ? postData?.user.username : '' }}</p>
         </div>
