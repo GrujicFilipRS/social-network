@@ -14,11 +14,11 @@ from schemas import (
     UserRegistrationRequest,
 )
 from services.service_models import (
+    AuthServiceModel,
     FollowServiceModel,
     PostServiceModel,
     UserServiceModel,
 )
-from utils import JWT
 
 router = APIRouter()
 
@@ -43,10 +43,11 @@ async def get_user(
 @inject
 async def get_current_user(
     request: Request,
+    auth_service: FromDishka[AuthServiceModel],
     user_service: FromDishka[UserServiceModel]
 ):
-    user_id = JWT.get_id_from_request(request)
-    
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
+
     if not user_id:
         return UserGetResponse.error('Unauthorized')
     
@@ -62,12 +63,14 @@ async def get_current_user(
 async def register(
     data: UserRegistrationRequest,
     response: Response,
+    auth_service: FromDishka[AuthServiceModel],
     user_service: FromDishka[UserServiceModel]
 ):
     result = await user_service.register(data.username, data.password, data.name)
     
     if result.user:
-        JWT.set_response_cookie(response, JWT.encode_token(UUID(result.user.id)))
+        token = auth_service.encode_token(UUID(result.user.id))
+        response.set_cookie('auth_token', token)
     
     return result
 
@@ -80,12 +83,14 @@ async def register(
 async def login(
     data: UserLoginRequest,
     response: Response,
+    auth_service: FromDishka[AuthServiceModel],
     user_service: FromDishka[UserServiceModel]
 ):
     result = await user_service.log_in(data.username, data.password)
     
     if result.user:
-        JWT.set_response_cookie(response, JWT.encode_token(UUID(result.user.id)))
+        token = auth_service.encode_token(UUID(result.user.id))
+        response.set_cookie('auth_token', token)
     
     return result
 
@@ -98,10 +103,11 @@ async def login(
 async def set_user_name(
     request: Request,
     data: SetNameRequest,
-    user_service: FromDishka[UserServiceModel]
+    user_service: FromDishka[UserServiceModel],
+    auth_service: FromDishka[AuthServiceModel]
 ):
-    user_id = JWT.get_id_from_request(request)
-    
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
+
     if not user_id:
         return DTO.error('Unauthorized')
     
@@ -117,10 +123,11 @@ async def set_user_name(
 async def change_username(
     request: Request,
     data: UserChangeUsernameRequest,
-    user_service: FromDishka[UserServiceModel]
+    user_service: FromDishka[UserServiceModel],
+    auth_service: FromDishka[AuthServiceModel]
 ):
-    user_id = JWT.get_id_from_request(request)
-    
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
+
     if not user_id:
         return DTO.error('Unauthorized')
     
@@ -134,10 +141,11 @@ async def change_username(
 async def change_password(
     request: Request,
     data: UserChangePasswordRequest,
-    user_service: FromDishka[UserServiceModel]
+    user_service: FromDishka[UserServiceModel],
+    auth_service: FromDishka[AuthServiceModel]
 ):
-    user_id = JWT.get_id_from_request(request)
-    
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
+
     if not user_id:
         return DTO.error('Unauthorized')
     
@@ -155,9 +163,10 @@ async def get_user_profile(
     username: str,
     user_service: FromDishka[UserServiceModel],
     follow_service: FromDishka[FollowServiceModel],
-    post_service: FromDishka[PostServiceModel]
+    post_service: FromDishka[PostServiceModel],
+    auth_service: FromDishka[AuthServiceModel]
 ):  
-    user_id = JWT.get_id_from_request(request)
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
         
     if not user_id:
         return DTO.error('Unauthorized')
@@ -203,9 +212,10 @@ async def get_current_user_profile(
     request: Request,
     user_service: FromDishka[UserServiceModel],
     follow_service: FromDishka[FollowServiceModel],
-    post_service: FromDishka[PostServiceModel]
+    post_service: FromDishka[PostServiceModel],
+    auth_service: FromDishka[AuthServiceModel]
 ):
-    user_id = JWT.get_id_from_request(request)
+    user_id = auth_service.decode_token(request.cookies['auth_token'])
     
     if not user_id:
         return DTO.error('Unauthorized')
@@ -249,6 +259,6 @@ async def get_current_user_profile(
 def logout() -> JSONResponse:
     response = JSONResponse(content=DTO.ok().__dict__, status_code=200)
     
-    JWT.set_response_cookie(response, '')
+    response.delete_cookie('auth_token')
     
     return response

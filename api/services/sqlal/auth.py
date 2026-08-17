@@ -13,7 +13,7 @@ class AuthServiceJWTSqlal(AuthServiceModel):
     def __init__(self, db_sess: Session):
         self.db_session = db_sess
     
-    def encode_token(self, user_id: UUID) -> str:
+    def encode_token(self, user_id: UUID | str) -> str:
         now = datetime.now(timezone.utc)
         expiration = now + timedelta(hours=Env.JWT_EXPIRATION_HOURS)
         payload = {
