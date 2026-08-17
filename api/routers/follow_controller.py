@@ -36,7 +36,7 @@ async def follow_user(
     follow_service: FromDishka[FollowServiceModel],
     auth_service: FromDishka[AuthServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
     
     if not user_id:
         return DTO.error('Unauthorized')
@@ -55,7 +55,7 @@ async def unfollow_user(
     follow_service: FromDishka[FollowServiceModel],
     auth_service: FromDishka[AuthServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
     
     if not user_id:
         return DTO.error('Unauthorized')
@@ -98,7 +98,7 @@ async def check_if_following(
     follow_service: FromDishka[FollowServiceModel],
     auth_service: FromDishka[AuthServiceModel]
 ):
-    id = auth_service.decode_token(request.cookies['auth_token'])
+    id = auth_service.decode_token(request.cookies.get('auth_token'))
     
     if not id:
         return ExistsGetResponse.error('Unauthorized')

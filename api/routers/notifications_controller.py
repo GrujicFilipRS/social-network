@@ -48,7 +48,7 @@ async def get_unread_notifications(
     auth_service: FromDishka[AuthServiceModel],
     notification_service: FromDishka[NotificationModelServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
     
     return await notification_service.get_unread_notifications(user_id)
         
@@ -64,6 +64,6 @@ async def read_notification(
     auth_service: FromDishka[AuthServiceModel],
     notification_service: FromDishka[NotificationModelServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
     
     return await notification_service.read_notification(notification_id, user_id)

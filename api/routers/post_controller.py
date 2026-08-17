@@ -4,10 +4,9 @@ from uuid import UUID
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
-from fastapi import APIRouter, File, Form, Request
+from fastapi import APIRouter, File, Form, Request, UploadFile
 from schemas import DTO, PostEditRequest, PostGetResponse
 from services.service_models import AuthServiceModel, PostServiceModel
-from starlette.datastructures import UploadFile
 
 router = APIRouter()
 
@@ -23,7 +22,7 @@ async def get_post(
     auth_service: FromDishka[AuthServiceModel],
     post_service: FromDishka[PostServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
     
     return await post_service.get_post(post_id, user_id)
 
@@ -42,7 +41,7 @@ async def create_post(
     post_service: FromDishka[PostServiceModel],
     images: Annotated[list[UploadFile], File()] = []  # noqa: B006
 ):
-    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
     
     if not user_id:
         return PostGetResponse.error('Unauthorized')
@@ -73,7 +72,7 @@ async def edit_post(
     auth_service: FromDishka[AuthServiceModel],
     post_service: FromDishka[PostServiceModel],
 ):
-    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
         
     if not user_id:
         return PostGetResponse.error('Unauthorized')
@@ -97,7 +96,7 @@ async def delete_post(
     auth_service: FromDishka[AuthServiceModel],
     post_service: FromDishka[PostServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
             
     if not user_id:
         return PostGetResponse.error('Unauthorized')

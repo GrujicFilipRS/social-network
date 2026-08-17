@@ -10,7 +10,7 @@ router = APIRouter()
 
 @router.get(
     '/get_like/{id}',
-    LikeGetResponse
+    response_model=LikeGetResponse
 )
 @inject
 async def get_like(
@@ -19,7 +19,7 @@ async def get_like(
     auth_service: FromDishka[AuthServiceModel],
     like_service: FromDishka[LikeServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
     
     return await like_service.get_like(id, user_id)
 
@@ -35,7 +35,7 @@ async def like_post(
     auth_service: FromDishka[AuthServiceModel],
     like_service: FromDishka[LikeServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
     
     if not user_id:
         return DTO.error('Unauthorized')
@@ -54,7 +54,7 @@ async def unlike_post(
     auth_service: FromDishka[AuthServiceModel],
     like_service: FromDishka[LikeServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies['auth_token'])
+    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
         
     if not user_id:
         return DTO.error('Unauthorized')
