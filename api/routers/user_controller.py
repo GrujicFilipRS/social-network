@@ -46,7 +46,7 @@ async def get_current_user(
     auth_service: FromDishka[AuthServiceModel],
     user_service: FromDishka[UserServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
+    user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
 
     if not user_id:
         return UserGetResponse.error('Unauthorized')
@@ -70,7 +70,7 @@ async def register(
     
     if result.user:
         token = auth_service.encode_token(UUID(result.user.id))
-        response.set_cookie('auth_token', token)
+        response.set_cookie(auth_service.auth_token_name, token)
     
     return result
 
@@ -90,7 +90,7 @@ async def login(
     
     if result.user:
         token = auth_service.encode_token(UUID(result.user.id))
-        response.set_cookie('auth_token', token)
+        response.set_cookie(auth_service.auth_token_name, token)
     
     return result
 
@@ -106,7 +106,7 @@ async def set_user_name(
     user_service: FromDishka[UserServiceModel],
     auth_service: FromDishka[AuthServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
+    user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
 
     if not user_id:
         return DTO.error('Unauthorized')
@@ -126,7 +126,7 @@ async def change_username(
     user_service: FromDishka[UserServiceModel],
     auth_service: FromDishka[AuthServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
+    user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
 
     if not user_id:
         return DTO.error('Unauthorized')
@@ -144,7 +144,7 @@ async def change_password(
     user_service: FromDishka[UserServiceModel],
     auth_service: FromDishka[AuthServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
+    user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
 
     if not user_id:
         return DTO.error('Unauthorized')
@@ -166,7 +166,7 @@ async def get_user_profile(
     post_service: FromDishka[PostServiceModel],
     auth_service: FromDishka[AuthServiceModel]
 ):  
-    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
+    user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
         
     if not user_id:
         return DTO.error('Unauthorized')
@@ -215,7 +215,7 @@ async def get_current_user_profile(
     post_service: FromDishka[PostServiceModel],
     auth_service: FromDishka[AuthServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
+    user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
     
     if not user_id:
         return DTO.error('Unauthorized')
@@ -256,9 +256,10 @@ async def get_current_user_profile(
     '/logout/',
     response_model=DTO
 )
-def logout() -> JSONResponse:
+@inject
+def logout(auth_service: FromDishka[AuthServiceModel]) -> JSONResponse:
     response = JSONResponse(content=DTO.ok().__dict__, status_code=200)
     
-    response.delete_cookie('auth_token')
+    response.delete_cookie(auth_service.auth_token_name)
     
     return response

@@ -18,7 +18,7 @@ async def create_user_pfp(
     auth_service: FromDishka[AuthServiceModel],
     pfp_service: FromDishka[PfpServiceModel]
 ):
-    user = auth_service.get_user_from_token(request.cookies.get('auth_token'))
+    user = auth_service.get_user_from_token(request.cookies.get(auth_service.auth_token_name))
     
     if not user:
         return DTO.error('Unauthorized')

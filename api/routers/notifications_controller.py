@@ -24,7 +24,7 @@ async def websocket(
         for item in cookie_header.split(';')
     )
     
-    user_id = auth_service.decode_token(cookies['auth_token'])
+    user_id = auth_service.decode_token(cookies[auth_service.auth_token_name])
 
     await websocket.accept()
 
@@ -48,7 +48,7 @@ async def get_unread_notifications(
     auth_service: FromDishka[AuthServiceModel],
     notification_service: FromDishka[NotificationModelServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
+    user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
     
     return await notification_service.get_unread_notifications(user_id)
         
@@ -64,6 +64,6 @@ async def read_notification(
     auth_service: FromDishka[AuthServiceModel],
     notification_service: FromDishka[NotificationModelServiceModel]
 ):
-    user_id = auth_service.decode_token(request.cookies.get('auth_token'))
+    user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
     
     return await notification_service.read_notification(notification_id, user_id)

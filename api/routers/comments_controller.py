@@ -23,7 +23,7 @@ async def get_comment(
     auth_service: FromDishka[AuthServiceModel],
     comment_service: FromDishka[CommentServiceModel]
 ):
-    user_id = auth_service.get_user_from_token(request.cookes['auth_token'])
+    user_id = auth_service.get_user_from_token(request.cookes[auth_service.auth_token_name])
     
     if not user_id:
         return CommentGetResponse.error('Unauthorized')
@@ -40,7 +40,7 @@ async def post_comment(
     request: Request,
     auth_service: FromDishka[AuthServiceModel]
 ) -> JSONResponse:
-    user = auth_service.get_user_from_token(request.cookies.get('auth_token'))
+    user = auth_service.get_user_from_token(request.cookies.get(auth_service.auth_token_name))
     
     if not user:
         return DTO.error('Unauthorized')
@@ -93,7 +93,7 @@ async def edit_comment(
     request: Request,
     auth_service: FromDishka[AuthServiceModel]
 ) -> JSONResponse:
-    user = auth_service.get_user_from_token(request.cookies.get('auth_token'))
+    user = auth_service.get_user_from_token(request.cookies.get(auth_service.auth_token_name))
     
     data = await request.json()
     try:
@@ -127,7 +127,7 @@ async def delete_comment(
     request: Request,
     auth_service: FromDishka[AuthServiceModel]
 ) -> JSONResponse:
-    user = auth_service.get_user_from_token(request.cookies.get('auth_token'))
+    user = auth_service.get_user_from_token(request.cookies.get(auth_service.auth_token_name))
 
     with DBSessionManager() as db_sess:
         data = await request.json()
@@ -156,7 +156,7 @@ def get_post_comments(
     request: Request,
     auth_service: FromDishka[AuthServiceModel]
 ) -> JSONResponse:
-    user = auth_service.get_user_from_token(request.cookies.get('auth_token'))
+    user = auth_service.get_user_from_token(request.cookies.get(auth_service.auth_token_name))
     
     with DBSessionManager() as db_sess:
         try:
