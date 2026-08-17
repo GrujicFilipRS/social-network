@@ -70,7 +70,13 @@ async def register(
     
     if result.user:
         token = auth_service.encode_token(UUID(result.user.id))
-        response.set_cookie(auth_service.auth_token_name, token)
+        response.set_cookie(
+            auth_service.auth_token_name,
+            token,
+            secure=True,
+            httponly=True,
+            samesite='lax'
+        )
     
     return result
 
@@ -90,7 +96,13 @@ async def login(
     
     if result.user:
         token = auth_service.encode_token(UUID(result.user.id))
-        response.set_cookie(auth_service.auth_token_name, token)
+        response.set_cookie(
+            auth_service.auth_token_name,
+            token,
+            secure=True,
+            httponly=True,
+            samesite='lax'
+        )
     
     return result
 

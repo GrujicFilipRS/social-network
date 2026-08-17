@@ -11,7 +11,9 @@ import InputText from 'primevue/inputtext';
 
 const router = useRouter();
 
-await verifyUser().catch((_: UserUnverifiedError) => router.push('/'));
+let loggedIn: boolean = true;
+await verifyUser().catch((_: UserUnverifiedError) => loggedIn = false);
+if (loggedIn) router.push('/feed');
 
 const signupMode = ref(true);
 const errorText = ref<string>('');

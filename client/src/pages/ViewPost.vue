@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 
 import Comment from '../components/Comment.vue';
 
-import { verifyUser } from '../api';
+import { UserUnverifiedError, verifyUser } from '../api';
 import { GetPostData } from '../functions/GetPostData';
 import { LikePost, UnlikePost } from '../functions/LikePost';
 import { CreateComment } from '../functions/CreateComment';
@@ -21,18 +21,12 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { useConfirm } from 'primevue/useconfirm';
-import type { UserData } from '../interfaces/UserData.ts';
 
 const router = useRouter();
 
 const currentUserId = ref<string>('');
 
-let userDataNullable: UserData | null = null;
-try {
-    userDataNullable = await verifyUser();
-} catch { router.push('/') }
-
-const userData = userDataNullable as UserData;
+await verifyUser().catch((_: UserUnverifiedError) => router.push('/'));
 
 const urlParams = new URLSearchParams(window.location.search);
 const postId = urlParams.get('post_id');
