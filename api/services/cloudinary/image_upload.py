@@ -5,6 +5,7 @@ from env import Env
 
 import cloudinary
 import cloudinary.api
+import cloudinary.uploader
 
 from ..service_models import ImageUploadServiceModel
 

@@ -31,7 +31,8 @@ class PfpServiceSqlal(PfpServiceModel):
         image_src, public_id = await self.upload_service.create_image(image_stream)
         
         user_pfp.image_src = image_src
-        user_pfp.public_id = public_id
+        user_pfp.image_id = public_id
+        user_pfp.user_id = user_id
         
         self.db_session.add(user_pfp)
         self.db_session.commit()

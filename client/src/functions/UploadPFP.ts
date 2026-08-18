@@ -1,10 +1,11 @@
 import type { ToastMessageOptions } from 'primevue/toast';
-import { FetchWithFileUpload } from '../api';
 import { eventBus } from '../events';
+import axios from 'axios';
+import type { DTO } from '../interfaces/DTO';
 
 export const UploadPFP = (
-    image: File, toastAdd:
-    (message: ToastMessageOptions) => void,
+    image: File,
+    toastAdd: (message: ToastMessageOptions) => void,
     setLoading: (value: boolean) => void,
     refreshImage: () => void
 ) => {
@@ -12,18 +13,15 @@ export const UploadPFP = (
     const data = new FormData();
     data.append('image', image);
 
-    FetchWithFileUpload('pfp/create_user_pfp/', {
-        method: 'POST'
-    }, image, 'image')
+    axios.post('pfp/create_user_pfp/', data)
     .then(async res => {
-        const status = res.status;
-        const data = await res.json();
+        const data: DTO = res.data as DTO;
 
-        if (status !== 201) {
+        if (!data.success) {
             toastAdd({
                 severity: 'error',
                 summary: 'Error while uploading',
-                detail: data.message,
+                detail: data.message ?? 'Unknown error',
                 life: 3000
             });
             return;

@@ -1,9 +1,9 @@
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
 from fastapi import APIRouter, Request
-from fastapi.datastructures import UploadFile
 from schemas import DTO
 from services.service_models import AuthServiceModel, PfpServiceModel
+from starlette.datastructures import UploadFile
 
 router = APIRouter()
 
