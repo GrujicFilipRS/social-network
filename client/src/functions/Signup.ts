@@ -1,33 +1,37 @@
 import type { Router } from 'vue-router';
-import { Fetch } from '../api';
 import type { Ref } from 'vue';
 import { eventBus } from '../events';
+import type { DTO } from '../interfaces/DTO';
+import axios from 'axios';
 
 export const handleSignup = async (
     username: string,
     password: string,
-    name: string,
+    name: string | null,
     router: Router,
     errorText: Ref<string, string>
 ) => {
-    Fetch('user/register/', {
-        method: 'POST',
-        body: JSON.stringify({
-            username: username,
-            password: password,
-            name: name
-        })
-    })
+    if (name === '') name = null;
+
+    const registrationData = {
+        username: username,
+        password: password,
+        name: name
+    }
+
+    axios.post('user/register/', registrationData)
     .then(async (res) => {
-        if (res.status == 200) {
+        const data = res.data as DTO;
+        
+        if (data.success) {
             router.push('/feed');
             eventBus.emit('header-update');
             return;
         }
-        
-        const errMessage = (await res.json())['message'];
-        errorText.value = errMessage;
-    }).catch((err) => {
-        console.error(err);
+
+        const errMessage = data.message;
+        errorText.value = errMessage ?? 'An error occurred during registration.';
+    }).catch((_) => {
+        errorText.value = 'An error occurred during registration.';
     });
 }
