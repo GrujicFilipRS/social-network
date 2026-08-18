@@ -1,5 +1,5 @@
-import { Fetch } from '../api';
-import type { ProfileData } from '../interfaces/ProfileData';
+import axios from 'axios';
+import type { UserProfileGetResponse } from '../interfaces/UserProfileGetResponse';
 
 export interface EditProfileData {
     usernameText: string;
@@ -8,18 +8,27 @@ export interface EditProfileData {
 }
 
 export const GetSelfProfileForEditing = async (): Promise<EditProfileData[]> => {
-    return await Fetch('user/get_current_user_profile/')
+    return await axios.get('user/get_current_user_profile/')
     .then(async res => {
-        const data: ProfileData = await res.json() as ProfileData;
+        const data: UserProfileGetResponse = res.data as UserProfileGetResponse;
+
+        if (!data.success || data.user === null) {
+            // TODO: add error toast
+            return [{
+                usernameText: '',
+                pfp_src: '/default-pfp.png',
+                nameText: ''
+            }];
+        }
 
         return [{
-            usernameText: data.username,
-            pfp_src: data.pfp_src ?? '/default-pfp.png',
-            nameText: data.user_name ?? 'Set your name here'
+            usernameText: data.user.username,
+            pfp_src: data.user.pfp_src ?? '/default-pfp.png',
+            nameText: data.user.name ?? 'Set your name here'
         }, {
-            usernameText: data.username,
-            pfp_src: data.pfp_src ?? '/default-pfp.png',
-            nameText: data.user_name ?? ''
+            usernameText: data.user.username,
+            pfp_src: data.user.pfp_src ?? '/default-pfp.png',
+            nameText: data.user.name ?? ''
         }]
-    });
+    })
 }
