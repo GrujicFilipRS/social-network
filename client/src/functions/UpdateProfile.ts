@@ -1,5 +1,6 @@
 import type { ToastMessageOptions } from 'primevue';
-import { Fetch } from '../api';
+import axios from 'axios';
+import type { DTO } from '../interfaces/DTO';
 
 export const EditUsername = (
     username: string,
@@ -18,24 +19,20 @@ export const EditUsername = (
         return;
     }
 
-    Fetch('user/change_username/', {
-        method: 'PUT',
-        body: JSON.stringify({
-            new_username: username
-        })
+    axios.put('user/change_username/', {
+        new_username: username
     })
     .then(async res => {
-        const status = res.status;
-        const data = await res.json();
+        const data: DTO = res.data as DTO;
 
-        if (status !== 200) {
+        if (!data.success) {
             toastAdd({
                 severity: 'error',
-                summary: 'Server error',
-                detail: data.message,
+                summary: 'Something went wrong',
+                detail: data.message ?? 'Unknown error',
                 life: 3000
             });
-
+            
             return;
         }
 
@@ -81,21 +78,17 @@ export const EditName = (
         return;
     }
 
-    Fetch('user/set_name/', {
-        method: 'PUT',
-        body: JSON.stringify({
-            new_name: name
-        })
+    axios.put('user/set_name/', {
+        new_name: name
     })
     .then(async res => {
-        const status = res.status;
-        const data = await res.json();
+        const data: DTO = res.data as DTO;
 
-        if (status !== 200) {
+        if (!data.success) {
             toastAdd({
                 severity: 'error',
-                summary: 'Server error',
-                detail: data.message,
+                summary: 'Something went wrong',
+                detail: data.message ?? 'Unknown error',
                 life: 3000
             });
 
@@ -105,7 +98,7 @@ export const EditName = (
         toastAdd({
             severity: 'success',
             summary: 'Success',
-            detail: 'Successfully updated username',
+            detail: 'Successfully updated name',
             life: 3000
         });
 
