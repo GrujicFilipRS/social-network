@@ -11,6 +11,7 @@ import ConfirmationService from 'primevue/confirmationservice';
 import axios from 'axios';
 
 axios.defaults.baseURL = import.meta.env.VITE_API_ROUTE;
+axios.defaults.withCredentials = true;
 
 const app = createApp(App);
 

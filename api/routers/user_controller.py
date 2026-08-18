@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from dishka.integrations.fastapi import FromDishka, inject
+from env import Env
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import JSONResponse
 from schemas import (
@@ -71,11 +72,13 @@ async def register(
     if result.user:
         token = auth_service.encode_token(UUID(result.user.id))
         response.set_cookie(
-            auth_service.auth_token_name,
-            token,
-            secure=True,
+            key=auth_service.auth_token_name,
+            value=token,
+            secure=Env.FLASK_ENV == 'production',
             httponly=True,
-            samesite='lax'
+            path='/',
+            samesite='lax',
+            expires=int(Env.JWT_EXPIRATION_HOURS * 3600)
         )
     
     return result
@@ -97,11 +100,13 @@ async def login(
     if result.user:
         token = auth_service.encode_token(UUID(result.user.id))
         response.set_cookie(
-            auth_service.auth_token_name,
-            token,
-            secure=True,
+            key=auth_service.auth_token_name,
+            value=token,
+            secure=Env.FLASK_ENV == 'production',
             httponly=True,
-            samesite='lax'
+            path='/',
+            samesite='lax',
+            expires=int(Env.JWT_EXPIRATION_HOURS * 3600)
         )
     
     return result
