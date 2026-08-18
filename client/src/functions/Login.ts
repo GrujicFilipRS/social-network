@@ -3,7 +3,7 @@ import type { Ref } from 'vue';
 
 import { eventBus } from '../events';
 import axios from 'axios';
-import type { DTO } from '../interfaces/DTO';
+import type { UserGetData } from '../interfaces/UserGetData';
 
 export const handleLogin = async (
     username: string,
@@ -15,7 +15,7 @@ export const handleLogin = async (
         username: username,
         password: password
     }).then(async (res) => {
-        const data = res.data as DTO;
+        const data = res.data as UserGetData;
         
         if (data.success) {
             router.push('/feed');

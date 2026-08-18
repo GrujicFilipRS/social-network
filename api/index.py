@@ -51,7 +51,7 @@ app.add_middleware(
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
         content=DTO.error('Invalid data').__dict__,
-        status_code=400
+        status_code=200
     )
 
 @app.exception_handler(Exception)

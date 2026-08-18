@@ -1,8 +1,8 @@
 import type { Router } from 'vue-router';
 import type { Ref } from 'vue';
 import { eventBus } from '../events';
-import type { DTO } from '../interfaces/DTO';
 import axios from 'axios';
+import type { UserGetData } from '../interfaces/UserGetData';
 
 export const handleSignup = async (
     username: string,
@@ -21,7 +21,7 @@ export const handleSignup = async (
 
     axios.post('user/register/', registrationData)
     .then(async (res) => {
-        const data = res.data as DTO;
+        const data = res.data as UserGetData;
         
         if (data.success) {
             router.push('/feed');
