@@ -25,6 +25,10 @@ from sqlalchemy.orm import Session
 
 
 class ServiceProvider(Provider):
+    @provide(scope=Scope.SESSION)
+    def auth_service_session(self, db_sess: Session) -> AuthServiceModel:
+        return AuthServiceJWTSqlal(db_sess)
+    
     @provide(scope=Scope.REQUEST)
     def user_service(self, db_sess: Session) -> UserServiceModel:
         return UserServiceSqlal(db_sess)
@@ -40,10 +44,6 @@ class ServiceProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def pfp_service(self, db_sess: Session, upload_service: ImageUploadServiceModel) -> PfpServiceModel:
         return PfpServiceSqlal(db_sess, upload_service)
-    
-    @provide(scope=Scope.REQUEST)
-    def auth_service(self, db_sess: Session) -> AuthServiceModel:
-        return AuthServiceJWTSqlal(db_sess)
     
     @provide(scope=Scope.REQUEST)
     def notification_model_service(self, db_sess: Session) -> NotificationModelServiceModel:

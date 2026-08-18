@@ -1,8 +1,9 @@
 import type { Router } from 'vue-router';
 import type { Ref } from 'vue';
 
-import { Fetch } from '../api';
 import { eventBus } from '../events';
+import axios from 'axios';
+import type { DTO } from '../interfaces/DTO';
 
 export const handleLogin = async (
     username: string,
@@ -10,23 +11,21 @@ export const handleLogin = async (
     router: Router,
     errorText: Ref<string>
 ) => {
-    Fetch('user/login/', {
-        method: 'POST',
-        body: JSON.stringify({
-            username: username,
-            password: password
-        })
-    })
-    .then(async (res) => {
-        if (res.status == 200) {
+    axios.post('user/login/', {
+        username: username,
+        password: password
+    }).then(async (res) => {
+        const data = res.data as DTO;
+        
+        if (data.success) {
             router.push('/feed');
             eventBus.emit('header-update');
             return;
         }
-        
-        const errMessage = (await res.json())['message'];
-        errorText.value = errMessage;
-    }).catch((err) => { 
-        console.error(err);
+
+        const errMessage = data.message;
+        errorText.value = errMessage ?? 'An error occurred during login.';
+    }).catch((_) => {
+        errorText.value = 'An error occurred during login.';
     });
 };

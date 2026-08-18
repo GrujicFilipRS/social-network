@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from ..user.user_dto import UserDTO
 
 
-class NotificationDTO(BaseModel): # TODO
+class NotificationDTO(BaseModel):
     id: str
     receiver: UserDTO
     sender: UserDTO

@@ -14,3 +14,8 @@ class DBSessionProvider(Provider):
     def db_sess(self) -> Generator[Session, None, None]:
         with DBSessionManager() as session:
             yield session
+            
+    @provide(scope=Scope.SESSION)
+    def db_sess_session(self) -> Generator[Session, None, None]:
+        with DBSessionManager() as session:
+            yield session
