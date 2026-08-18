@@ -12,7 +12,7 @@ from ..service_models import AuthServiceModel
 class AuthServiceJWTSqlal(AuthServiceModel):
     def __init__(self, db_sess: Session):
         self.db_session = db_sess
-        self.auth_token_name = 'auth_token'
+        super().__init__()
     
     def encode_token(self, user_id: UUID | str) -> str:
         now = datetime.now(timezone.utc)
