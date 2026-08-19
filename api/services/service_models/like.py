@@ -2,10 +2,9 @@ from abc import abstractmethod
 from uuid import UUID
 
 from schemas import DTO, LikeGetResponse
-from services.service_models import (
-    NotificationModelServiceModel,
-    NotificationServiceModel,
-)
+
+from .notification import NotificationServiceModel
+from .notification_model import NotificationModelServiceModel
 
 
 class LikeServiceModel:

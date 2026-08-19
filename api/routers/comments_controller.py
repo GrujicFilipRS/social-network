@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from uuid import UUID
 
 from db import DBSessionManager
@@ -6,10 +5,11 @@ from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from models import Comment, Post
-from schemas import DTO, CommentGetResponse
+from schemas import CommentCreateRequest, CommentGetResponse
 from services.service_models import (
     AuthServiceModel,
     CommentServiceModel,
+    NotificationModelServiceModel,
     NotificationServiceModel,
 )
 from utils import PostLiterals
@@ -37,58 +37,39 @@ async def get_comment(
 
 @router.post(
     '/post_comment/',
-    response_model=DTO
+    response_model=CommentGetResponse
 )
 @inject
 async def post_comment(
     request: Request,
+    data: CommentCreateRequest,
     auth_service: FromDishka[AuthServiceModel],
-    notification_service: FromDishka[NotificationServiceModel]
+    comment_service: FromDishka[CommentServiceModel],
+    notification_service: FromDishka[NotificationServiceModel],
+    notification_model_service: FromDishka[NotificationModelServiceModel],
 ) -> JSONResponse:
     user = auth_service.get_user_from_token(request.cookies.get(auth_service.auth_token_name))
     
     if not user:
-        return DTO.error('Unauthorized')
-
-    data = await request.json()
-
-    if not Comment.validate_creation(data):
-        return JSONResponse(content={'message': 'Invalid comment data'}, status_code=400)
+        return CommentGetResponse.error('Unauthorized')
     
-    body: str = data.get('body').strip()
-    post_id: UUID = UUID(data.get('post_id'))
-    comment_id: UUID | None = UUID(data.get('comment_id')) if data.get('comment_id') else None
-
-    with DBSessionManager() as db_sess:
-        post: Post | None = db_sess.get(Post, post_id)
-        if post is None:
-            return JSONResponse(content={'message': 'No post found'}, status_code=404)
-        
-        new_comment = Comment(
-            body=body,
-            post_id=post.id,
-            comment_id=comment_id,
-            creator_id=user.id,
-            commented_at=datetime.now(timezone.utc)
+    response = await comment_service.post_comment(
+        body=data.body,
+        post_id=data.post_id,
+        user_id=user.id,
+        comment_id=data.comment_id
+    )
+    
+    if response.success and response.comment and response.comment.post.user_id != user.id:
+        await notification_service.create_notification(
+            notification_model_service=notification_model_service,
+            receiver_id=response.comment.post.user_id,
+            sender_id=user.id,
+            object_type='comment',
+            object_id=response.comment.id
         )
-
-        db_sess.add(new_comment)
-        db_sess.commit()
-        
-        if post.user_id != user.id:
-            await notification_service.create_notification(
-                receiver_id=post.user_id,
-                sender_id=user.id,
-                object_type='comment',
-                object_id=new_comment.id
-            )
-
-        content: dict = {
-            'message': 'Comment posted',
-            'comment': new_comment.to_dict()
-        }
-
-        return JSONResponse(content=content, status_code=201)
+    
+    return response
 
 
 @router.put('/edit_comment/')
