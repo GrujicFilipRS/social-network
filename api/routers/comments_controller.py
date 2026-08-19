@@ -57,17 +57,10 @@ async def post_comment(
         body=data.body,
         post_id=data.post_id,
         user_id=user.id,
-        comment_id=data.comment_id
+        comment_id=data.comment_id,
+        notification_service=notification_service,
+        notification_model_service=notification_model_service
     )
-    
-    if response.success and response.comment and response.comment.post.user_id != user.id:
-        await notification_service.create_notification(
-            notification_model_service=notification_model_service,
-            receiver_id=response.comment.post.user_id,
-            sender_id=user.id,
-            object_type='comment',
-            object_id=response.comment.id
-        )
     
     return response
 

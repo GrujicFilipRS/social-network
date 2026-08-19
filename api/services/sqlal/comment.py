@@ -28,7 +28,9 @@ class CommentServiceSqlal(CommentServiceModel):
         body: str,
         post_id: UUID,
         user_id: UUID,
-        comment_id: UUID | None = None
+        comment_id: UUID | None,
+        notification_service,
+        notification_model_service
     ) -> CommentGetResponse:
         user = self.db_session.get(User, user_id)
         if not user:
@@ -55,6 +57,15 @@ class CommentServiceSqlal(CommentServiceModel):
             commented_at=datetime.now(timezone.utc)
         )
         self.db_session.add(comment)
-        self.db_session.commit()
+        self.db_session.flush()
+        
+        if post.user_id != user.id:
+            await notification_service.create_notification(
+                notification_model_service=notification_model_service,
+                receiver_id=post.user_id,
+                sender_id=user.id,
+                object_type='comment',
+                object_id=comment.id
+            )
         
         return CommentGetResponse.ok(comment)
