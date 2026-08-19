@@ -1,7 +1,13 @@
 from abc import abstractmethod
 from uuid import UUID
 
-from schemas import DTO, ExistsGetResponse, UserGetResponse, UserListResponse
+from schemas import (
+    DTO,
+    ExistsGetResponse,
+    FollowGetResponse,
+    UserGetResponse,
+    UserListResponse,
+)
 
 
 class FollowServiceModel:
@@ -9,7 +15,7 @@ class FollowServiceModel:
     async def exists(self, follower_id: UUID, followed_id: UUID) -> ExistsGetResponse: ...
     
     @abstractmethod
-    async def create_follow(self, follower_id: UUID, followed_id: UUID) -> DTO: ...
+    async def create_follow(self, follower_id: UUID, followed_id: UUID) -> FollowGetResponse: ...
     
     @abstractmethod
     async def remove_follow(self, follower_id: UUID, followed_id: UUID) -> DTO: ...

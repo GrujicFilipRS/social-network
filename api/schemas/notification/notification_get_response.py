@@ -10,7 +10,7 @@ class NotificationGetResponse(DTO):
     notification: NotificationDTO | None
     
     @staticmethod
-    def ok(notification: Notification | NotificationDTO, message: str | None) -> NotificationGetResponse:
+    def ok(notification: Notification | NotificationDTO, message: str | None = None) -> NotificationGetResponse:
         return NotificationGetResponse(
             success=True,
             message=message,
@@ -18,7 +18,7 @@ class NotificationGetResponse(DTO):
         )
     
     @staticmethod
-    def error(message: str | None) -> NotificationGetResponse:
+    def error(message: str) -> NotificationGetResponse:
         return NotificationGetResponse(
             success=False,
             message=message,

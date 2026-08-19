@@ -2,6 +2,7 @@ from .comment.comment_dto import CommentDTO
 from .comment.comment_get_response import CommentGetResponse
 from .follow.create_follow_request import FollowCreateRequest
 from .follow.follow_dto import FollowDTO
+from .follow.follow_get_response import FollowGetResponse
 from .follow.follow_list_response import FollowListResponse
 from .like.like_dto import LikeDTO
 from .like.like_get_response import LikeGetResponse
@@ -31,6 +32,7 @@ __all__ = [
     'ExistsGetResponse',
     'FollowCreateRequest',
     'FollowDTO',
+    'FollowGetResponse',
     'FollowListResponse',
     'LikeDTO',
     'LikeGetResponse',

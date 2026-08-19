@@ -2,9 +2,14 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from models import Follow, User
-from schemas import DTO, ExistsGetResponse, UserGetResponse, UserListResponse
+from schemas import (
+    DTO,
+    ExistsGetResponse,
+    FollowGetResponse,
+    UserGetResponse,
+    UserListResponse,
+)
 from sqlalchemy.orm import Session
-from utils import NotificationController
 
 from ..service_models import FollowServiceModel
 
@@ -21,18 +26,18 @@ class FollowServiceSqlal(FollowServiceModel):
         
         return ExistsGetResponse.ok(exists)
     
-    async def create_follow(self, follower_id: UUID, followed_id: UUID) -> DTO:
+    async def create_follow(self, follower_id: UUID, followed_id: UUID) -> FollowGetResponse:
         exists = self.db_session.query(Follow).filter_by(
             follower_id = follower_id,
             followed_id = followed_id
         ).first() is not None
         
         if exists:
-            return DTO.error('User already follows that user')
+            return FollowGetResponse.error('User already follows that user')
         
-        users_exist = self.db_session.query(User).filter(id == follower_id or id == followed_id).count() == 2
+        users_exist = self.db_session.query(User).filter(User.id == follower_id or User.id == followed_id).count() == 2
         if not users_exist:
-            return DTO.error('Users do not exist')
+            return FollowGetResponse.error('Users do not exist')
         
         follow = Follow(
             follower_id = follower_id,
@@ -43,15 +48,7 @@ class FollowServiceSqlal(FollowServiceModel):
         self.db_session.add(follow)
         self.db_session.commit()
         
-        await NotificationController.create_notification(
-            session=self.db_session,
-            receiver_id=followed_id,
-            sender_id=follower_id,
-            object_type='follow',
-            object_id=follow.id
-        )
-        
-        return DTO.ok()
+        return FollowGetResponse.ok(follow)
     
     async def remove_follow(self, follower_id: UUID, followed_id: UUID) -> DTO:
         follow = self.db_session.query(Follow).filter_by(

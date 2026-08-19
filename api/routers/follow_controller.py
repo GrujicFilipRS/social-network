@@ -6,10 +6,16 @@ from schemas import (
     DTO,
     ExistsGetResponse,
     FollowCreateRequest,
+    FollowGetResponse,
     UserGetResponse,
     UserListResponse,
 )
-from services.service_models import AuthServiceModel, FollowServiceModel
+from services.service_models import (
+    AuthServiceModel,
+    FollowServiceModel,
+    NotificationModelServiceModel,
+    NotificationServiceModel,
+)
 
 router = APIRouter()
 
@@ -27,21 +33,34 @@ async def get_follower(
 
 @router.post(
     '/follow_user/',
-    response_model=DTO
+    response_model=FollowGetResponse
 )
 @inject
 async def follow_user(
     request: Request,
     data: FollowCreateRequest,
     follow_service: FromDishka[FollowServiceModel],
-    auth_service: FromDishka[AuthServiceModel]
+    auth_service: FromDishka[AuthServiceModel],
+    notification_service: FromDishka[NotificationServiceModel],
+    notification_model_service: FromDishka[NotificationModelServiceModel]
 ):
     user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
     
     if not user_id:
         return DTO.error('Unauthorized')
     
-    return await follow_service.create_follow(user_id, data.to_follow_id)
+    follow_response = await follow_service.create_follow(user_id, data.to_follow_id)
+    
+    if follow_response.success and follow_response.follow:
+        await notification_service.create_notification(
+            notification_model_service,
+            receiver_id=data.to_follow_id,
+            sender_id=user_id,
+            object_type='follow',
+            object_id=follow_response.follow.id
+        )
+    
+    return follow_response
 
 
 @router.delete(
