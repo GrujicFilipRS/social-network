@@ -1,0 +1,26 @@
+from __future__ import annotations
+
+from api.models.notifications import Notification
+
+from ..shared import DTO
+from .notification_dto import NotificationDTO
+
+
+class NotificationGetResponse(DTO):
+    notification: NotificationDTO | None
+    
+    @staticmethod
+    def ok(notification: Notification | NotificationDTO, message: str | None) -> NotificationGetResponse:
+        return NotificationGetResponse(
+            success=True,
+            message=message,
+            notification=NotificationDTO.to_dto(notification)
+        )
+    
+    @staticmethod
+    def error(message: str | None) -> NotificationGetResponse:
+        return NotificationGetResponse(
+            success=False,
+            message=message,
+            notification=None
+        )

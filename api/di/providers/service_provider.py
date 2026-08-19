@@ -7,6 +7,7 @@ from services.service_models import (
     ImageUploadServiceModel,
     LikeServiceModel,
     NotificationModelServiceModel,
+    NotificationServiceModel,
     PfpServiceModel,
     PostServiceModel,
     UserServiceModel,
@@ -22,6 +23,8 @@ from services.sqlal import (
     UserServiceSqlal,
 )
 from sqlalchemy.orm import Session
+
+from api.services.sqlal.notification import NotificationServiceSqlal
 
 
 class ServiceProvider(Provider):
@@ -44,6 +47,10 @@ class ServiceProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def pfp_service(self, db_sess: Session, upload_service: ImageUploadServiceModel) -> PfpServiceModel:
         return PfpServiceSqlal(db_sess, upload_service)
+    
+    @provide(scope=Scope.REQUEST)
+    def notification_service(self, db_sess: Session) -> NotificationServiceModel:
+        return NotificationServiceSqlal(db_sess)
     
     @provide(scope=Scope.REQUEST)
     def notification_model_service(self, db_sess: Session) -> NotificationModelServiceModel:

@@ -6,6 +6,7 @@ from .follow.follow_list_response import FollowListResponse
 from .like.like_dto import LikeDTO
 from .like.like_get_response import LikeGetResponse
 from .notification.notification_dto import NotificationDTO
+from .notification.notification_get_response import NotificationGetResponse
 from .notification.notification_list_response import NotificationListResponse
 from .post.post_dto import PostDTO
 from .post.post_edit_request import PostEditRequest
@@ -34,6 +35,7 @@ __all__ = [
     'LikeDTO',
     'LikeGetResponse',
     'NotificationDTO',
+    'NotificationGetResponse',
     'NotificationListResponse',
     'PostDTO',
     'PostEditRequest',

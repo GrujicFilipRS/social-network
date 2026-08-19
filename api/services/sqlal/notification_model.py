@@ -1,5 +1,8 @@
+from datetime import datetime, timezone
+from uuid import UUID
+
 from models import Notification, User
-from schemas import DTO, NotificationListResponse
+from schemas import DTO, NotificationGetResponse, NotificationListResponse
 from services.service_models import NotificationModelServiceModel
 from sqlalchemy.orm import Session
 
@@ -42,3 +45,30 @@ class NotificationModelServiceSqlal(NotificationModelServiceModel):
         self.db_session.commit()
         
         return DTO.ok()
+    
+    async def create_notification(
+        self,
+        receiver_id: UUID,
+        sender_id: UUID,
+        object_type: str,
+        object_id: UUID
+    ) -> NotificationGetResponse:
+        receiver = self.db_session.get(User, receiver_id)
+        sender = self.db_session.get(User, sender_id)
+        
+        if not receiver or not sender:
+            return NotificationGetResponse.error('Receiver or sender doesn\'t exist')
+        
+        notification = Notification(
+            receiver=receiver,
+            sender=sender,
+            object_type=object_type,
+            object_id=object_id,
+            received_at=datetime.now(timezone.utc),
+            seen=False
+        )
+        
+        self.db_session.add(notification)
+        self.db_session.commit()
+        
+        return NotificationGetResponse.ok(notification)
