@@ -3,9 +3,12 @@ from datetime import datetime, timezone
 from models import Like, Post, User
 from schemas import DTO, LikeGetResponse
 from sqlalchemy.orm import Session
-from utils import NotificationController
 
-from ..service_models import LikeServiceModel
+from ..service_models import (
+    LikeServiceModel,
+    NotificationModelServiceModel,
+    NotificationServiceModel,
+)
 
 
 class LikeServiceSqlal(LikeServiceModel):
@@ -23,7 +26,13 @@ class LikeServiceSqlal(LikeServiceModel):
         
         return LikeGetResponse.ok(like)
     
-    async def like_post(self, post_id, user_id) -> DTO:
+    async def like_post(
+        self,
+        post_id,
+        user_id,
+        notification_service: NotificationServiceModel,
+        notification_model_service: NotificationModelServiceModel
+    ) -> DTO:
         if self.db_session.get(User, user_id).first() is None:
             return DTO.error('Unauthorized')
         
@@ -51,12 +60,12 @@ class LikeServiceSqlal(LikeServiceModel):
         self.db_session.commit()
         
         if post.user_id != user_id:
-            await NotificationController.create_notification(
-                self.db_session,
-                post.user_id,
-                user_id,
-                'like',
-                like.id
+            await notification_service.create_notification(
+                notification_model_service=notification_model_service,
+                receiver_id=post.user_id,
+                sender_id=user_id,
+                object_type='like',
+                object_id=like.id
             )
         
         return DTO.ok()

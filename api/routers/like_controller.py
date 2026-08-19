@@ -3,7 +3,12 @@ from uuid import UUID
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Request
 from schemas import DTO, LikeGetResponse
-from services.service_models import AuthServiceModel, LikeServiceModel
+from services.service_models import (
+    AuthServiceModel,
+    LikeServiceModel,
+    NotificationModelServiceModel,
+    NotificationServiceModel,
+)
 
 router = APIRouter()
 
@@ -33,14 +38,21 @@ async def like_post(
     request: Request,
     post_id: UUID,
     auth_service: FromDishka[AuthServiceModel],
-    like_service: FromDishka[LikeServiceModel]
+    like_service: FromDishka[LikeServiceModel],
+    notification_service: FromDishka[NotificationServiceModel],
+    notification_model_service: FromDishka[NotificationModelServiceModel]
 ):
     user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
     
     if not user_id:
         return DTO.error('Unauthorized')
     
-    return await like_service.like_post(post_id, user_id)
+    return await like_service.like_post(
+        post_id,
+        user_id,
+        notification_service,
+        notification_model_service
+    )
     
 
 @router.delete(
