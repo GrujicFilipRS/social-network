@@ -47,11 +47,11 @@ class ServiceProvider(Provider):
     def pfp_service(self, db_sess: Session, upload_service: ImageUploadServiceModel) -> PfpServiceModel:
         return PfpServiceSqlal(db_sess, upload_service)
     
-    @provide(scope=Scope.REQUEST)
+    @provide(scope=Scope.SESSION)
     def notification_service(self, db_sess: Session) -> NotificationServiceModel:
         return NotificationServiceSqlal(db_sess)
     
-    @provide(scope=Scope.REQUEST)
+    @provide(scope=Scope.SESSION)
     def notification_model_service(self, db_sess: Session) -> NotificationModelServiceModel:
         return NotificationModelServiceSqlal(db_sess)
     

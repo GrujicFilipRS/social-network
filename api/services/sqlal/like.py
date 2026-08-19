@@ -1,14 +1,11 @@
 from datetime import datetime, timezone
 
+from dishka import FromDishka
 from models import Like, Post, User
 from schemas import DTO, LikeGetResponse
 from sqlalchemy.orm import Session
 
-from ..service_models import (
-    LikeServiceModel,
-    NotificationModelServiceModel,
-    NotificationServiceModel,
-)
+from ..service_models import LikeServiceModel, NotificationServiceModel
 
 
 class LikeServiceSqlal(LikeServiceModel):
@@ -30,8 +27,7 @@ class LikeServiceSqlal(LikeServiceModel):
         self,
         post_id,
         user_id,
-        notification_service: NotificationServiceModel,
-        notification_model_service: NotificationModelServiceModel
+        notification_service: FromDishka[NotificationServiceModel],
     ) -> DTO:
         if self.db_session.get(User, user_id).first() is None:
             return DTO.error('Unauthorized')
@@ -61,7 +57,6 @@ class LikeServiceSqlal(LikeServiceModel):
         
         if post.user_id != user_id:
             await notification_service.create_notification(
-                notification_model_service=notification_model_service,
                 receiver_id=post.user_id,
                 sender_id=user_id,
                 object_type='like',

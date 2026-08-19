@@ -1,11 +1,10 @@
 from abc import abstractmethod
 from uuid import UUID
 
+from dishka import FromDishka
 from schemas import CommentGetResponse
-from services.service_models import (
-    NotificationModelServiceModel,
-    NotificationServiceModel,
-)
+
+from .notification import NotificationServiceModel
 
 
 class CommentServiceModel:
@@ -19,6 +18,5 @@ class CommentServiceModel:
         post_id: UUID,
         user_id: UUID,
         comment_id: UUID | None,
-        notification_service: NotificationServiceModel,
-        notification_model_service: NotificationModelServiceModel,
+        notification_service: FromDishka[NotificationServiceModel],
     ) -> CommentGetResponse: ...

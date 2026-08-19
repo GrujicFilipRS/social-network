@@ -6,12 +6,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from models import Comment, Post
 from schemas import CommentCreateRequest, CommentGetResponse
-from services.service_models import (
-    AuthServiceModel,
-    CommentServiceModel,
-    NotificationModelServiceModel,
-    NotificationServiceModel,
-)
+from services.service_models import AuthServiceModel, CommentServiceModel
 from utils import PostLiterals
 
 router = APIRouter()
@@ -45,8 +40,6 @@ async def post_comment(
     data: CommentCreateRequest,
     auth_service: FromDishka[AuthServiceModel],
     comment_service: FromDishka[CommentServiceModel],
-    notification_service: FromDishka[NotificationServiceModel],
-    notification_model_service: FromDishka[NotificationModelServiceModel],
 ) -> JSONResponse:
     user = auth_service.get_user_from_token(request.cookies.get(auth_service.auth_token_name))
     
@@ -57,9 +50,7 @@ async def post_comment(
         body=data.body,
         post_id=data.post_id,
         user_id=user.id,
-        comment_id=data.comment_id,
-        notification_service=notification_service,
-        notification_model_service=notification_model_service
+        comment_id=data.comment_id
     )
     
     return response

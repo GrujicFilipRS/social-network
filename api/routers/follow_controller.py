@@ -13,7 +13,6 @@ from schemas import (
 from services.service_models import (
     AuthServiceModel,
     FollowServiceModel,
-    NotificationModelServiceModel,
     NotificationServiceModel,
 )
 
@@ -42,7 +41,6 @@ async def follow_user(
     follow_service: FromDishka[FollowServiceModel],
     auth_service: FromDishka[AuthServiceModel],
     notification_service: FromDishka[NotificationServiceModel],
-    notification_model_service: FromDishka[NotificationModelServiceModel]
 ):
     user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
     
@@ -53,7 +51,6 @@ async def follow_user(
     
     if follow_response.success and follow_response.follow:
         await notification_service.create_notification(
-            notification_model_service,
             receiver_id=data.to_follow_id,
             sender_id=user_id,
             object_type='follow',

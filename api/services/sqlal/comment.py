@@ -1,11 +1,15 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
+from dishka import FromDishka
 from models import Comment, Post, User
 from schemas import CommentGetResponse
 from sqlalchemy.orm import Session
 
-from ..service_models import CommentServiceModel
+from ..service_models import (
+    CommentServiceModel,
+    NotificationServiceModel,
+)
 
 
 class CommentServiceSqlal(CommentServiceModel):
@@ -29,8 +33,7 @@ class CommentServiceSqlal(CommentServiceModel):
         post_id: UUID,
         user_id: UUID,
         comment_id: UUID | None,
-        notification_service,
-        notification_model_service
+        notification_service: FromDishka[NotificationServiceModel]
     ) -> CommentGetResponse:
         user = self.db_session.get(User, user_id)
         if not user:
@@ -61,7 +64,6 @@ class CommentServiceSqlal(CommentServiceModel):
         
         if post.user_id != user.id:
             await notification_service.create_notification(
-                notification_model_service=notification_model_service,
                 receiver_id=post.user_id,
                 sender_id=user.id,
                 object_type='comment',

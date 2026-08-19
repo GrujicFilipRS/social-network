@@ -10,18 +10,18 @@ from utils import ConnectionController
 
 
 class NotificationServiceSqlal(NotificationServiceModel):
-    def __init__(self, db_session: Session):
+    def __init__(self, db_session: Session, notification_model_service: NotificationModelServiceModel):
         self.db_session = db_session
-        
+        self.notification_model_service = notification_model_service
+
     async def create_notification(
         self,
-        notification_model_service: NotificationModelServiceModel,
         receiver_id: UUID,
         sender_id: UUID,
         object_type: str,
         object_id: UUID
     ) -> NotificationGetResponse:
-        notification_response = await notification_model_service.create_notification(
+        notification_response = await self.notification_model_service.create_notification(
             receiver_id,
             sender_id,
             object_type,
@@ -39,7 +39,7 @@ class NotificationServiceSqlal(NotificationServiceModel):
         )
         
         if seen:
-            await notification_model_service.read_notification(notification.id, receiver_id)
+            await self.notification_model_service.read_notification(notification.id, receiver_id)
         
         return notification_response
         
