@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from models import Follow
 
-from ..shared import DTO
+from ..shared.dto import DTO
 from .follow_dto import FollowDTO
 
 

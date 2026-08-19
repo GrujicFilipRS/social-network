@@ -18,13 +18,12 @@ from services.sqlal import (
     FollowServiceSqlal,
     LikeServiceSqlal,
     NotificationModelServiceSqlal,
+    NotificationServiceSqlal,
     PfpServiceSqlal,
     PostServiceSqlal,
     UserServiceSqlal,
 )
 from sqlalchemy.orm import Session
-
-from api.services.sqlal.notification import NotificationServiceSqlal
 
 
 class ServiceProvider(Provider):

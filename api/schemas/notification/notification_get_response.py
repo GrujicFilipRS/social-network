@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from api.models.notifications import Notification
+from models import Notification
 
-from ..shared import DTO
+from ..shared.dto import DTO
 from .notification_dto import NotificationDTO
 
 
