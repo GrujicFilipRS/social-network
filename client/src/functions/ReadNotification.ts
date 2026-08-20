@@ -1,11 +1,13 @@
-import { Fetch } from '../api';
+import axios from 'axios';
+import type { DTO } from '../interfaces/DTO';
 
 export const ReadNotification = async (notificationId: string): Promise<boolean> => {
-    return await Fetch(`notifications/read_notification/${notificationId}`, { method: 'POST' })
+    return await axios.post(`notifications/read_notification/${notificationId}`)
     .then(async res => {
-        if (!res.ok) {
-            const errorData = await res.json();
-            console.error(errorData.error || 'Failed to mark notification as read');
+        const data: DTO = res.data;
+
+        if (!data.success) {
+            console.error(data.message || 'Failed to mark notification as read');
             return false;
         }
 
