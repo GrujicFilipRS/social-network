@@ -171,7 +171,7 @@ async def change_password(
 
 
 @router.get(
-    '/get_user_profile/',
+    '/get_user_profile/{username}',
     response_model=UserProfileResponse
 )
 @inject

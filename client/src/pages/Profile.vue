@@ -3,7 +3,7 @@ import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { verifyUser } from '../api';
 
-import { GetProfile, GetSelfProfile } from '../functions/GetProfile';
+import { GetProfile } from '../functions/GetProfile';
 import { Follow, Unfollow } from '../functions/Follow';
 
 import type { ProfileData } from '../interfaces/ProfileData';
@@ -24,10 +24,6 @@ try {
     userId = (await verifyUser()).id;
 } catch { router.push('/') }
 
-const fetchData = ref<{status: number, data?: ProfileData}>({
-    status: 0,
-    data: undefined
-});
 const postData = ref<PostData[]>([]);
 const profileData = ref<ProfileData>();
 
@@ -37,24 +33,15 @@ const secondRow = ref<string>('');
 const followingUser = ref<boolean>();
 
 const loadProfile = async () => {
-    const {status, data} = route.query.user === undefined ?
-    await GetSelfProfile() : await GetProfile(route.query.user as string);
-
-    fetchData.value = {status, data};
-
-    if (fetchData.value.status === 404) {
-        router.push('/feed');
-        return;
-    }
-
-    fetchData.value = {status, data};
-    postData.value = fetchData.value.data!.posts!;
-    profileData.value = fetchData.value.data!;
-
-    followingUser.value = profileData.value!.user_followed;
-
-    firstRow.value = profileData.value.user_name ? profileData.value.user_name : profileData.value.username;
-    secondRow.value = profileData.value.user_name ? profileData.value.username : '';
+    await GetProfile(
+        route.query.user ? route.query.user as string : null,
+        router,
+        (_) => postData.value = _,
+        (_) => profileData.value = _,
+        (_) => followingUser.value = _,
+        (_) => firstRow.value = _,
+        (_) => secondRow.value = _,
+    );
 }
 
 loadProfile();
