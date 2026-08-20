@@ -1,4 +1,5 @@
 <script setup lang='ts'>
+import { GetNotificationText } from '../functions/GetNotificationText';
 import { ReadNotification } from '../functions/ReadNotification';
 import type { Notification } from '../interfaces/Notification';
 
@@ -19,7 +20,7 @@ const handleRead = async () => {
     <div class='notification-card'>
         <div class='notification-content flex align-items-center justify-content-between'>
             <div class='lside-not'>
-                <p>{{ notification.message_txt }}</p>
+                <p>{{ GetNotificationText(notification) }}</p>
                 <span class='notification-time'>
                     {{ new Date(notification.received_at).toLocaleString('sr-RS') }}
                 </span>

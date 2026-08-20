@@ -1,14 +1,21 @@
 import { type Notification } from '../interfaces/Notification';
-import { Fetch } from '../api';
+import { type NotificationListResponse } from '../interfaces/NotificationListResponse';
+import axios from 'axios';
 
 export const GetUnreadNotifications = async (): Promise<Notification[]> => {
-    return Fetch('notifications/get_unread_notifications/')
-    .then(async (response) => {
-        if (response.ok) {
-            const data = await response.json();
-            return data as Notification[];
+    return axios.get('notifications/get_unread_notifications/')
+    .then(async res => {
+        const data: NotificationListResponse = res.data;
+
+        if (data.success) {
+            return data.notifications;
         } else {
-            throw new Error('Failed to fetch notifications');
+            console.error('Failed to fetch notifications');
+            return [];
         }
-    });
+    })
+    .catch((_) => {
+        console.error('Failed to fetch notifications');
+        return [];
+    })
 }
