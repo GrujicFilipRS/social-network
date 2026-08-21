@@ -1,5 +1,5 @@
 from typing import BinaryIO
-from uuid import UUID, uuid4
+from uuid import UUID, uuid7
 
 from env import Env
 
@@ -29,14 +29,14 @@ class ImageServiceCloudinary(ImageUploadServiceModel):
     async def create_image(
         self,
         stream: BinaryIO,
-        filename: str = str(uuid4()),
+        filename: str = str(uuid7()),
     ) -> tuple[str, str]:
 
         result = cloudinary.uploader.upload(
             stream,
             folder=Env.CLOUDINARY_PFP_FOLDER,
             resource_type='image',
-            public_id=str(uuid4()),
+            public_id=str(uuid7()),
             overwrite=True,
             filename=filename,
         )

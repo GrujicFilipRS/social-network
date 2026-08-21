@@ -19,7 +19,7 @@ class Comment(SqlAlchemyBase):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID,
         primary_key=True,
-        default=uuid.uuid4
+        default=uuid.uuid7
     )
     body: Mapped[str] = mapped_column(
         Text,

@@ -4,7 +4,7 @@ import re
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
-from uuid import uuid4
+from uuid import uuid7
 
 import regex
 from argon2 import PasswordHasher
@@ -25,7 +25,7 @@ class User(SqlAlchemyBase):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID,
         primary_key=True,
-        default=uuid4
+        default=uuid7
     )
     username: Mapped[str] = mapped_column(
         String,

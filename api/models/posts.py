@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
-from uuid import uuid4
+from uuid import uuid7
 
 from db import SqlAlchemyBase
 from sqlalchemy import UUID, DateTime, ForeignKey, String, Text
@@ -19,7 +19,7 @@ class Post(SqlAlchemyBase):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID,
         primary_key=True,
-        default=uuid4
+        default=uuid7
     )
     title: Mapped[str] = mapped_column(
         String,
