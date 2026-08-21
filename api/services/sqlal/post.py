@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from models import Photo, Post, User
-from schemas import DTO, PostGetResponse, PostListResponse
+from models import Like, Photo, Post, User
+from schemas import DTO, ExistsGetResponse, PostGetResponse, PostListResponse
 from services.service_models import ImageUploadServiceModel
 from sqlalchemy.orm import Session
 from utils import PhotoVerificationMethods
@@ -127,3 +127,13 @@ class PostServiceSqlal(PostServiceModel):
         self.db_session.commit()
         
         return DTO.ok()
+    
+    async def post_liked_by_user(self, post_id: UUID, user_id: UUID) -> ExistsGetResponse:
+        post = self.db_session.get(Post, post_id)
+                        
+        if not post:
+            return ExistsGetResponse.error('Post not found')
+
+        liked = self.db_session.query(Like).filter_by(post_id=post_id, user_id=user_id).first() is not None
+        
+        return ExistsGetResponse.ok(liked)

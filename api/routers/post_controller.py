@@ -5,7 +5,7 @@ from uuid import UUID
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
 from fastapi import APIRouter, File, Form, Request, UploadFile
-from schemas import DTO, PostEditRequest, PostGetResponse
+from schemas import DTO, ExistsGetResponse, PostEditRequest, PostGetResponse
 from services.service_models import AuthServiceModel, PostServiceModel
 
 router = APIRouter()
@@ -102,3 +102,21 @@ async def delete_post(
         return PostGetResponse.error('Unauthorized')
     
     return await post_service.delete_post(post_id)
+
+@router.get(
+    '/liked_by_current_user/{post_id}',
+    response_model=ExistsGetResponse
+)
+@inject
+async def liked_by_current_user(
+    request: Request,
+    post_id: UUID,
+    auth_service: FromDishka[AuthServiceModel],
+    post_service: FromDishka[PostServiceModel]
+):
+    user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
+                
+    if not user_id:
+        return PostGetResponse.error('Unauthorized')
+        
+    return await post_service.post_liked_by_user(post_id, user_id)

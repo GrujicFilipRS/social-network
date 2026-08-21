@@ -2,7 +2,7 @@ from abc import abstractmethod
 from io import BytesIO
 from uuid import UUID
 
-from schemas import DTO, PostGetResponse, PostListResponse
+from schemas import DTO, ExistsGetResponse, PostGetResponse, PostListResponse
 
 
 class PostServiceModel:
@@ -37,3 +37,6 @@ class PostServiceModel:
     
     @abstractmethod
     async def delete_post(self, post_id: UUID, user_id: UUID) -> DTO: ...
+    
+    @abstractmethod
+    async def post_liked_by_user(self, post_id: UUID, user_id: UUID) -> ExistsGetResponse: ...
