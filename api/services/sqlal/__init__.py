@@ -5,6 +5,7 @@ from .like import LikeServiceSqlal
 from .notification import NotificationServiceSqlal
 from .notification_model import NotificationModelServiceSqlal
 from .pfp import PfpServiceSqlal
+from .photo import PhotoServiceSqlal
 from .post import PostServiceSqlal
 from .user import UserServiceSqlal
 
@@ -16,6 +17,7 @@ __all__ = [
     'NotificationModelServiceSqlal',
     'NotificationServiceSqlal',
     'PfpServiceSqlal',
+    'PhotoServiceSqlal',
     'PostServiceSqlal',
     'UserServiceSqlal'
 ]

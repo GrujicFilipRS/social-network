@@ -9,6 +9,7 @@ from services.service_models import (
     NotificationModelServiceModel,
     NotificationServiceModel,
     PfpServiceModel,
+    PhotoServiceModel,
     PostServiceModel,
     UserServiceModel,
 )
@@ -20,6 +21,7 @@ from services.sqlal import (
     NotificationModelServiceSqlal,
     NotificationServiceSqlal,
     PfpServiceSqlal,
+    PhotoServiceSqlal,
     PostServiceSqlal,
     UserServiceSqlal,
 )
@@ -70,3 +72,7 @@ class ServiceProvider(Provider):
     @provide(scope=Scope.APP)
     def image_service_app(self) -> ImageUploadServiceModel:
         return ImageServiceCloudinary()
+    
+    @provide(scope=Scope.REQUEST)
+    def photo_service(self, db_sess: Session) -> PhotoServiceModel:
+        return PhotoServiceSqlal(db_sess)

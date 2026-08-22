@@ -10,6 +10,8 @@ from .like.like_get_response import LikeGetResponse
 from .notification.notification_dto import NotificationDTO
 from .notification.notification_get_response import NotificationGetResponse
 from .notification.notification_list_response import NotificationListResponse
+from .photo.photo_dto import PhotoDTO
+from .photo.photo_list_response import PhotoListResponse
 from .post.post_dto import PostDTO
 from .post.post_edit_request import PostEditRequest
 from .post.post_get_response import PostGetResponse
@@ -41,6 +43,8 @@ __all__ = [
     'NotificationDTO',
     'NotificationGetResponse',
     'NotificationListResponse',
+    'PhotoDTO',
+    'PhotoListResponse',
     'PostDTO',
     'PostEditRequest',
     'PostGetResponse',

@@ -6,6 +6,7 @@ from .like import LikeServiceModel
 from .notification import NotificationServiceModel
 from .notification_model import NotificationModelServiceModel
 from .pfp import PfpServiceModel
+from .photo import PhotoServiceModel
 from .post import PostServiceModel
 from .user import UserServiceModel
 
@@ -18,6 +19,7 @@ __all__ = [
     'NotificationModelServiceModel',
     'NotificationServiceModel',
     'PfpServiceModel',
+    'PhotoServiceModel',
     'PostServiceModel',
     'UserServiceModel'
 ]
