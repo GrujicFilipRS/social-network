@@ -235,7 +235,7 @@ async def get_current_user_profile(
     user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
     
     if not user_id:
-        return DTO.error('Unauthorized')
+        return UserProfileResponse.error('Unauthorized')
     
     user_get_response = await user_service.get_user(user_id)
     user = user_get_response.user
