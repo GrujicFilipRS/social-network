@@ -10,15 +10,22 @@ import { GetLikedByCurrentUser } from '../functions/GetLikedByCurrentUser';
 import { LikePost, UnlikePost } from '../functions/LikePost';
 
 import Button from 'primevue/button';
+import { GetPostPhotos } from '../functions/GetPostPhotos';
 
 const { postData, router } = defineProps<{postData: PostData, router: Router}>();
 const likedByUser = ref<boolean>(false);
+const firstImageSrc = ref<string | null>(null);
 
 const getLikedByUser = async () => {
     likedByUser.value = await GetLikedByCurrentUser(postData.id);
 }
 
+const getFirstImage = async () => {
+    firstImageSrc.value = (await GetPostPhotos(postData.id))[0]?.image_src ?? null;
+}
+
 getLikedByUser();
+getFirstImage();
 
 const shortenString = (
     input: string,
@@ -73,11 +80,11 @@ const clickLikeButton = () => {
                 <p style='white-space: pre-line;'>{{ shortenString(postData.body, 200, 4) }}</p>
             </div>
 
-            <div class='rs-top' v-if='/*postData.photos!.length*/ 0 > 0'>
+            <div class='rs-top' v-if='firstImageSrc'>
                 <div
                     class='img-wrapper'
                     :style='{
-                        backgroundImage: `url(${postData.body /*postData.photos![0]!.image_src*/ })`
+                        backgroundImage: `url(${firstImageSrc})`
                     }'
                 ></div>
             </div>
