@@ -5,7 +5,13 @@ from uuid import UUID
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
 from fastapi import APIRouter, File, Form, Request, UploadFile
-from schemas import DTO, ExistsGetResponse, PostEditRequest, PostGetResponse
+from schemas import (
+    DTO,
+    ExistsGetResponse,
+    PostEditRequest,
+    PostGetResponse,
+    PostMiscResponse,
+)
 from services.service_models import AuthServiceModel, PostServiceModel
 
 router = APIRouter()
@@ -120,3 +126,37 @@ async def liked_by_current_user(
         return PostGetResponse.error('Unauthorized')
         
     return await post_service.post_liked_by_user(post_id, user_id)
+
+@router.get(
+    '/misc_data/{post_id}',
+    response_model=PostMiscResponse
+)
+@inject
+async def get_misc_data(
+    request: Request,
+    post_id: UUID,
+    auth_service: FromDishka[AuthServiceModel],
+    post_service: FromDishka[PostServiceModel]
+):
+    user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
+    
+    liked_by_current_user: bool = False
+    if user_id:
+        like_exists_response = await post_service.post_liked_by_user(post_id, user_id)
+        if not like_exists_response.success:
+            return PostMiscResponse.error(
+                like_exists_response.message or\
+                'An error while fetching user liked happened'
+            )
+        
+        liked_by_current_user = like_exists_response.exists
+    
+    # TODO
+    num_likes = 1 # await like_service.get_post_num_likes(post_id)
+    num_comments = 1 # await comments_service.get_post_num_comments(post_id)
+    
+    return PostMiscResponse.ok(
+        liked_by_current_user,
+        num_likes,
+        num_comments
+    )

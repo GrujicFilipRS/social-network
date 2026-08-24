@@ -16,6 +16,7 @@ from .post.post_dto import PostDTO
 from .post.post_edit_request import PostEditRequest
 from .post.post_get_response import PostGetResponse
 from .post.post_list_response import PostListResponse
+from .post.post_misc_response import PostMiscResponse
 from .shared.dto import DTO
 from .shared.exists_get_response import ExistsGetResponse
 from .user.user_change_password_request import UserChangePasswordRequest
@@ -49,6 +50,7 @@ __all__ = [
     'PostEditRequest',
     'PostGetResponse',
     'PostListResponse',
+    'PostMiscResponse',
     'SetNameRequest',
     'UserChangePasswordRequest',
     'UserChangeUsernameRequest',
