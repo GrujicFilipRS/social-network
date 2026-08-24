@@ -6,25 +6,29 @@ import type { Router } from 'vue-router';
 
 import type { PostData } from '../interfaces/PostData';
 
-import { GetLikedByCurrentUser } from '../functions/GetLikedByCurrentUser';
+import { GetPostPhotos } from '../functions/GetPostPhotos';
+import { GetPostMiscData } from '../functions/GetPostMiscData';
 import { LikePost, UnlikePost } from '../functions/LikePost';
 
 import Button from 'primevue/button';
-import { GetPostPhotos } from '../functions/GetPostPhotos';
 
 const { postData, router } = defineProps<{postData: PostData, router: Router}>();
 const likedByUser = ref<boolean>(false);
 const firstImageSrc = ref<string | null>(null);
+const numLikes = ref<number>(0);
 
-const getLikedByUser = async () => {
-    likedByUser.value = await GetLikedByCurrentUser(postData.id);
+const getMiscPostData = async () => {
+    const data = await GetPostMiscData(postData.id);
+
+    likedByUser.value = data.liked_by_user;
+    numLikes.value = data.num_likes;
 }
 
 const getFirstImage = async () => {
     firstImageSrc.value = (await GetPostPhotos(postData.id))[0]?.image_src ?? null;
 }
 
-getLikedByUser();
+getMiscPostData();
 getFirstImage();
 
 const shortenString = (
@@ -57,7 +61,7 @@ const clickLikeButton = () => {
             () => {}, // No toast needed here
             (val: boolean) => likedByUser.value = val,
             (val: boolean) => likeButtonLoading.value = val,
-            () => {/* TODO postData.likes! -= 1*/}
+            () => { numLikes.value -= 1 }
         );
     } else {
         LikePost(
@@ -65,7 +69,7 @@ const clickLikeButton = () => {
             () => {},
             (val: boolean) => likedByUser.value = val,
             (val: boolean) => likeButtonLoading.value = val,
-            () => {/* TODO postData.likes! += 1*/}
+            () => { numLikes.value += 1 }
         );
     }
 }
@@ -95,7 +99,7 @@ const clickLikeButton = () => {
                 severity='secondary'
                 class='p-button-sm'
                 :icon='likedByUser ? `pi pi-thumbs-up-fill` : `pi pi-thumbs-up`'
-                :label='String(0/* postData.likes */)'
+                :label='String(numLikes)'
                 :loading='likeButtonLoading'
                 @click='clickLikeButton'
             />

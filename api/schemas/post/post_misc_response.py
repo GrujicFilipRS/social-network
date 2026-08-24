@@ -1,4 +1,4 @@
-from ..shared import DTO
+from ..shared.dto import DTO
 
 
 class PostMiscResponse(DTO):
