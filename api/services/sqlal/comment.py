@@ -3,7 +3,8 @@ from uuid import UUID
 
 from dishka import FromDishka
 from models import Comment, Post, User
-from schemas import CommentGetResponse
+from schemas import CommentGetResponse, IntegerGetResponse
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..service_models import (
@@ -71,3 +72,20 @@ class CommentServiceSqlal(CommentServiceModel):
             )
         
         return CommentGetResponse.ok(comment)
+    
+    async def get_post_num_comments(self, post_id, user_id) -> IntegerGetResponse:
+        post = self.db_session.get(Post, post_id)
+                
+        if not post:
+            return IntegerGetResponse.error('Post not found')
+                
+        if post.status == 'PRIVATE' and (not user_id or post.user_id != user_id):
+            return IntegerGetResponse.error('Post not found')
+        
+        count: int = self.db_session.scalar(
+            select(func.count())
+            .select_from(Comment)
+            .where(Comment.post_id == post_id)
+        )
+        
+        return IntegerGetResponse.ok(count)

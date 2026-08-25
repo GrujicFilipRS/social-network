@@ -2,7 +2,7 @@ from abc import abstractmethod
 from uuid import UUID
 
 from dishka import FromDishka
-from schemas import CommentGetResponse
+from schemas import CommentGetResponse, IntegerGetResponse
 
 from .notification import NotificationServiceModel
 
@@ -20,3 +20,6 @@ class CommentServiceModel:
         comment_id: UUID | None,
         notification_service: FromDishka[NotificationServiceModel],
     ) -> CommentGetResponse: ...
+    
+    @abstractmethod
+    async def get_post_num_comments(self, post_id: UUID, user_id: UUID | None) -> IntegerGetResponse: ...
