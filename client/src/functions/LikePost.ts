@@ -1,30 +1,34 @@
-import { Fetch } from '../api';
+import axios from 'axios';
+import type { DTO } from '../interfaces/DTO';
 
 export const LikePost = async (
     postId: string,
-    toastAdd: (message: string) => void,
+    errorToast: (message: string) => void,
     setLiked: (liked: boolean) => void,
-    setLoading: (loading: boolean) => void,
-    incrementLikes?: () => void
+    incrementLikes?: (_: number) => void
 ): Promise<boolean> => {
-    setLoading(true);
+    // Optimistic loading
+    setLiked(true);
+    if (incrementLikes) incrementLikes(1);
 
-    return Fetch(`like/like_post/`, {
-        method: 'POST',
-        body: JSON.stringify({ post_id: postId })
-    })
+    return axios.post(`like/like_post/${postId}`)
     .then(async res => {
-        if (res.status !== 201) {
-            const data = await res.json();
-            toastAdd(data.message);
+        const data: DTO = res.data;
+
+        if (!data.success) {
+            if (incrementLikes)
+                incrementLikes(-1);
+            setLiked(false);
+            errorToast(data.message ?? 'An error occured while liking post. Please try again later');
             return false;
         }
 
-        setLiked(true);
-        if (incrementLikes) incrementLikes()
         return true;
     })
-    .finally(() => setLoading(false));
+    .catch(() => {
+        errorToast('An error occured while liking post. Please try again later');
+        return false;
+    });
 }
 
 export const UnlikePost = async (

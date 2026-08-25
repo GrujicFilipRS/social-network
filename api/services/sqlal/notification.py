@@ -35,7 +35,7 @@ class NotificationServiceSqlal(NotificationServiceModel):
         
         seen = await ConnectionController.send_to_user(
             receiver_id,
-            notification.to_dict()
+            dict(notification.to_dto())
         )
         
         if seen:

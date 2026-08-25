@@ -64,7 +64,7 @@ class ConnectionController:
             json.dumps({
                 'user_id': str(user_id),
                 'message': message
-            })
+            }, default=str)
         )
         
         return False

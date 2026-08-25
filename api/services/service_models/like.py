@@ -4,7 +4,6 @@ from uuid import UUID
 from schemas import DTO, IntegerGetResponse, LikeGetResponse
 
 from .notification import NotificationServiceModel
-from .notification_model import NotificationModelServiceModel
 
 
 class LikeServiceModel:
@@ -16,8 +15,7 @@ class LikeServiceModel:
         self,
         post_id: UUID,
         user_id: UUID,
-        notification_service: NotificationServiceModel,
-        notification_model_service: NotificationModelServiceModel
+        notification_service: NotificationServiceModel
     ) -> DTO: ...
     
     @abstractmethod

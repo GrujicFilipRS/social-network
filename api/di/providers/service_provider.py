@@ -50,12 +50,16 @@ class ServiceProvider(Provider):
         return PfpServiceSqlal(db_sess, upload_service)
     
     @provide(scope=Scope.SESSION)
-    def notification_service(self, db_sess: Session) -> NotificationServiceModel:
-        return NotificationServiceSqlal(db_sess)
-    
-    @provide(scope=Scope.SESSION)
     def notification_model_service(self, db_sess: Session) -> NotificationModelServiceModel:
         return NotificationModelServiceSqlal(db_sess)
+    
+    @provide(scope=Scope.SESSION)
+    def notification_service(
+        self,
+        db_sess: Session,
+        notification_model_service: NotificationModelServiceModel
+    ) -> NotificationServiceModel:
+        return NotificationServiceSqlal(db_sess, notification_model_service)
     
     @provide(scope=Scope.REQUEST)
     def like_service(self, db_sess: Session) -> LikeServiceModel:

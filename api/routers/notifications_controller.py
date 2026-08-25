@@ -50,6 +50,9 @@ async def get_unread_notifications(
 ):
     user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
     
+    if not user_id:
+        return NotificationListResponse.ok([])
+    
     return await notification_service.get_unread_notifications(user_id)
         
 

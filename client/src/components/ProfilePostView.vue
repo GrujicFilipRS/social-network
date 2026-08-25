@@ -10,6 +10,10 @@ import { GetPostMiscData } from '../functions/GetPostMiscData';
 import { LikePost, UnlikePost } from '../functions/LikePost';
 
 import Button from 'primevue/button';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue';
+
+const toast = useToast();
 
 const { postData, router } = defineProps<{postData: PostData, router: Router}>();
 const likedByUser = ref<boolean>(false);
@@ -67,10 +71,13 @@ const clickLikeButton = () => {
     } else {
         LikePost(
             postData.id,
-            () => {},
+            (message: string) => { toast.add({
+                severity: 'error',
+                summary: 'An error occured',
+                detail: message
+            })},
             (val: boolean) => likedByUser.value = val,
-            (val: boolean) => likeButtonLoading.value = val,
-            () => { numLikes.value += 1 }
+            (val: number) => { numLikes.value += val }
         );
     }
 }
@@ -80,6 +87,7 @@ const redirectToComments = () => router.push(`/post/${postData.id}#comments`)
 </script>
 
 <template>
+    <Toast />
     <div class='post mb-4 p-2'>
         <div class='top' @click='() => router.push(`/post/${postData.id}`)'>
             <div class='ls-top'>

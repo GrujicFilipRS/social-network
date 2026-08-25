@@ -50,8 +50,7 @@ async def like_post(
     return await like_service.like_post(
         post_id,
         user_id,
-        notification_service,
-        notification_model_service
+        notification_service
     )
     
 

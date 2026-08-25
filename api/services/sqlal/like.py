@@ -30,7 +30,7 @@ class LikeServiceSqlal(LikeServiceModel):
         user_id,
         notification_service: FromDishka[NotificationServiceModel],
     ) -> DTO:
-        if self.db_session.get(User, user_id).first() is None:
+        if self.db_session.get(User, user_id) is None:
             return DTO.error('Unauthorized')
         
         post = self.db_session.get(Post, post_id)
@@ -67,7 +67,7 @@ class LikeServiceSqlal(LikeServiceModel):
         return DTO.ok()
     
     async def unlike_post(self, post_id, user_id):
-        if self.db_session.get(User, user_id).first() is None:
+        if self.db_session.get(User, user_id) is None:
             return DTO.error('Unauthorized')
         
         post = self.db_session.get(Post, post_id)
