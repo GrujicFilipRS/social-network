@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from uuid import UUID
 
-from schemas import DTO, LikeGetResponse
+from schemas import DTO, IntegerGetResponse, LikeGetResponse
 
 from .notification import NotificationServiceModel
 from .notification_model import NotificationModelServiceModel
@@ -22,3 +22,6 @@ class LikeServiceModel:
     
     @abstractmethod
     async def unlike_post(self, post_id: UUID, user_id: UUID) -> DTO: ...
+    
+    @abstractmethod
+    async def get_post_num_likes(self, post_id: UUID, user_id: UUID | None) -> IntegerGetResponse: ...

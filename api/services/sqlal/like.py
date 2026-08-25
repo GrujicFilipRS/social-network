@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from dishka import FromDishka
 from models import Like, Post, User
-from schemas import DTO, LikeGetResponse
+from schemas import DTO, IntegerGetResponse, LikeGetResponse
 from sqlalchemy.orm import Session
 
 from ..service_models import LikeServiceModel, NotificationServiceModel
@@ -87,3 +87,14 @@ class LikeServiceSqlal(LikeServiceModel):
         self.db_session.commit()
         
         return DTO.ok()
+    
+    async def get_post_num_likes(self, post_id, user_id) -> IntegerGetResponse:
+        post = self.db_session.get(Post, post_id)
+        
+        if not post:
+            return IntegerGetResponse.error('Post not found')
+        
+        if post.status == 'PRIVATE' and (not user_id or post.user_id != user_id):
+            IntegerGetResponse.error('Post not found')
+        
+        return IntegerGetResponse.ok(len(post.likes))

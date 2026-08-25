@@ -1,5 +1,4 @@
 <script setup lang='ts'>
-// TODO: complete fetching on all missing data
 
 import { ref } from 'vue';
 import type { Router } from 'vue-router';

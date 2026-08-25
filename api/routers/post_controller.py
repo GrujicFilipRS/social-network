@@ -12,7 +12,7 @@ from schemas import (
     PostGetResponse,
     PostMiscResponse,
 )
-from services.service_models import AuthServiceModel, PostServiceModel
+from services.service_models import AuthServiceModel, LikeServiceModel, PostServiceModel
 
 router = APIRouter()
 
@@ -136,6 +136,7 @@ async def get_misc_data(
     request: Request,
     post_id: UUID,
     auth_service: FromDishka[AuthServiceModel],
+    like_service: FromDishka[LikeServiceModel],
     post_service: FromDishka[PostServiceModel]
 ):
     user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
@@ -151,12 +152,19 @@ async def get_misc_data(
         
         liked_by_current_user = like_exists_response.exists
     
+    num_likes_response = await like_service.get_post_num_likes(post_id, user_id)
+    
+    if not num_likes_response.success:
+        return PostMiscResponse.error(
+            like_exists_response.message or\
+            'An error while fetching number of likes'
+        )
+    
     # TODO
-    num_likes = 1 # await like_service.get_post_num_likes(post_id)
     num_comments = 1 # await comments_service.get_post_num_comments(post_id)
     
     return PostMiscResponse.ok(
         liked_by_current_user,
-        num_likes,
+        num_likes_response.number,
         num_comments
     )

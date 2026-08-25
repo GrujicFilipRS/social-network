@@ -19,6 +19,7 @@ from .post.post_list_response import PostListResponse
 from .post.post_misc_response import PostMiscResponse
 from .shared.dto import DTO
 from .shared.exists_get_response import ExistsGetResponse
+from .shared.int_get_response import IntegerGetResponse
 from .user.user_change_password_request import UserChangePasswordRequest
 from .user.user_change_username_request import UserChangeUsernameRequest
 from .user.user_dto import UserDTO
@@ -39,6 +40,7 @@ __all__ = [
     'FollowDTO',
     'FollowGetResponse',
     'FollowListResponse',
+    'IntegerGetResponse',
     'LikeDTO',
     'LikeGetResponse',
     'NotificationDTO',
