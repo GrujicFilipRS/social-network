@@ -7,13 +7,13 @@ export const GetNotificationLink = async (notification: Notification): Promise<s
     let postId = '';
     switch (notification.object_type) {
         case 'post':
-            return `/post?post_id=${notification.object_id}`;
+            return `/post/${notification.object_id}`;
         case 'like':
             postId = await GetPostIdFromLikeId(notification.object_id);
-            return `/post?post_id=${postId}`;
+            return `/post/${postId}`;
         case 'comment':
             postId = await GetPostIdFromCommentId(notification.object_id);
-            return `/post?post_id=${postId}#comment-${notification.object_id}`;
+            return `/post/${postId}#comment-${notification.object_id}`;
         case 'follow':
             const followerUsername = await GetFollowerUsernameFromFollowId(notification.object_id);
             return `/profile?user=${followerUsername}`;

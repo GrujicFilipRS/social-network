@@ -1,6 +1,6 @@
 <script lang='tsx' setup>
 import { nextTick, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import Comment from '../components/Comment.vue';
 
@@ -28,8 +28,9 @@ const currentUserId = ref<string>('');
 
 await verifyUser().catch((_: UserUnverifiedError) => router.push('/'));
 
-const urlParams = new URLSearchParams(window.location.search);
-const postId = urlParams.get('post_id');
+const route = useRoute();
+
+const postId = route.params.post_id;
 
 if (!postId) {
     router.push('/feed');
@@ -112,7 +113,7 @@ const fetchPostData = async () => {
     resetEditingForm();
 
     if (postData.value === null) {
-        router.push('/feed');
+        // router.push('/feed');
         return;
     }
 

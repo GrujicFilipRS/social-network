@@ -15,12 +15,14 @@ const { postData, router } = defineProps<{postData: PostData, router: Router}>()
 const likedByUser = ref<boolean>(false);
 const firstImageSrc = ref<string | null>(null);
 const numLikes = ref<number>(0);
+const numComments = ref<number>(0);
 
 const getMiscPostData = async () => {
     const data = await GetPostMiscData(postData.id);
 
     likedByUser.value = data.liked_by_user;
     numLikes.value = data.num_likes;
+    numComments.value = data.num_comments;
 }
 
 const getFirstImage = async () => {
@@ -73,11 +75,13 @@ const clickLikeButton = () => {
     }
 }
 
+const redirectToComments = () => router.push(`/post/${postData.id}#comments`)
+
 </script>
 
 <template>
     <div class='post mb-4 p-2'>
-        <div class='top' @click='() => router.push(`/post?post_id=${postData.id}`)'>
+        <div class='top' @click='() => router.push(`/post/${postData.id}`)'>
             <div class='ls-top'>
                 <h3>{{ shortenString(postData.title, 25) }}</h3>
                 <p style='white-space: pre-line;'>{{ shortenString(postData.body, 200, 4) }}</p>
@@ -101,6 +105,14 @@ const clickLikeButton = () => {
                 :label='String(numLikes)'
                 :loading='likeButtonLoading'
                 @click='clickLikeButton'
+            />
+
+            <Button
+                severity='secondary'
+                class='p-button-sm'
+                icon='pi pi-comment'
+                :label='String(numComments)'
+                @click='redirectToComments'
             />
         </div>
     </div>

@@ -25,7 +25,7 @@ const routes: RouteRecordRaw[] = [
     { path: '/profile', component: Profile },
     { path: '/edit_profile', component: EditProfile },
     { path: '/create_post', component: CreatePost },
-    { path: '/post', component: ViewPost }
+    { path: '/post/:post_id', component: ViewPost }
 ];
 
 const router = createRouter({
