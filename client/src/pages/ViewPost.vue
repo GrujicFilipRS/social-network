@@ -10,8 +10,12 @@ import { LikePost, UnlikePost } from '../functions/LikePost';
 import { CreateComment } from '../functions/CreateComment';
 import { EditPost } from '../functions/EditPost';
 import { DeletePost } from '../functions/DeletePost';
-
+import { type PhotoData } from '../interfaces/PhotoData.ts';
+import { GetPostPhotos } from '../functions/GetPostPhotos.ts';
+import { type PostMiscResponse } from '../interfaces/PostMiscResponse.ts';
 import type { PostData } from '../interfaces/PostData';
+import { GetPostMiscData } from '../functions/GetPostMiscData.ts';
+import { type CommentsData } from '../interfaces/CommentsData.ts';
 
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
@@ -41,9 +45,12 @@ const confirm = useConfirm();
 
 const postData = ref<PostData | null>(null);
 const likeLoading = ref<boolean>(false);
-const postLiked = ref<boolean>(postData.value?.liked_by_user ?? false);
+const postLiked = ref<boolean>(false);
 const commentInput = ref<string>('');
 const commentedLoading = ref<boolean>(false);
+const photos = ref<PhotoData[]>([]);
+const postMiscData = ref<PostMiscResponse | null>(null);
+const comments = ref<CommentsData[]>([]);
 
 const editingPost = ref<boolean>(false);
 const editLoading = ref<boolean>(false);
@@ -122,6 +129,9 @@ const fetchPostData = async () => {
         return;
     }
 
+    photos.value = await GetPostPhotos(postId);
+    postMiscData.value = await GetPostMiscData(postId);
+
     await scrollToComment();
 };
 
@@ -157,26 +167,21 @@ const showPostDeleteConfirmPopup = () => {
 }
 
 const pressLikeButton = async () => {
-    if (!postData.value) return;
+    if (!postData.value || !postId || !postMiscData.value) return;
 
-    if (!postData.value.liked_by_user) {
-        const result: boolean = await LikePost(
-            postData!.value.id,
+    if (!postMiscData.value.liked_by_user) {
+        await LikePost(
+            postId,
             (message: string) => toast.add({
                 severity: "error",
                 summary: message,
                 life: 3000
             }),
-            (value: boolean) => postLiked.value = value,
-            (value: boolean) => likeLoading.value = value
+            (value: boolean) => postMiscData.value!.liked_by_user = value,
+            (value: number) => postMiscData.value!.num_likes += value
         );
-
-        if (result) {
-            postData.value.liked_by_user = true;
-            postData.value.likes! += 1;
-        }
     } else {
-        const result: boolean = await UnlikePost(
+        await UnlikePost(
             postData!.value.id,
             (message: string) => toast.add({
                 severity: "error",
@@ -186,11 +191,6 @@ const pressLikeButton = async () => {
             (value: boolean) => postLiked.value = value,
             (value: boolean) => likeLoading.value = value
         );
-
-        if (result) {
-            postData.value.liked_by_user = false;
-            postData.value.likes! -= 1;
-        }
     }
 }
 
@@ -304,7 +304,7 @@ const postComment = async () => {
 
         <div class='image-list'>
             <img
-                v-for='image in postData?.photos ?? []'
+                v-for='image in photos'
                 :key='image.post_position'
                 :src='image.image_src'
                 class='post-image'
@@ -313,20 +313,20 @@ const postComment = async () => {
 
         <div class='flex items-center gap-2 mt-4'>
             <Button
-                :icon='postData?.liked_by_user ? "pi pi-thumbs-up-fill" : "pi pi-thumbs-up"'
+                :icon='postMiscData?.liked_by_user ? "pi pi-thumbs-up-fill" : "pi pi-thumbs-up"'
                 severity='secondary'
                 :loading='likeLoading'
                 @click='pressLikeButton'
             />
 
-            <p>{{ postData?.likes }}</p>
+            <p>{{ postMiscData?.num_likes }}</p>
         </div>
 
         <div class='comments'>
             <h3 class='text-2xl font-bold'>Comments</h3>
 
             <Comment
-                v-for='comment in postData?.comments ?? []'
+                v-for='comment in comments'
                 :key='comment.id'
                 :comment-data='comment'
                 :user-id='currentUserId'
@@ -337,7 +337,7 @@ const postComment = async () => {
                 )'
             />
 
-            <p v-if='postData?.comments!.length === 0'>No comments yet</p>
+            <p v-if='comments.length === 0'>No comments yet</p>
             
             <div class='comment-form'>
                 <h3>Write a comment</h3>
