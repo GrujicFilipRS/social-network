@@ -30,9 +30,9 @@ await verifyUser().catch((_: UserUnverifiedError) => router.push('/'));
 
 const route = useRoute();
 
-const postId = route.params.post_id;
+const postId: string | null = route.params.post_id ? String(route.params.post_id) : null;
 
-if (!postId) {
+if (!postId || typeof postId !== 'string') {
     router.push('/feed');
 }
 
@@ -109,15 +109,18 @@ const confirmEdit = () => {
 }
 
 const fetchPostData = async () => {
-    postData.value = await GetPostData(postId!, router);
-    resetEditingForm();
-
-    if (postData.value === null) {
-        // router.push('/feed');
+    if (!postId) {
+        router.push('/feed');
         return;
     }
 
-    postLiked.value = postData.value!.liked_by_user!;
+    postData.value = await GetPostData(postId);
+    resetEditingForm();
+
+    if (postData.value === null) {
+        router.push('/feed');
+        return;
+    }
 
     await scrollToComment();
 };
