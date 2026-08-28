@@ -4,10 +4,9 @@ from db import DBSessionManager
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from models import Comment, Post
+from models import Comment
 from schemas import CommentCreateRequest, CommentGetResponse
 from services.service_models import AuthServiceModel, CommentServiceModel
-from utils import PostLiterals
 
 router = APIRouter()
 
@@ -119,36 +118,14 @@ async def delete_comment(
         return JSONResponse(content={'message': 'Comment successfully deleted'}, status_code=200)
 
 
-@router.get('/get_post_comments/')
+@router.get('/get_post_comments/{post_id}')
 @inject
-def get_post_comments(
+async def get_post_comments(
     request: Request,
-    auth_service: FromDishka[AuthServiceModel]
+    post_id: UUID,
+    auth_service: FromDishka[AuthServiceModel],
+    comment_service: FromDishka[CommentServiceModel]
 ) -> JSONResponse:
-    user = auth_service.get_user_from_token(request.cookies.get(auth_service.auth_token_name))
+    user_id = auth_service.get_user_from_token(request.cookies.get(auth_service.auth_token_name))
     
-    with DBSessionManager() as db_sess:
-        try:
-            post_id: UUID | None = UUID(request.query_params.get('post_id'))
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid post_id'}, status_code=400)
-
-        post: Post | None = db_sess.get(Post, post_id)
-
-        if post is None:
-            return JSONResponse(content={'message': 'Post not found'}, status_code=404)
-        
-        content: dict = {
-            'message': 'Successfully gotten comments of post',
-            'comments': [comm.to_dict() for comm in post.comments]
-        }
-
-        if post.status == PostLiterals.PUBLIC:
-            return JSONResponse(content=content, status_code=200)
-
-        if post.user != user:
-            return JSONResponse(content={
-                'message': 'You are not authorized to view this post'
-            }, status_code=401)
-        
-        return JSONResponse(content=content, status_code=200)
+    return await comment_service.get_post_comments(post_id, user_id)
