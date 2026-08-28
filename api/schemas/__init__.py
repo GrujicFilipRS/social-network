@@ -1,6 +1,7 @@
 from .comment.comment_create_request import CommentCreateRequest
 from .comment.comment_dto import CommentDTO
 from .comment.comment_get_response import CommentGetResponse
+from .comment.comment_list_response import CommentListResponse
 from .follow.create_follow_request import FollowCreateRequest
 from .follow.follow_dto import FollowDTO
 from .follow.follow_get_response import FollowGetResponse
@@ -35,6 +36,7 @@ __all__ = [
     'CommentCreateRequest',
     'CommentDTO',
     'CommentGetResponse',
+    'CommentListResponse',
     'ExistsGetResponse',
     'FollowCreateRequest',
     'FollowDTO',

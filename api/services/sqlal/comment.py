@@ -3,14 +3,11 @@ from uuid import UUID
 
 from dishka import FromDishka
 from models import Comment, Post, User
-from schemas import CommentGetResponse, IntegerGetResponse
+from schemas import CommentGetResponse, CommentListResponse, IntegerGetResponse
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ..service_models import (
-    CommentServiceModel,
-    NotificationServiceModel,
-)
+from ..service_models import CommentServiceModel, NotificationServiceModel
 
 
 class CommentServiceSqlal(CommentServiceModel):
@@ -89,3 +86,16 @@ class CommentServiceSqlal(CommentServiceModel):
         )
         
         return IntegerGetResponse.ok(count)
+    
+    async def get_post_comments(self, post_id, user_id) -> CommentListResponse:
+        post = self.db_session.get(Post, post_id)
+                        
+        if not post:
+            return CommentListResponse.error('Post not found')
+                        
+        if post.status == 'PRIVATE' and (not user_id or post.user_id != user_id):
+            return CommentListResponse.error('Post not found')
+        
+        comments: list[Comment] = list(self.db_session.query(Comment).filter_by(Comment.post_id == post_id))
+        
+        return CommentListResponse.ok(comments)
