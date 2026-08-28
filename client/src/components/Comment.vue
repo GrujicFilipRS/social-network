@@ -72,7 +72,7 @@ const editComment = async () => {
     <ConfirmPopup />
     <div :id='commentId'>
         <div class='comment-header'>
-            <img :src='props.commentData.creator.pfp ?? "/default-pfp.png"' class='comment-pfp' />
+            <img :src='props.commentData.creator.pfp_src ?? "/default-pfp.png"' class='comment-pfp' />
             <p>{{ props.commentData.creator.name ?? props.commentData.creator.username }}</p>
             <p>{{ props.commentData.commented_at }}</p>
         </div>

@@ -96,6 +96,6 @@ class CommentServiceSqlal(CommentServiceModel):
         if post.status == 'PRIVATE' and (not user_id or post.user_id != user_id):
             return CommentListResponse.error('Post not found')
         
-        comments: list[Comment] = list(self.db_session.query(Comment).filter_by(Comment.post_id == post_id))
+        comments: list[Comment] = list(self.db_session.query(Comment).filter(Comment.post_id == post_id))
         
         return CommentListResponse.ok(comments)

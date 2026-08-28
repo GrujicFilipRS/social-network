@@ -16,6 +16,7 @@ import { type PostMiscResponse } from '../interfaces/PostMiscResponse.ts';
 import type { PostData } from '../interfaces/PostData';
 import { GetPostMiscData } from '../functions/GetPostMiscData.ts';
 import { type CommentsData } from '../interfaces/CommentsData.ts';
+import { GetPostComments } from '../functions/GetPostComments.ts';
 
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
@@ -131,6 +132,7 @@ const fetchPostData = async () => {
 
     photos.value = await GetPostPhotos(postId);
     postMiscData.value = await GetPostMiscData(postId);
+    comments.value = await GetPostComments(postId);
 
     await scrollToComment();
 };

@@ -27,6 +27,6 @@ class CommentDTO(BaseModel):
             body = comment.body,
             post_id = comment.post_id,
             comment_id = comment.comment_id,
-            creator = comment.creator,
+            creator = UserDTO.to_dto(comment.creator),
             commented_at = comment.commented_at
         )
