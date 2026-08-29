@@ -46,7 +46,6 @@ const confirm = useConfirm();
 
 const postData = ref<PostData | null>(null);
 const likeLoading = ref<boolean>(false);
-const postLiked = ref<boolean>(false);
 const commentInput = ref<string>('');
 const commentedLoading = ref<boolean>(false);
 const photos = ref<PhotoData[]>([]);
@@ -190,8 +189,8 @@ const pressLikeButton = async () => {
                 summary: message,
                 life: 3000
             }),
-            (value: boolean) => postLiked.value = value,
-            (value: boolean) => likeLoading.value = value
+            (value: boolean) => postMiscData.value!.liked_by_user = value,
+            (value: number) => postMiscData.value!.num_likes -= value
         );
     }
 }

@@ -63,10 +63,13 @@ const clickLikeButton = () => {
     if (likedByUser.value) {
         UnlikePost(
             postData.id,
-            () => {}, // No toast needed here
+            (message: string) => { toast.add({
+                severity: 'error',
+                summary: 'An error occured',
+                detail: message
+            })},
             (val: boolean) => likedByUser.value = val,
-            (val: boolean) => likeButtonLoading.value = val,
-            () => { numLikes.value -= 1 }
+            (val: number) => { numLikes.value -= val }
         );
     } else {
         LikePost(

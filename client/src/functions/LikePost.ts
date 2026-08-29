@@ -33,27 +33,32 @@ export const LikePost = async (
 
 export const UnlikePost = async (
     postId: string,
-    toastAdd: (message: string) => void,
+    errorToast: (message: string) => void,
     setLiked: (liked: boolean) => void,
-    setLoading: (loading: boolean) => void,
-    decrementLikes?: () => void
+    decrementLikes?: (_: number) => void
 ): Promise<boolean> => {
-    setLoading(true);
+    setLiked(false);
+    if (decrementLikes) decrementLikes(1);
 
-    return Fetch(`like/unlike_post/`, {
-        method: 'DELETE',
-        body: JSON.stringify({ post_id: postId })
-    })
+    return axios.delete(`like/unlike_post/${postId}`)
     .then(async res => {
-        if (res.status !== 200) {
-            const data = await res.json();
-            toastAdd(data.message);
+        const data: DTO = res.data;
+
+        if (!data.success) {
+            if (decrementLikes)
+                decrementLikes(-1);
+            setLiked(true);
+            errorToast(data.message ?? 'An error occured while unliking post. Please try again later');
             return false;
         }
 
-        setLiked(false);
-        if (decrementLikes) decrementLikes();
         return true;
     })
-    .finally(() => setLoading(false));
+    .catch(() => {
+        if (decrementLikes)
+            decrementLikes(-1);
+        setLiked(true);
+        errorToast('An error occured while unliking post. Please try again later');
+        return false;
+    });
 }
