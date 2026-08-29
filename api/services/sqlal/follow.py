@@ -35,9 +35,13 @@ class FollowServiceSqlal(FollowServiceModel):
         if exists:
             return FollowGetResponse.error('User already follows that user')
         
-        users_exist = self.db_session.query(User).filter(User.id == follower_id or User.id == followed_id).count() == 2
-        if not users_exist:
-            return FollowGetResponse.error('Users do not exist')
+        follower = self.db_session.get(User, follower_id)
+        if not follower:
+            return FollowGetResponse.error('Follower does not exist')
+        
+        followed = self.db_session.get(User, followed_id)
+        if not followed:
+            return FollowGetResponse.error('Followed user does not exist')
         
         follow = Follow(
             follower_id = follower_id,

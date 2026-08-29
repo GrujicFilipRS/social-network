@@ -5,7 +5,6 @@ from fastapi import APIRouter, Request
 from schemas import (
     DTO,
     ExistsGetResponse,
-    FollowCreateRequest,
     FollowGetResponse,
     UserGetResponse,
     UserListResponse,
@@ -31,13 +30,13 @@ async def get_follower(
     return await follow_service.get_follower_from_follow(follow_id)
 
 @router.post(
-    '/follow_user/',
+    '/follow_user/{to_follow_id}',
     response_model=FollowGetResponse
 )
 @inject
 async def follow_user(
     request: Request,
-    data: FollowCreateRequest,
+    to_follow_id: UUID,
     follow_service: FromDishka[FollowServiceModel],
     auth_service: FromDishka[AuthServiceModel],
     notification_service: FromDishka[NotificationServiceModel],
@@ -45,13 +44,13 @@ async def follow_user(
     user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
     
     if not user_id:
-        return DTO.error('Unauthorized')
+        return FollowGetResponse.error('Unauthorized')
     
-    follow_response = await follow_service.create_follow(user_id, data.to_follow_id)
+    follow_response = await follow_service.create_follow(user_id, to_follow_id)
     
     if follow_response.success and follow_response.follow:
         await notification_service.create_notification(
-            receiver_id=data.to_follow_id,
+            receiver_id=to_follow_id,
             sender_id=user_id,
             object_type='follow',
             object_id=follow_response.follow.id
@@ -61,13 +60,13 @@ async def follow_user(
 
 
 @router.delete(
-    '/unfollow_user/',
+    '/unfollow_user/{to_unfollow_id}',
     response_model=DTO
 )
 @inject
 async def unfollow_user(
     request: Request,
-    data: FollowCreateRequest,
+    to_unfollow_id: UUID,
     follow_service: FromDishka[FollowServiceModel],
     auth_service: FromDishka[AuthServiceModel]
 ):
@@ -76,7 +75,7 @@ async def unfollow_user(
     if not user_id:
         return DTO.error('Unauthorized')
     
-    return await follow_service.remove_follow(user_id, data.to_follow_id)
+    return await follow_service.remove_follow(user_id, to_unfollow_id)
 
 
 @router.get(
