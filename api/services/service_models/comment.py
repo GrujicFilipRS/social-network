@@ -1,7 +1,6 @@
 from abc import abstractmethod
 from uuid import UUID
 
-from dishka import FromDishka
 from schemas import CommentGetResponse, CommentListResponse, IntegerGetResponse
 
 from .notification import NotificationServiceModel
@@ -18,7 +17,7 @@ class CommentServiceModel:
         post_id: UUID,
         user_id: UUID,
         comment_id: UUID | None,
-        notification_service: FromDishka[NotificationServiceModel],
+        notification_service: NotificationServiceModel,
     ) -> CommentGetResponse: ...
     
     @abstractmethod

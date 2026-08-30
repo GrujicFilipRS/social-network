@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from dishka import FromDishka
 from models import Comment, Post, User
 from schemas import CommentGetResponse, CommentListResponse, IntegerGetResponse
 from sqlalchemy import func, select
@@ -31,7 +30,7 @@ class CommentServiceSqlal(CommentServiceModel):
         post_id: UUID,
         user_id: UUID,
         comment_id: UUID | None,
-        notification_service: FromDishka[NotificationServiceModel]
+        notification_service: NotificationServiceModel
     ) -> CommentGetResponse:
         user = self.db_session.get(User, user_id)
         if not user:
@@ -53,7 +52,7 @@ class CommentServiceSqlal(CommentServiceModel):
         comment = Comment(
             body=body,
             post_id=post.id,
-            user_id=user.id,
+            creator_id=user.id,
             comment_id=comment.id if comment else None,
             commented_at=datetime.now(timezone.utc)
         )
