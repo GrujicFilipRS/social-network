@@ -1,4 +1,5 @@
-import { Fetch } from '../api';
+import axios from 'axios';
+import { type CommentGetResponse } from '../interfaces/CommentGetResponse';
 
 export const CreateComment = async (
     postId: string,
@@ -10,25 +11,32 @@ export const CreateComment = async (
 ) => {
     setLoading(true);
 
-    Fetch('comment/post_comment/', {
-        method: 'POST',
-        body: JSON.stringify({
-            post_id: postId,
-            body: commentBody
-        })
-    }).then(async res => {
-        const status = res.status;
-        const data = await res.json();
-        if (status !== 201) {
-            toastAdd(data.message ?? 'Failed to post comment', 'error');
+    axios.post('comment/post_comment', {
+        body: commentBody,
+        comment_id: null,
+        post_id: postId
+    })
+    .then((res) => {
+        const data = res.data as CommentGetResponse;
+
+        if (!data.success || !data.comment) {
+            setLoading(false);
+            toastAdd(
+                data.message ?? 'There was an error while uploading comment',
+                'error'
+            );
             return;
         }
 
         clearCommentInput();
         toastAdd('Comment posted successfully', 'success');
     })
+    .catch(() => {
+        toastAdd('There was an error while uploading comment', 'error');
+        clearCommentInput();
+    })
     .finally(() => {
         setLoading(false);
         callback();
-    });
+    })
 }
