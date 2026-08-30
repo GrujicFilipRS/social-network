@@ -56,8 +56,9 @@ class CommentServiceSqlal(CommentServiceModel):
             comment_id=comment.id if comment else None,
             commented_at=datetime.now(timezone.utc)
         )
+        
         self.db_session.add(comment)
-        self.db_session.flush()
+        self.db_session.commit()
         
         if post.user_id != user.id:
             await notification_service.create_notification(

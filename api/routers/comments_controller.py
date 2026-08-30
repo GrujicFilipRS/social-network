@@ -5,7 +5,7 @@ from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from models import Comment
-from schemas import CommentCreateRequest, CommentGetResponse
+from schemas import CommentCreateRequest, CommentGetResponse, CommentListResponse
 from services.service_models import (
     AuthServiceModel,
     CommentServiceModel,
@@ -124,7 +124,10 @@ async def delete_comment(
         return JSONResponse(content={'message': 'Comment successfully deleted'}, status_code=200)
 
 
-@router.get('/get_post_comments/{post_id}')
+@router.get(
+    '/get_post_comments/{post_id}',
+    response_model=CommentListResponse
+)
 @inject
 async def get_post_comments(
     request: Request,
