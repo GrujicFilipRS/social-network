@@ -1,4 +1,5 @@
-import { Fetch } from '../api';
+import axios from 'axios';
+import type { DTO } from '../interfaces/DTO';
 
 export const DeleteComment = (
     commentId: string,
@@ -8,23 +9,22 @@ export const DeleteComment = (
 ) => {
     setLoading(true);
 
-    Fetch('comment/remove_comment/', {
-        method: 'DELETE',
-        body: JSON.stringify({ comment_id: commentId })
-    })
-    .then(async res => {
-        const statusCode = res.status;
-        const data = await res.json();
+    axios.delete(`comment/remove_comment/${commentId}`)
+    .then((res) => {
+        const data = res.data as DTO;
 
-        if (statusCode !== 200) {
-            toastAdd(data.message || 'Failed to delete comment', 'error');
+        if (!data.success) {
+            toastAdd(data.message ?? 'Failed to delete comment', 'error');
             return;
         }
 
         toastAdd('Comment deleted successfully', 'success');
     })
+    .catch(() => {
+        toastAdd('Failed to delete comment', 'error');
+    })
     .finally(() => {
         setLoading(false);
         callbackFetch();
-    });
+    })
 }
