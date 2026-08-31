@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from uuid import UUID
 
-from schemas import CommentGetResponse, CommentListResponse, IntegerGetResponse
+from schemas import DTO, CommentGetResponse, CommentListResponse, IntegerGetResponse
 
 from .notification import NotificationServiceModel
 
@@ -25,3 +25,6 @@ class CommentServiceModel:
     
     @abstractmethod
     async def get_post_comments(self, post_id: UUID, user_id: UUID | None) -> CommentListResponse: ...
+    
+    @abstractmethod
+    async def remove_comment(self, comment_id: UUID, user_id: UUID) -> DTO: ...

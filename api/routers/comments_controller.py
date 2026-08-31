@@ -5,7 +5,7 @@ from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from models import Comment
-from schemas import CommentCreateRequest, CommentGetResponse, CommentListResponse
+from schemas import DTO, CommentCreateRequest, CommentGetResponse, CommentListResponse
 from services.service_models import (
     AuthServiceModel,
     CommentServiceModel,
@@ -95,33 +95,23 @@ async def edit_comment(
         
     return JSONResponse(content={'message': 'Successfully edited comment'}, status_code=200)
 
-@router.delete('/remove_comment/')
+@router.delete(
+    '/remove_comment/{comment_id}',
+    response_model=DTO
+)
 @inject
 async def delete_comment(
     request: Request,
-    auth_service: FromDishka[AuthServiceModel]
+    comment_id: UUID,
+    auth_service: FromDishka[AuthServiceModel],
+    comment_service: FromDishka[CommentServiceModel]
 ) -> JSONResponse:
-    user = auth_service.get_user_from_token(request.cookies.get(auth_service.auth_token_name))
+    user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
 
-    with DBSessionManager() as db_sess:
-        data = await request.json()
-        try:
-            comment_id = UUID(data.get('comment_id'))
-        except ValueError:
-            return JSONResponse(content={'message': 'Invalid comment_id'}, status_code=400)
-
-        comment: Comment | None = db_sess.get(Comment, comment_id)
-
-        if comment is None:
-            return JSONResponse(content={'message': 'Comment not found'}, status_code=404)
-
-        if comment.creator != user:
-            return JSONResponse(content={'message': 'You are not authorized to delete this comment'}, status_code=401)
-        
-        db_sess.delete(comment)
-        db_sess.commit()
-
-        return JSONResponse(content={'message': 'Comment successfully deleted'}, status_code=200)
+    if not user_id:
+        return DTO.error('Unauthorized')
+    
+    return await comment_service.remove_comment(comment_id, user_id)
 
 
 @router.get(

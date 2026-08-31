@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from models import Comment, Post, User
-from schemas import CommentGetResponse, CommentListResponse, IntegerGetResponse
+from schemas import DTO, CommentGetResponse, CommentListResponse, IntegerGetResponse
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -99,3 +99,20 @@ class CommentServiceSqlal(CommentServiceModel):
         comments: list[Comment] = list(self.db_session.query(Comment).filter(Comment.post_id == post_id))
         
         return CommentListResponse.ok(comments)
+    
+    async def remove_comment(self, comment_id, user_id) -> DTO:
+        comment = self.db_session.get(Comment, comment_id)
+        
+        if not comment:
+            return DTO.error('Comment not found')
+        
+        if comment.post.status == 'PRIVATE' and (not user_id or comment.post.user_id != user_id):
+            return DTO.error('Comment not found')
+        
+        if comment.creator_id != user_id:
+            return DTO.error('Unauthorized')
+        
+        self.db_session.delete(comment)
+        self.db_session.commit()
+        
+        return DTO.ok()

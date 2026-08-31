@@ -32,7 +32,7 @@ class Comment(SqlAlchemyBase):
     )
     comment_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID,
-        ForeignKey('comments.id'),
+        ForeignKey('comments.id', ondelete='CASCADE'),
         nullable=True
     )
     creator_id: Mapped[uuid.UUID] = mapped_column(
