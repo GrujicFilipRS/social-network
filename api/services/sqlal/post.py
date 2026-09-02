@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from utils import PhotoVerificationMethods
 
 from ..service_models import PostServiceModel
+from .notification import NotificationServiceSqlal
 
 
 class PostServiceSqlal(PostServiceModel):
@@ -18,6 +19,7 @@ class PostServiceSqlal(PostServiceModel):
     ):
         self.db_session = db_session
         self.upload_service = upload_service
+        self.notification_service = NotificationServiceSqlal(db_session)
     
     async def get_post(self, post_id: UUID, user_id: UUID | None) -> PostGetResponse:
         post = self.db_session.get(Post, post_id)
@@ -89,6 +91,15 @@ class PostServiceSqlal(PostServiceModel):
             self.db_session.flush()
         
         self.db_session.commit()
+        
+        for follower in user.followers:
+            await self.notification_service.create_notification(
+                receiver_id=follower.follower_id,
+                sender_id=user.id,
+                object_type='post',
+                object_id=post.id
+            )
+        
         return PostGetResponse.ok(post)
 
     async def edit_post(self, post_id, user_id, title, body, status) -> DTO:

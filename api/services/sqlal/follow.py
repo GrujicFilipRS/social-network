@@ -12,11 +12,13 @@ from schemas import (
 from sqlalchemy.orm import Session
 
 from ..service_models import FollowServiceModel
+from .notification import NotificationServiceSqlal
 
 
 class FollowServiceSqlal(FollowServiceModel):
     def __init__(self, db_session: Session):
         self.db_session = db_session
+        self.notification_service = NotificationServiceSqlal(db_session)
         
     async def exists(self, follower_id: UUID, followed_id: UUID) -> ExistsGetResponse:
         exists = self.db_session.query(Follow).filter_by(
@@ -51,6 +53,13 @@ class FollowServiceSqlal(FollowServiceModel):
         
         self.db_session.add(follow)
         self.db_session.commit()
+        
+        await self.notification_service.create_notification(
+            receiver_id=followed_id,
+            sender_id=follower_id,
+            object_type='follow',
+            object_id=follow.id
+        )
         
         return FollowGetResponse.ok(follow)
     

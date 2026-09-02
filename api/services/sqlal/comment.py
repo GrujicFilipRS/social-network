@@ -6,12 +6,14 @@ from schemas import DTO, CommentGetResponse, CommentListResponse, IntegerGetResp
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ..service_models import CommentServiceModel, NotificationServiceModel
+from ..service_models import CommentServiceModel
+from .notification import NotificationServiceSqlal
 
 
 class CommentServiceSqlal(CommentServiceModel):
     def __init__(self, db_sess: Session):
         self.db_session = db_sess
+        self.notification_service = NotificationServiceSqlal(db_sess)
     
     async def get_comment(self, comment_id, user_id) -> CommentGetResponse:
         comment = self.db_session.get(Comment, comment_id)
@@ -29,8 +31,7 @@ class CommentServiceSqlal(CommentServiceModel):
         body: str,
         post_id: UUID,
         user_id: UUID,
-        comment_id: UUID | None,
-        notification_service: NotificationServiceModel
+        comment_id: UUID | None
     ) -> CommentGetResponse:
         user = self.db_session.get(User, user_id)
         if not user:
@@ -61,7 +62,7 @@ class CommentServiceSqlal(CommentServiceModel):
         self.db_session.commit()
         
         if post.user_id != user.id:
-            await notification_service.create_notification(
+            await self.notification_service.create_notification(
                 receiver_id=post.user_id,
                 sender_id=user.id,
                 object_type='comment',

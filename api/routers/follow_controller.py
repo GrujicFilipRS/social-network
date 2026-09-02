@@ -12,7 +12,6 @@ from schemas import (
 from services.service_models import (
     AuthServiceModel,
     FollowServiceModel,
-    NotificationServiceModel,
 )
 
 router = APIRouter()
@@ -39,7 +38,6 @@ async def follow_user(
     to_follow_id: UUID,
     follow_service: FromDishka[FollowServiceModel],
     auth_service: FromDishka[AuthServiceModel],
-    notification_service: FromDishka[NotificationServiceModel],
 ):
     user_id = auth_service.decode_token(request.cookies.get(auth_service.auth_token_name))
     
@@ -47,14 +45,6 @@ async def follow_user(
         return FollowGetResponse.error('Unauthorized')
     
     follow_response = await follow_service.create_follow(user_id, to_follow_id)
-    
-    if follow_response.success and follow_response.follow:
-        await notification_service.create_notification(
-            receiver_id=to_follow_id,
-            sender_id=user_id,
-            object_type='follow',
-            object_id=follow_response.follow.id
-        )
     
     return follow_response
 
