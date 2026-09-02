@@ -31,7 +31,9 @@ const router = useRouter();
 
 const currentUserId = ref<string>('');
 
-await verifyUser().catch((_: UserUnverifiedError) => router.push('/'));
+await verifyUser()
+    .then((user) => currentUserId.value = user.id)
+    .catch((_: UserUnverifiedError) => router.push('/'));
 
 const route = useRoute();
 
