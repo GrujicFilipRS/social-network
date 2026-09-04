@@ -1,5 +1,7 @@
 import type { Router } from 'vue-router';
-import { Fetch } from '../api';
+import type { DTO } from '../interfaces/DTO';
+
+import axios from 'axios';
 
 export const DeletePost = async (
     postId: string,
@@ -9,22 +11,19 @@ export const DeletePost = async (
 ) => {
     setLoading(true);
 
-    Fetch(`post/delete_post/`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ post_id: postId })
-    })
-    .then(async res => {
-        const data = await res.json();
+    axios.delete(`post/delete_post/${postId}`)
+    .then((res) => {
+        const data = res.data as DTO;
 
-        if (!res.ok) {
-            showErrorToast(data.message);
+        if (!data.success) {
+            showErrorToast(data.message ?? 'Failed to delete post');
             return;
         }
 
         router.push('/profile');
     })
-    .then(() => setLoading(false));
+    .catch(() => {
+        showErrorToast('Failed to delete post');
+    })
+    .finally(() => setLoading(false));
 }
