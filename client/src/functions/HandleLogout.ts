@@ -1,11 +1,11 @@
 import type { Router } from 'vue-router';
-import { Fetch } from '../api';
+import axios from 'axios';
 
 export const HandleLogout = (
     router: Router,
     turnOffHeader: () => void
 ) => {
-    Fetch('user/logout/', { method: 'POST' })
+    axios.post('user/logout/')
     .then(() => {
         turnOffHeader();
         router.push('/join');
