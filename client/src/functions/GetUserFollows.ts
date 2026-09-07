@@ -1,11 +1,10 @@
-import { Fetch } from '../api'
-import type { FollowsData } from '../interfaces/FollowData';
+import type { UserListResponse } from '../interfaces/UserListResponse';
+import axios from 'axios';
 
 export const GetUserFollows = async (userId: string) => {
-    return Fetch(`follow/get_user_follows/?user_id=${userId}`)
+    return axios.get(`follow/get_user_follows/${userId}`)
     .then(async (res) => {
-        if (!res.ok) return res;
-        
-        return (await res.json() as FollowsData);
+        const data = res.data as UserListResponse;
+        return data;
     });
 }

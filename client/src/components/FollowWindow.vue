@@ -87,7 +87,7 @@ defineExpose({ showWindow });
                 @click='redirectToUser(user.username)'
             >
                 <Avatar
-                    :image='user.pfp ?? "/default-pfp.png"'
+                    :image='user.pfp_src ?? "/default-pfp.png"'
                     shape='circle'
                 />
 

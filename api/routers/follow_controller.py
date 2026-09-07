@@ -69,7 +69,7 @@ async def unfollow_user(
 
 
 @router.get(
-    '/get_user_follows/',
+    '/get_user_follows/{user_id}',
     response_model=UserListResponse
 )
 @inject
