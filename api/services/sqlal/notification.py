@@ -10,7 +10,6 @@ from .notification_model import NotificationModelServiceSqlal
 
 class NotificationServiceSqlal(NotificationServiceModel):
     def __init__(self, db_session: Session):
-        self.db_session = db_session
         self.notification_model_service = NotificationModelServiceSqlal(db_session)
 
     async def create_notification(
