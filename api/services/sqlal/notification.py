@@ -1,18 +1,17 @@
 from uuid import UUID
 
 from schemas import NotificationGetResponse
-from services.service_models import (
-    NotificationModelServiceModel,
-    NotificationServiceModel,
-)
+from services.service_models import NotificationServiceModel
 from sqlalchemy.orm import Session
 from utils import ConnectionController
 
+from .notification_model import NotificationModelServiceSqlal
+
 
 class NotificationServiceSqlal(NotificationServiceModel):
-    def __init__(self, db_session: Session, notification_model_service: NotificationModelServiceModel):
+    def __init__(self, db_session: Session):
         self.db_session = db_session
-        self.notification_model_service = notification_model_service
+        self.notification_model_service = NotificationModelServiceSqlal(db_session)
 
     async def create_notification(
         self,
